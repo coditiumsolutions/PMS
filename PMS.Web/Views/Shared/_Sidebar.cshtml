@@ -1,0 +1,16 @@
+<div class="sidebar">
+@if (ViewBag.ActiveModule == "Customers")
+{
+    <ul>
+        <li><a>Active Customers</a></li>
+        <li><a>Blocked Customers</a></li>
+        <li><a>Allotted Customers</a></li>
+        <li><a>Not Allotted Customers</a></li>
+        <li><a>Reports</a></li>
+    </ul>
+}
+else
+{
+    <p>Select a module</p>
+}
+</div>

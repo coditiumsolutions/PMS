@@ -1,0 +1,53 @@
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Top Bar 1 */
+.topbar-primary {
+    background-color: #0d6efd;
+    color: white;
+    padding: 12px 20px;
+    font-size: 18px;
+}
+
+/* Top Bar 2 */
+.topbar-secondary {
+    background-color: white;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.topbar-secondary a {
+    margin-right: 15px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Layout */
+.main-container {
+    display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 220px;
+    background-color: #f4f4f4;
+    padding: 15px;
+    min-height: calc(100vh - 120px);
+}
+
+/* Content */
+.content-area {
+    flex: 1;
+    padding: 20px;
+}
+
+/* Footer */
+.footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
