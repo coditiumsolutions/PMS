@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PMS</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    
+    <!-- Allow optional styles defined in views -->
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    @await Html.PartialAsync("_TopBar")
+    @await Html.PartialAsync("_SecondTopBar")
+    
+    <div class="main-container">
+        @await Html.PartialAsync("_Sidebar")
+        
+        <main class="content-area">
+            @RenderBody()
+        </main>
+    </div>
+    
+    @await Html.PartialAsync("_Footer")
+    
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

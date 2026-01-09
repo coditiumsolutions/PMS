@@ -1,0 +1,70 @@
+<!-- Dynamic Sidebar -->
+<aside class="sidebar" id="sidebar">
+    @if (ViewBag.ActiveModule == "Customers")
+    {
+        <ul class="sidebar-nav">
+            <li><a href="#">Active Customers</a></li>
+            <li><a href="#">Blocked Customers</a></li>
+            <li><a href="#">Allotted Customers</a></li>
+            <li><a href="#">Not Allotted Customers</a></li>
+            <li><a href="#">Reports</a></li>
+        </ul>
+    }
+    else if (ViewBag.ActiveModule == "Plots")
+    {
+        <ul class="sidebar-nav">
+            <li><a href="#">All Plots</a></li>
+            <li><a href="#">Available Plots</a></li>
+            <li><a href="#">Reserved Plots</a></li>
+            <li><a href="#">Sold Plots</a></li>
+            <li><a href="#">Plot Reports</a></li>
+        </ul>
+    }
+    else if (ViewBag.ActiveModule == "Payments")
+    {
+        <ul class="sidebar-nav">
+            <li><a href="#">Pending Payments</a></li>
+            <li><a href="#">Received Payments</a></li>
+            <li><a href="#">Payment History</a></li>
+            <li><a href="#">Payment Reports</a></li>
+        </ul>
+    }
+    else if (ViewBag.ActiveModule == "Schedules")
+    {
+        <ul class="sidebar-nav">
+            <li><a href="#">Payment Schedules</a></li>
+            <li><a href="#">Installment Plans</a></li>
+            <li><a href="#">Schedule Reports</a></li>
+        </ul>
+    }
+    else if (ViewBag.ActiveModule == "Transfers")
+    {
+        <ul class="sidebar-nav">
+            <li><a href="#">Plot Transfers</a></li>
+            <li><a href="#">Transfer Requests</a></li>
+            <li><a href="#">Transfer History</a></li>
+            <li><a href="#">Transfer Reports</a></li>
+        </ul>
+    }
+    else if (ViewBag.ActiveModule == "Setup")
+    {
+        <ul class="sidebar-nav">
+            <li><a href="#">System Settings</a></li>
+            <li><a href="#">User Management</a></li>
+            <li><a href="#">Configuration</a></li>
+            <li><a href="#">Backup & Restore</a></li>
+        </ul>
+    }
+    else
+    {
+        <ul class="sidebar-nav">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><a asp-controller="Customers" asp-action="Index">Customers</a></li>
+            <li><a asp-controller="Plots" asp-action="Index">Plots</a></li>
+            <li><a asp-controller="Payments" asp-action="Index">Payments</a></li>
+            <li><a asp-controller="Schedules" asp-action="Index">Schedules</a></li>
+            <li><a asp-controller="Transfers" asp-action="Index">Transfers</a></li>
+            <li><a asp-controller="Setup" asp-action="Index">Setup</a></li>
+        </ul>
+    }
+</aside>
