@@ -1,12 +1,116 @@
 @{
     ViewData["Title"] = "Plots Dashboard";
+    var categoryLabels = ViewBag.CategoryLabels as string ?? "[]";
+    var categoryCounts = ViewBag.CategoryCounts as string ?? "[]";
+    var statusLabels = ViewBag.StatusLabels as string ?? "[]";
+    var statusCounts = ViewBag.StatusCounts as string ?? "[]";
+    var projectLabels = ViewBag.ProjectLabels as string ?? "[]";
+    var projectCounts = ViewBag.ProjectCounts as string ?? "[]";
 }
 
-<h2>Plots Dashboard</h2>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Plots Dashboard</h2>
+    </div>
 
-<p>Plot dashboard overview and statistics.</p>
-
-<div class="info-box">
-    <p>This page will display plot dashboard metrics and overview.</p>
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Plots by Category</h5>
+                    <canvas id="plotsByCategoryChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Plots by Allotment Status</h5>
+                    <canvas id="plotsByStatusChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Plots by Project</h5>
+                    <canvas id="plotsByProjectChart" height="140"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const categoryLabels = @Html.Raw(categoryLabels);
+    const categoryCounts = @Html.Raw(categoryCounts);
+    const statusLabels = @Html.Raw(statusLabels);
+    const statusCounts = @Html.Raw(statusCounts);
+    const projectLabels = @Html.Raw(projectLabels);
+    const projectCounts = @Html.Raw(projectCounts);
+
+    if (categoryLabels.length > 0) {
+        new Chart(document.getElementById('plotsByCategoryChart'), {
+            type: 'bar',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    label: 'Plots',
+                    data: categoryCounts,
+                    backgroundColor: '#0d6efd'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    if (statusLabels.length > 0) {
+        new Chart(document.getElementById('plotsByStatusChart'), {
+            type: 'bar',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    label: 'Plots',
+                    data: statusCounts,
+                    backgroundColor: '#0d6efd'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    if (projectLabels.length > 0) {
+        new Chart(document.getElementById('plotsByProjectChart'), {
+            type: 'line',
+            data: {
+                labels: projectLabels,
+                datasets: [{
+                    label: 'Plots',
+                    data: projectCounts,
+                    borderColor: '#198754',
+                    backgroundColor: 'rgba(25, 135, 84, 0.15)',
+                    fill: true,
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+</script>
 

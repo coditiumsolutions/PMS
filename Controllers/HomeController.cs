@@ -51,10 +51,14 @@ public class HomeController : Controller
 
         // KPI Cards Data
         ViewBag.TotalCustomers = await _context.Customers.CountAsync();
-        ViewBag.TotalPlots = 0; // Placeholder - will be replaced when Plots model is added
-        ViewBag.TotalPaymentsCollected = 0m; // Placeholder - will be replaced when Payments model is added
-        ViewBag.PendingPayments = 0; // Placeholder - will be replaced when Payments model is added
-        ViewBag.ActiveAllotments = 0; // Placeholder - will be replaced when Allotments model is added
+        ViewBag.TotalPlots = await _context.InventoryDetails.CountAsync();
+
+        var payments = await _context.Payments.AsNoTracking().ToListAsync();
+        ViewBag.TotalPaymentsCollected = payments.Sum(p => ParseAmount(p.PaidAmount));
+        ViewBag.PendingPayments = payments.Count(p => string.IsNullOrWhiteSpace(p.PaidDate));
+        ViewBag.ActiveAllotments = await _context.InventoryDetails.CountAsync(p =>
+            p.AllotmentStatus != null &&
+            p.AllotmentStatus.Trim().ToLower() == "allotted");
         ViewBag.TransfersThisMonth = 0; // Placeholder - will be replaced when Transfers model is added
 
         // Recent Activity
@@ -65,24 +69,36 @@ public class HomeController : Controller
             .ToListAsync();
         ViewBag.RecentCustomers = recentCustomers;
 
-        // Financial Snapshot (Placeholders - will be replaced when Payments model is added)
-        ViewBag.TodaysCollection = 0m;
-        ViewBag.ThisMonthCollection = 0m;
+        // Financial Snapshot
+        ViewBag.TodaysCollection = payments
+            .Where(p => DateTime.TryParse(p.PaidDate, out var dt) && dt.Date == today)
+            .Sum(p => ParseAmount(p.PaidAmount));
+        ViewBag.ThisMonthCollection = payments
+            .Where(p => DateTime.TryParse(p.PaidDate, out var dt) && dt >= thisMonthStart && dt < thisMonthStart.AddMonths(1))
+            .Sum(p => ParseAmount(p.PaidAmount));
         ViewBag.OutstandingBalance = 0m;
 
         // Monthly Payments Trend (Last 6 months - Placeholder data structure)
-        var monthlyTrend = new List<MonthlyTrendData>();
+        var monthlyTrend = new List<object>();
         for (int i = 5; i >= 0; i--)
         {
             var monthStart = thisMonthStart.AddMonths(-i);
+            var monthEnd = monthStart.AddMonths(1);
             var monthName = monthStart.ToString("MMM yyyy");
-            monthlyTrend.Add(new MonthlyTrendData { Month = monthName, Amount = 0m });
+            var monthTotal = payments
+                .Where(p => DateTime.TryParse(p.PaidDate ?? p.CreatedOn, out var dt) && dt >= monthStart && dt < monthEnd)
+                .Sum(p => ParseAmount(p.PaidAmount));
+            monthlyTrend.Add(new { month = monthName, amount = monthTotal });
         }
         ViewBag.MonthlyPaymentsTrend = monthlyTrend;
 
-        // Sold vs Available Plots (Placeholder)
-        ViewBag.SoldPlots = 0;
-        ViewBag.AvailablePlots = 0;
+        // Sold vs Available Plots
+        ViewBag.SoldPlots = await _context.InventoryDetails.CountAsync(p =>
+            p.AllotmentStatus != null &&
+            p.AllotmentStatus.Trim().ToLower() == "allotted");
+        ViewBag.AvailablePlots = await _context.InventoryDetails.CountAsync(p =>
+            p.AllotmentStatus != null &&
+            p.AllotmentStatus.Trim().ToLower() == "available");
 
         // Alerts & Notifications (Placeholders - will be replaced when respective models are added)
         var alerts = new List<AlertData>();
@@ -95,6 +111,16 @@ public class HomeController : Controller
         ViewBag.Alerts = alerts;
 
         return View();
+    }
+
+    private static decimal ParseAmount(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return 0m;
+        }
+
+        return decimal.TryParse(value, out var amount) ? amount : 0m;
     }
 
     public IActionResult Privacy()

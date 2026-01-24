@@ -14,16 +14,48 @@ public class PlotsController : Controller
         _context = context;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         ViewBag.ActiveModule = "Plots";
+        await LoadDashboardData();
+        return View("Dashboard");
+    }
+
+    public async Task<IActionResult> Dashboard()
+    {
+        ViewBag.ActiveModule = "Plots";
+        await LoadDashboardData();
         return View();
     }
 
-    public IActionResult Dashboard()
+    private async Task LoadDashboardData()
     {
-        ViewBag.ActiveModule = "Plots";
-        return View();
+        var plots = await _context.InventoryDetails.AsNoTracking().ToListAsync();
+
+        var categoryGroups = plots
+            .GroupBy(p => string.IsNullOrWhiteSpace(p.Category) ? "Unknown" : p.Category.Trim())
+            .OrderByDescending(g => g.Count())
+            .Select(g => new { Label = g.Key, Count = g.Count() })
+            .ToList();
+
+        var statusGroups = plots
+            .GroupBy(p => string.IsNullOrWhiteSpace(p.AllotmentStatus) ? "Not Specified" : p.AllotmentStatus.Trim())
+            .OrderByDescending(g => g.Count())
+            .Select(g => new { Label = g.Key, Count = g.Count() })
+            .ToList();
+
+        var projectGroups = plots
+            .GroupBy(p => string.IsNullOrWhiteSpace(p.Project) ? "Unknown" : p.Project.Trim())
+            .OrderByDescending(g => g.Count())
+            .Select(g => new { Label = g.Key, Count = g.Count() })
+            .ToList();
+
+        ViewBag.CategoryLabels = System.Text.Json.JsonSerializer.Serialize(categoryGroups.Select(c => c.Label));
+        ViewBag.CategoryCounts = System.Text.Json.JsonSerializer.Serialize(categoryGroups.Select(c => c.Count));
+        ViewBag.StatusLabels = System.Text.Json.JsonSerializer.Serialize(statusGroups.Select(s => s.Label));
+        ViewBag.StatusCounts = System.Text.Json.JsonSerializer.Serialize(statusGroups.Select(s => s.Count));
+        ViewBag.ProjectLabels = System.Text.Json.JsonSerializer.Serialize(projectGroups.Select(p => p.Label));
+        ViewBag.ProjectCounts = System.Text.Json.JsonSerializer.Serialize(projectGroups.Select(p => p.Count));
     }
 
     // GET: Plots/Summary

@@ -13,10 +13,10 @@
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-4 col-lg-2">
             <a href="/Customers" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-primary">
+                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-primary text-white">
                     <div class="card-body text-center py-3">
                         <div class="kpi-icon mb-2">👥</div>
-                        <div class="text-muted small">Total Customers</div>
+                        <div class="kpi-label small">Total Customers</div>
                         <div class="fs-3 fw-bold">@ViewBag.TotalCustomers</div>
                     </div>
                 </div>
@@ -24,10 +24,10 @@
         </div>
         <div class="col-6 col-md-4 col-lg-2">
             <a href="/Plots" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-success">
+                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-success text-white">
                     <div class="card-body text-center py-3">
                         <div class="kpi-icon mb-2">🏘️</div>
-                        <div class="text-muted small">Total Plots</div>
+                        <div class="kpi-label small">Total Plots</div>
                         <div class="fs-3 fw-bold">@ViewBag.TotalPlots</div>
                     </div>
                 </div>
@@ -35,21 +35,10 @@
         </div>
         <div class="col-6 col-md-4 col-lg-2">
             <a href="/Payments" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-info">
-                    <div class="card-body text-center py-3">
-                        <div class="kpi-icon mb-2">💰</div>
-                        <div class="text-muted small">Payments Collected</div>
-                        <div class="fs-3 fw-bold">@string.Format("{0:C}", ViewBag.TotalPaymentsCollected)</div>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-6 col-md-4 col-lg-2">
-            <a href="/Payments" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-warning">
+                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-warning text-white">
                     <div class="card-body text-center py-3">
                         <div class="kpi-icon mb-2">⏳</div>
-                        <div class="text-muted small">Pending Payments</div>
+                        <div class="kpi-label small">Pending Payments</div>
                         <div class="fs-3 fw-bold">@ViewBag.PendingPayments</div>
                     </div>
                 </div>
@@ -57,10 +46,10 @@
         </div>
         <div class="col-6 col-md-4 col-lg-2">
             <a href="/Plots" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-secondary">
+                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-secondary text-white">
                     <div class="card-body text-center py-3">
                         <div class="kpi-icon mb-2">✅</div>
-                        <div class="text-muted small">Active Allotments</div>
+                        <div class="kpi-label small">Active Allotments</div>
                         <div class="fs-3 fw-bold">@ViewBag.ActiveAllotments</div>
                     </div>
                 </div>
@@ -68,10 +57,10 @@
         </div>
         <div class="col-6 col-md-4 col-lg-2">
             <a href="/Transfers" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-danger">
+                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-danger text-white">
                     <div class="card-body text-center py-3">
                         <div class="kpi-icon mb-2">🔄</div>
-                        <div class="text-muted small">Transfers This Month</div>
+                        <div class="kpi-label small">Transfers This Month</div>
                         <div class="fs-3 fw-bold">@ViewBag.TransfersThisMonth</div>
                     </div>
                 </div>
@@ -315,22 +304,25 @@
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
         }
         .kpi-card-primary {
-            border-left: 4px solid #0d6efd;
+            background: linear-gradient(135deg, #0d6efd 0%, #6ea8fe 100%);
         }
         .kpi-card-success {
-            border-left: 4px solid #198754;
+            background: linear-gradient(135deg, #198754 0%, #34d399 100%);
         }
         .kpi-card-info {
-            border-left: 4px solid #0dcaf0;
+            background: linear-gradient(135deg, #0dcaf0 0%, #7dd3fc 100%);
         }
         .kpi-card-warning {
-            border-left: 4px solid #ffc107;
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
         }
         .kpi-card-secondary {
-            border-left: 4px solid #6c757d;
+            background: linear-gradient(135deg, #6c757d 0%, #94a3b8 100%);
         }
         .kpi-card-danger {
-            border-left: 4px solid #dc3545;
+            background: linear-gradient(135deg, #dc3545 0%, #f87171 100%);
+        }
+        .kpi-label {
+            color: rgba(255, 255, 255, 0.85);
         }
         .kpi-icon {
             font-size: 2rem;

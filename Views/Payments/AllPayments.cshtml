@@ -52,10 +52,13 @@
                                 <th scope="col">Paid Amount</th>
                                 <th scope="col">Paid Date</th>
                                 <th scope="col">Method</th>
-                                <th scope="col">DS No</th>
                                 <th scope="col">Bank</th>
-                                <th scope="col">DD/Po No</th>
-                                <th scope="col">Inst No</th>
+                                <th scope="col">Created By</th>
+                                <th scope="col">DS No</th>
+                                <th scope="col">DS Date</th>
+                                
+                                <th scope="col">Install No</th>
+                                
                             </tr>
                         </thead>
                         <tbody>
@@ -66,10 +69,13 @@
                                     <td>@Html.DisplayFor(modelItem => item.PaidAmount)</td>
                                     <td>@Html.DisplayFor(modelItem => item.PaidDate)</td>
                                     <td>@Html.DisplayFor(modelItem => item.Method)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.DepsoiteSlipNo)</td>
                                     <td>@Html.DisplayFor(modelItem => item.BankName)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.DD_PoNo)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.InstallmentNo)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.CreatedBy)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.DSNo)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.DSDate)</td>
+                                    
+                                    <td>@Html.DisplayFor(modelItem => item.InstallNo)</td>
+                                    
                                 </tr>
                             }
                         </tbody>

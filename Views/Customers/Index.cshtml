@@ -20,56 +20,56 @@
     <!-- KPI Cards -->
     <div class="row g-3 mb-4">
         <div class="col-md-3 col-sm-6">
-            <div class="card shadow-sm border-primary h-100">
+            <div class="card shadow-sm border-0 h-100 kpi-bg-primary text-white">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">Total Customers</h6>
-                            <h3 class="mb-0 text-primary">@Model.KPIs.TotalCustomers</h3>
+                            <h6 class="kpi-label mb-1">Total Customers</h6>
+                            <h3 class="mb-0 text-white">@Model.KPIs.TotalCustomers</h3>
                         </div>
-                        <div class="text-primary" style="font-size: 2.5rem;">👥</div>
+                        <div class="text-white" style="font-size: 2.5rem;">👥</div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
-            <div class="card shadow-sm border-success h-100">
+            <div class="card shadow-sm border-0 h-100 kpi-bg-success text-white">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">New This Month</h6>
-                            <h3 class="mb-0 text-success">@Model.KPIs.NewThisMonth</h3>
-                            <small class="text-muted">@(Model.GrowthAnalysis.GrowthRateThisMonth.ToString("F1"))% growth</small>
+                            <h6 class="kpi-label mb-1">New This Month</h6>
+                            <h3 class="mb-0 text-white">@Model.KPIs.NewThisMonth</h3>
+                            <small class="kpi-subtext">@(Model.GrowthAnalysis.GrowthRateThisMonth.ToString("F1"))% growth</small>
                         </div>
-                        <div class="text-success" style="font-size: 2.5rem;">📈</div>
+                        <div class="text-white" style="font-size: 2.5rem;">📈</div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
-            <div class="card shadow-sm border-info h-100">
+            <div class="card shadow-sm border-0 h-100 kpi-bg-info text-white">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">Active Cities</h6>
-                            <h3 class="mb-0 text-info">@Model.KPIs.ActiveCities</h3>
-                            <small class="text-muted">@Model.KPIs.ActiveCountries countries</small>
+                            <h6 class="kpi-label mb-1">Active Cities</h6>
+                            <h3 class="mb-0 text-white">@Model.KPIs.ActiveCities</h3>
+                            <small class="kpi-subtext">@Model.KPIs.ActiveCountries countries</small>
                         </div>
-                        <div class="text-info" style="font-size: 2.5rem;">🌍</div>
+                        <div class="text-white" style="font-size: 2.5rem;">🌍</div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
-            <div class="card shadow-sm border-warning h-100">
+            <div class="card shadow-sm border-0 h-100 kpi-bg-warning text-white">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">Data Quality</h6>
-                            <h3 class="mb-0 text-warning">@(Model.DataQuality.DataCompletenessPercentage.ToString("F1"))%</h3>
-                            <small class="text-muted">Completeness</small>
+                            <h6 class="kpi-label mb-1">Data Quality</h6>
+                            <h3 class="mb-0 text-white">@(Model.DataQuality.DataCompletenessPercentage.ToString("F1"))%</h3>
+                            <small class="kpi-subtext">Completeness</small>
                         </div>
-                        <div class="text-warning" style="font-size: 2.5rem;">✅</div>
+                        <div class="text-white" style="font-size: 2.5rem;">✅</div>
                     </div>
                 </div>
             </div>
@@ -706,4 +706,27 @@
             initCharts();
         });
     </script>
+}
+
+@section Styles {
+    <style>
+        .kpi-bg-primary {
+            background: linear-gradient(135deg, #0d6efd 0%, #6ea8fe 100%);
+        }
+        .kpi-bg-success {
+            background: linear-gradient(135deg, #198754 0%, #34d399 100%);
+        }
+        .kpi-bg-info {
+            background: linear-gradient(135deg, #0dcaf0 0%, #7dd3fc 100%);
+        }
+        .kpi-bg-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+        }
+        .kpi-label {
+            color: rgba(255, 255, 255, 0.85);
+        }
+        .kpi-subtext {
+            color: rgba(255, 255, 255, 0.75);
+        }
+    </style>
 }

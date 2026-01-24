@@ -14,16 +14,58 @@ public class PaymentsController : Controller
         _context = context;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         ViewBag.ActiveModule = "Payments";
+        await LoadDashboardData();
+        return View("Dashboard");
+    }
+
+    public async Task<IActionResult> Dashboard()
+    {
+        ViewBag.ActiveModule = "Payments";
+        await LoadDashboardData();
         return View();
     }
 
-    public IActionResult Dashboard()
+    private async Task LoadDashboardData()
     {
-        ViewBag.ActiveModule = "Payments";
-        return View();
+        var payments = await _context.Payments.AsNoTracking().ToListAsync();
+
+        var methodGroups = payments
+            .GroupBy(p => string.IsNullOrWhiteSpace(p.Method) ? "Unknown" : p.Method.Trim())
+            .OrderBy(g => g.Key)
+            .Select(g => new { Method = g.Key, Count = g.Count() })
+            .ToList();
+
+        var monthlyTotals = payments
+            .Select(p =>
+            {
+                var dateText = p.PaidDate ?? p.CreatedOn;
+                return DateTime.TryParse(dateText, out var dt)
+                    ? new { Month = dt.ToString("yyyy-MM"), Amount = ParseAmount(p.PaidAmount) }
+                    : null;
+            })
+            .Where(x => x != null)
+            .GroupBy(x => x!.Month)
+            .OrderBy(g => g.Key)
+            .Select(g => new { Month = g.Key, Total = g.Sum(v => v!.Amount) })
+            .ToList();
+
+        ViewBag.MethodLabels = System.Text.Json.JsonSerializer.Serialize(methodGroups.Select(m => m.Method));
+        ViewBag.MethodCounts = System.Text.Json.JsonSerializer.Serialize(methodGroups.Select(m => m.Count));
+        ViewBag.MonthLabels = System.Text.Json.JsonSerializer.Serialize(monthlyTotals.Select(m => m.Month));
+        ViewBag.MonthTotals = System.Text.Json.JsonSerializer.Serialize(monthlyTotals.Select(m => m.Total));
+    }
+
+    private static decimal ParseAmount(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return 0m;
+        }
+
+        return decimal.TryParse(value, out var amount) ? amount : 0m;
     }
 
     public IActionResult Details()

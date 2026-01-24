@@ -18,10 +18,6 @@ public class Payment
     [StringLength(255)]
     public string? PaidAmount { get; set; }
 
-    [Display(Name = "Payment Date")]
-    [StringLength(60)]
-    public string? PaymentDate { get; set; }
-
     [Display(Name = "Paid Date")]
     [StringLength(60)]
     public string? PaidDate { get; set; }
@@ -30,35 +26,47 @@ public class Payment
     [StringLength(60)]
     public string? Method { get; set; }
 
-    [Display(Name = "Deposit Slip No")]
-    [StringLength(50)]
-    public string DepsoiteSlipNo { get; set; } = string.Empty;
-
     [Display(Name = "Bank Name")]
     [StringLength(50)]
     public string BankName { get; set; } = string.Empty;
 
-    [Display(Name = "DD/Po No")]
-    [StringLength(50)]
-    public string? DD_PoNo { get; set; }
-
-    [Display(Name = "Installment No")]
-    [StringLength(50)]
-    public string InstallmentNo { get; set; } = string.Empty;
-
-    [Display(Name = "Payment For")]
-    [StringLength(100)]
-    public string PaymentFor { get; set; } = string.Empty;
-
-    [Display(Name = "Description")]
-    [StringLength(500)]
-    public string? Description { get; set; }
-
-    [Display(Name = "Created At")]
-    [StringLength(60)]
-    public string CreatedAt { get; set; } = string.Empty;
-
     [Display(Name = "Created By")]
     [StringLength(100)]
     public string? CreatedBy { get; set; }
+
+    [Display(Name = "DS No")]
+    [StringLength(50)]
+    public string? DSNo { get; set; }
+
+    [Display(Name = "DS Date")]
+    [StringLength(60)]
+    public string? DSDate { get; set; }
+
+    [Display(Name = "DD No")]
+    [StringLength(50)]
+    public string? DDNo { get; set; }
+
+    [Display(Name = "DD Date")]
+    [StringLength(60)]
+    public string? DDDate { get; set; }
+
+    [Display(Name = "Cheque No")]
+    [StringLength(50)]
+    public string? ChequeNo { get; set; }
+
+    [Display(Name = "Cheque Date")]
+    [StringLength(60)]
+    public string? ChequeDate { get; set; }
+
+    [Display(Name = "Install No")]
+    [StringLength(50)]
+    public string? InstallNo { get; set; }
+
+    [Display(Name = "Payment Description")]
+    [StringLength(500)]
+    public string? PaymentDescription { get; set; }
+
+    [Display(Name = "Created On")]
+    [StringLength(60)]
+    public string CreatedOn { get; set; } = string.Empty;
 }

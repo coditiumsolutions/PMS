@@ -1,12 +1,84 @@
 @{
     ViewData["Title"] = "Payments Dashboard";
+    var methodLabels = ViewBag.MethodLabels as string ?? "[]";
+    var methodCounts = ViewBag.MethodCounts as string ?? "[]";
+    var monthLabels = ViewBag.MonthLabels as string ?? "[]";
+    var monthTotals = ViewBag.MonthTotals as string ?? "[]";
 }
 
-<h2>Payments Dashboard</h2>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Payments Dashboard</h2>
+    </div>
 
-<p>Payment dashboard overview and statistics.</p>
-
-<div class="info-box">
-    <p>This page will display payment dashboard metrics and overview.</p>
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Payments by Method</h5>
+                    <canvas id="paymentsByMethodChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Monthly Paid Amount</h5>
+                    <canvas id="monthlyPaidChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const methodLabels = @Html.Raw(methodLabels);
+    const methodCounts = @Html.Raw(methodCounts);
+    const monthLabels = @Html.Raw(monthLabels);
+    const monthTotals = @Html.Raw(monthTotals);
+
+    if (methodLabels.length > 0) {
+        new Chart(document.getElementById('paymentsByMethodChart'), {
+            type: 'bar',
+            data: {
+                labels: methodLabels,
+                datasets: [{
+                    label: 'Payments',
+                    data: methodCounts,
+                    backgroundColor: '#0d6efd'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    if (monthLabels.length > 0) {
+        new Chart(document.getElementById('monthlyPaidChart'), {
+            type: 'line',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: 'Total Paid',
+                    data: monthTotals,
+                    borderColor: '#198754',
+                    backgroundColor: 'rgba(25, 135, 84, 0.15)',
+                    fill: true,
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+</script>
 
