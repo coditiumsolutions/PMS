@@ -1,0 +1,172 @@
+@model PMS.Web.Models.Customer
+
+@{
+    ViewData["Title"] = "Create Customer";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Create Customer</h2>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <!-- Personal Information Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Personal Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="CustomerNo" class="form-label fw-semibold"></label>
+                                        <input asp-for="CustomerNo" class="form-control" />
+                                        <span asp-validation-for="CustomerNo" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="CreationDate" class="form-label fw-semibold"></label>
+                                        <input asp-for="CreationDate" type="date" class="form-control" />
+                                        <span asp-validation-for="CreationDate" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="FullName" class="form-label fw-semibold"></label>
+                                        <input asp-for="FullName" class="form-control" />
+                                        <span asp-validation-for="FullName" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="FatherName" class="form-label fw-semibold"></label>
+                                        <input asp-for="FatherName" class="form-control" />
+                                        <span asp-validation-for="FatherName" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Cnic" class="form-label fw-semibold"></label>
+                                        <input asp-for="Cnic" class="form-control" />
+                                        <span asp-validation-for="Cnic" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Gender" class="form-label fw-semibold"></label>
+                                        <select asp-for="Gender" class="form-select">
+                                            <option value="">Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                        <span asp-validation-for="Gender" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">Contact Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="ContactNo" class="form-label fw-semibold"></label>
+                                        <input asp-for="ContactNo" class="form-control" />
+                                        <span asp-validation-for="ContactNo" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Email" class="form-label fw-semibold"></label>
+                                        <input asp-for="Email" type="email" class="form-control" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Address Information Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">Address Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="text-muted mb-3">Present Address</h6>
+                                <div class="mb-3">
+                                    <label asp-for="PresAddress" class="form-label fw-semibold"></label>
+                                    <textarea asp-for="PresAddress" class="form-control" rows="3"></textarea>
+                                    <span asp-validation-for="PresAddress" class="text-danger"></span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="PresCity" class="form-label fw-semibold"></label>
+                                        <input asp-for="PresCity" class="form-control" />
+                                        <span asp-validation-for="PresCity" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="PresCountry" class="form-label fw-semibold"></label>
+                                        <input asp-for="PresCountry" class="form-control" />
+                                        <span asp-validation-for="PresCountry" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4" />
+
+                                <h6 class="text-muted mb-3">Permanent Address</h6>
+                                <div class="mb-3">
+                                    <label asp-for="PremAddress" class="form-label fw-semibold"></label>
+                                    <textarea asp-for="PremAddress" class="form-control" rows="3"></textarea>
+                                    <span asp-validation-for="PremAddress" class="text-danger"></span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="PremCity" class="form-label fw-semibold"></label>
+                                        <input asp-for="PremCity" class="form-control" />
+                                        <span asp-validation-for="PremCity" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="PremCountry" class="form-label fw-semibold"></label>
+                                        <input asp-for="PremCountry" class="form-control" />
+                                        <span asp-validation-for="PremCountry" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">Additional Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="CreatedBy" class="form-label fw-semibold"></label>
+                                        <input asp-for="CreatedBy" class="form-control" />
+                                        <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <input type="submit" value="Create Customer" class="btn btn-primary btn-lg" />
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

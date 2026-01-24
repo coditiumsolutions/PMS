@@ -1,0 +1,379 @@
+@model System.Data.DataTable
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Customers Dashboard";
+    var projectSummary = ViewBag.CustomersByProject as List<KeyValuePair<string, int>> ?? new();
+    var citySummary = ViewBag.CustomersByCity as List<KeyValuePair<string, int>> ?? new();
+    var projectLabels = projectSummary.Select(p => p.Key).ToArray();
+    var projectValues = projectSummary.Select(p => p.Value).ToArray();
+    var cityLabels = citySummary.Select(p => p.Key).ToArray();
+    var cityValues = citySummary.Select(p => p.Value).ToArray();
+    var monthlyTrend = ViewBag.MonthlyTrend as List<KeyValuePair<string, int>> ?? new();
+    var monthlyLabels = monthlyTrend.Select(p => p.Key).ToArray();
+    var monthlyValues = monthlyTrend.Select(p => p.Value).ToArray();
+}
+
+<div class="container-fluid">
+    <h2 class="mb-4">Customers Dashboard</h2>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Customers</h6>
+                            <h3 class="mb-0 text-primary">@ViewBag.TotalCustomers</h3>
+                        </div>
+                        <div class="text-primary" style="font-size: 2.5rem;">
+                            👥
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">This Month</h6>
+                            <h3 class="mb-0 text-success">@ViewBag.ThisMonthCustomers</h3>
+                        </div>
+                        <div class="text-success" style="font-size: 2.5rem;">
+                            📅
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Last 30 Days</h6>
+                            <h3 class="mb-0 text-info">@ViewBag.RecentCustomers</h3>
+                        </div>
+                        <div class="text-info" style="font-size: 2.5rem;">
+                            ⏱️
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Projects</h6>
+                            <h3 class="mb-0 text-warning">@projectSummary.Count</h3>
+                        </div>
+                        <div class="text-warning" style="font-size: 2.5rem;">
+                            📁
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+        <!-- Gender Distribution Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Customers by Gender</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="genderChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project-wise Customers Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Customers by Project</h5>
+                </div>
+                <div class="card-body">
+                    @if (projectSummary.Any())
+                    {
+                        <canvas id="projectChart" style="max-height: 300px;"></canvas>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-5">No project data available</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Charts Row -->
+    <div class="row">
+        <!-- City Distribution Chart -->
+        @if (citySummary.Any())
+        {
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Top 10 Cities</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="cityChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Monthly Trend Chart -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Monthly Registration Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="monthlyChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        (function () {
+            // Gender Chart
+            const genderCtx = document.getElementById('genderChart');
+            if (genderCtx) {
+                const totalMale = @ViewBag.MaleCustomers ?? 0;
+                const totalFemale = @ViewBag.FemaleCustomers ?? 0;
+                const totalOther = @ViewBag.OtherGenderCustomers ?? 0;
+
+                new Chart(genderCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Male', 'Female', 'Other/Not Specified'],
+                        datasets: [{
+                            data: [totalMale, totalFemale, totalOther],
+                            backgroundColor: ['#0d6efd', '#dc3545', '#6c757d'],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { 
+                                position: 'bottom',
+                                labels: {
+                                    padding: 15,
+                                    font: { size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Project Chart
+            const projectCtx = document.getElementById('projectChart');
+            if (projectCtx && @(projectSummary.Any() ? "true" : "false")) {
+                const projectLabels = @Html.Raw(JsonSerializer.Serialize(projectLabels));
+                const projectValues = @Html.Raw(JsonSerializer.Serialize(projectValues));
+
+                new Chart(projectCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: projectLabels,
+                        datasets: [{
+                            label: 'Customers',
+                            data: projectValues,
+                            backgroundColor: '#28a745',
+                            borderColor: '#1e7e34',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Customers: ' + context.parsed.x;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { 
+                                beginAtZero: true, 
+                                ticks: { 
+                                    precision: 0,
+                                    stepSize: 1
+                                } 
+                            },
+                            y: {
+                                ticks: {
+                                    font: { size: 11 }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // City Chart
+            const cityCtx = document.getElementById('cityChart');
+            if (cityCtx && @(citySummary.Any() ? "true" : "false")) {
+                const cityLabels = @Html.Raw(JsonSerializer.Serialize(cityLabels));
+                const cityValues = @Html.Raw(JsonSerializer.Serialize(cityValues));
+
+                new Chart(cityCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: cityLabels,
+                        datasets: [{
+                            label: 'Customers',
+                            data: cityValues,
+                            backgroundColor: '#17a2b8',
+                            borderColor: '#117a8b',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Customers: ' + context.parsed.x;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { 
+                                beginAtZero: true, 
+                                ticks: { 
+                                    precision: 0,
+                                    stepSize: 1
+                                } 
+                            },
+                            y: {
+                                ticks: {
+                                    font: { size: 11 }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Monthly Trend Chart
+            const monthlyCtx = document.getElementById('monthlyChart');
+            if (monthlyCtx) {
+                const monthlyLabels = @Html.Raw(JsonSerializer.Serialize(monthlyLabels));
+                const monthlyValues = @Html.Raw(JsonSerializer.Serialize(monthlyValues));
+
+                new Chart(monthlyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: monthlyLabels,
+                        datasets: [{
+                            label: 'New Customers',
+                            data: monthlyValues,
+                            borderColor: '#ffc107',
+                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#ffc107',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { 
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'New Customers: ' + context.parsed.y;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { 
+                                beginAtZero: true, 
+                                ticks: { 
+                                    precision: 0,
+                                    stepSize: 1
+                                } 
+                            }
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
+}
+
+@section Styles {
+    <style>
+        .container-fluid {
+            font-size: 0.875rem;
+        }
+        .container-fluid h2 {
+            font-size: 1.5rem;
+        }
+        .card {
+            border-radius: 8px;
+        }
+        .card-header {
+            border-radius: 8px 8px 0 0 !important;
+            font-weight: 600;
+        }
+        .card-body h3 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .card-body h6 {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+}

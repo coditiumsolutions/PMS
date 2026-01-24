@@ -1,0 +1,704 @@
+@model PMS.Web.ViewModels.CustomerAnalyticsViewModel
+@{
+    ViewData["Title"] = "Customer Analytics";
+    var filterOptions = ViewBag.FilterOptions as Dictionary<string, List<string>> ?? new Dictionary<string, List<string>>();
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Customer Analytics & Insights</h2>
+        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <i class="bi bi-funnel"></i> Apply Filters
+        </button>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Customers</h6>
+                            <h3 class="mb-0 text-primary">@Model.KPIs.TotalCustomers</h3>
+                        </div>
+                        <div class="text-primary" style="font-size: 2.5rem;">👥</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-success h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">New This Month</h6>
+                            <h3 class="mb-0 text-success">@Model.KPIs.NewThisMonth</h3>
+                            <small class="text-muted">@(Model.GrowthAnalysis.GrowthRateThisMonth.ToString("F1"))% growth</small>
+                        </div>
+                        <div class="text-success" style="font-size: 2.5rem;">📈</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-info h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Active Cities</h6>
+                            <h3 class="mb-0 text-info">@Model.KPIs.ActiveCities</h3>
+                            <small class="text-muted">@Model.KPIs.ActiveCountries countries</small>
+                        </div>
+                        <div class="text-info" style="font-size: 2.5rem;">🌍</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-warning h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Data Quality</h6>
+                            <h3 class="mb-0 text-warning">@(Model.DataQuality.DataCompletenessPercentage.ToString("F1"))%</h3>
+                            <small class="text-muted">Completeness</small>
+                        </div>
+                        <div class="text-warning" style="font-size: 2.5rem;">✅</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. Customer Growth Analysis -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Customer Growth Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="growthChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Demographic Analysis -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Gender Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="genderChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Top Cities</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="cityChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Location Analysis -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Present vs Permanent City Comparison</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="locationComparisonChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Registration Analysis -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Daily Registrations (Last 30 Days)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="dailyRegistrationsChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Registrations by Creator</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>Created By</th>
+                                    <th class="text-end">Count</th>
+                                    <th class="text-end">Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.RegistrationAnalysis.CreatedByAnalysis)
+                                {
+                                    <tr>
+                                        <td>@item.CreatedBy</td>
+                                        <td class="text-end">@item.Count</td>
+                                        <td class="text-end">@(item.Percentage.ToString("F1"))%</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Data Quality Insights -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Data Quality Issues</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Missing Emails
+                            <span class="badge bg-danger rounded-pill">@Model.DataQuality.MissingEmails</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Missing Contact Numbers
+                            <span class="badge bg-warning rounded-pill">@Model.DataQuality.MissingContactNumbers</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Missing Both
+                            <span class="badge bg-danger rounded-pill">@Model.DataQuality.MissingBoth</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Duplicate CNICs
+                            <span class="badge bg-danger rounded-pill">@Model.DataQuality.DuplicateCNICs</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Duplicate CNIC Details</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.DataQuality.DuplicateCNICDetails.Any())
+                    {
+                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                            <table class="table table-sm table-hover">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th>CNIC</th>
+                                        <th class="text-end">Count</th>
+                                        <th>Customer Nos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var duplicate in Model.DataQuality.DuplicateCNICDetails)
+                                    {
+                                        <tr>
+                                            <td>@duplicate.CNIC</td>
+                                            <td class="text-end">@duplicate.Count</td>
+                                            <td>
+                                                <small>@string.Join(", ", duplicate.CustomerNos)</small>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-3">No duplicate CNICs found</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Tables -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Top Cities Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>City</th>
+                                    <th class="text-end">Customers</th>
+                                    <th class="text-end">Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var city in Model.LocationAnalysis.TopCities)
+                                {
+                                    <tr>
+                                        <td>@city.City</td>
+                                        <td class="text-end">@city.CustomerCount</td>
+                                        <td class="text-end">@(city.Percentage.ToString("F1"))%</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Date Range Registrations</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Period</th>
+                                    <th class="text-end">Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var range in Model.RegistrationAnalysis.DateRangeRegistrations)
+                                {
+                                    <tr>
+                                        <td>@range.RangeLabel</td>
+                                        <td class="text-end">@range.Count</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Apply Filters</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="filterForm">
+                    <div class="mb-3">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate" name="startDate">
+                    </div>
+                    <div class="mb-3">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="endDate" name="endDate">
+                    </div>
+                    <div class="mb-3">
+                        <label for="cityFilter" class="form-label">City</label>
+                        <select class="form-select" id="cityFilter" name="city">
+                            <option value="">All Cities</option>
+                            @foreach (var city in filterOptions.GetValueOrDefault("Cities", new List<string>()))
+                            {
+                                <option value="@city">@city</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="countryFilter" class="form-label">Country</label>
+                        <select class="form-select" id="countryFilter" name="country">
+                            <option value="">All Countries</option>
+                            @foreach (var country in filterOptions.GetValueOrDefault("Countries", new List<string>()))
+                            {
+                                <option value="@country">@country</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="genderFilter" class="form-label">Gender</label>
+                        <select class="form-select" id="genderFilter" name="gender">
+                            <option value="">All Genders</option>
+                            @foreach (var gender in filterOptions.GetValueOrDefault("Genders", new List<string>()))
+                            {
+                                <option value="@gender">@gender</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createdByFilter" class="form-label">Created By</label>
+                        <select class="form-select" id="createdByFilter" name="createdBy">
+                            <option value="">All Users</option>
+                            @foreach (var user in filterOptions.GetValueOrDefault("CreatedBy", new List<string>()))
+                            {
+                                <option value="@user">@user</option>
+                            }
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">Clear All</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Chart data from server
+        const growthData = {
+            labels: @Html.Raw(Json.Serialize(Model.GrowthAnalysis.MonthlyGrowth.Select(m => m.Month))),
+            data: @Html.Raw(Json.Serialize(Model.GrowthAnalysis.MonthlyGrowth.Select(m => m.Count))),
+            cumulativeData: @Html.Raw(Json.Serialize(Model.GrowthAnalysis.MonthlyGrowth.Select(m => m.CumulativeCount)))
+        };
+
+        const genderData = {
+            labels: @Html.Raw(Json.Serialize(Model.DemographicAnalysis.GenderDistribution.Select(g => g.Gender))),
+            data: @Html.Raw(Json.Serialize(Model.DemographicAnalysis.GenderDistribution.Select(g => g.Count)))
+        };
+
+        const cityData = {
+            labels: @Html.Raw(Json.Serialize(Model.DemographicAnalysis.CityDistribution.Take(10).Select(c => c.City))),
+            data: @Html.Raw(Json.Serialize(Model.DemographicAnalysis.CityDistribution.Take(10).Select(c => c.Count)))
+        };
+
+        const locationComparisonData = {
+            labels: @Html.Raw(Json.Serialize(Model.LocationAnalysis.CityComparison.Take(10).Select(c => c.City))),
+            presentData: @Html.Raw(Json.Serialize(Model.LocationAnalysis.CityComparison.Take(10).Select(c => c.PresentAddressCount))),
+            permanentData: @Html.Raw(Json.Serialize(Model.LocationAnalysis.CityComparison.Take(10).Select(c => c.PermanentAddressCount)))
+        };
+
+        const dailyRegistrationsData = {
+            labels: @Html.Raw(Json.Serialize(Model.RegistrationAnalysis.DailyRegistrations.Select(d => d.DateLabel))),
+            data: @Html.Raw(Json.Serialize(Model.RegistrationAnalysis.DailyRegistrations.Select(d => d.Count)))
+        };
+
+        // Initialize Charts
+        let growthChart, genderChart, cityChart, locationComparisonChart, dailyRegistrationsChart;
+
+        function initCharts() {
+            // Growth Chart
+            const growthCtx = document.getElementById('growthChart');
+            if (growthCtx) {
+                growthChart = new Chart(growthCtx, {
+                    type: 'line',
+                    data: {
+                        labels: growthData.labels,
+                        datasets: [
+                            {
+                                label: 'New Customers',
+                                data: growthData.data,
+                                borderColor: 'rgb(75, 192, 192)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Cumulative Total',
+                                data: growthData.cumulativeData,
+                                borderColor: 'rgb(54, 162, 235)',
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                tension: 0.4,
+                                fill: false,
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'New Customers'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Cumulative Total'
+                                },
+                                grid: {
+                                    drawOnChartArea: false,
+                                },
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Customer Growth Over Time'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Gender Chart
+            const genderCtx = document.getElementById('genderChart');
+            if (genderCtx) {
+                genderChart = new Chart(genderCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: genderData.labels,
+                        datasets: [{
+                            data: genderData.data,
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.8)',
+                                'rgba(255, 99, 132, 0.8)',
+                                'rgba(255, 206, 86, 0.8)',
+                                'rgba(75, 192, 192, 0.8)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // City Chart
+            const cityCtx = document.getElementById('cityChart');
+            if (cityCtx) {
+                cityChart = new Chart(cityCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: cityData.labels,
+                        datasets: [{
+                            label: 'Customers',
+                            data: cityData.data,
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Location Comparison Chart
+            const locationCtx = document.getElementById('locationComparisonChart');
+            if (locationCtx) {
+                locationComparisonChart = new Chart(locationCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: locationComparisonData.labels,
+                        datasets: [
+                            {
+                                label: 'Present Address',
+                                data: locationComparisonData.presentData,
+                                backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Permanent Address',
+                                data: locationComparisonData.permanentData,
+                                backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Daily Registrations Chart
+            const dailyCtx = document.getElementById('dailyRegistrationsChart');
+            if (dailyCtx) {
+                dailyRegistrationsChart = new Chart(dailyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: dailyRegistrationsData.labels,
+                        datasets: [{
+                            label: 'Registrations',
+                            data: dailyRegistrationsData.data,
+                            borderColor: 'rgb(153, 102, 255)',
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Filter functions
+        function applyFilters() {
+            const filter = {
+                startDate: document.getElementById('startDate').value || null,
+                endDate: document.getElementById('endDate').value || null,
+                city: document.getElementById('cityFilter').value || null,
+                country: document.getElementById('countryFilter').value || null,
+                gender: document.getElementById('genderFilter').value || null,
+                createdBy: document.getElementById('createdByFilter').value || null
+            };
+
+            // Convert date strings to Date objects if present
+            if (filter.startDate) {
+                filter.startDate = new Date(filter.startDate).toISOString();
+            }
+            if (filter.endDate) {
+                filter.endDate = new Date(filter.endDate).toISOString();
+            }
+
+            // Show loading
+            const loadingToast = document.createElement('div');
+            loadingToast.className = 'position-fixed top-0 end-0 p-3';
+            loadingToast.innerHTML = '<div class="toast show" role="alert"><div class="toast-body">Loading analytics...</div></div>';
+            document.body.appendChild(loadingToast);
+
+            fetch('/Customers/GetFilteredAnalytics', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(filter)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update page with new data
+                updateAnalytics(data);
+                document.body.removeChild(loadingToast);
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('filterModal'));
+                modal.hide();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.body.removeChild(loadingToast);
+                alert('Error loading filtered analytics. Please try again.');
+            });
+        }
+
+        function clearFilters() {
+            document.getElementById('filterForm').reset();
+            applyFilters(); // Reload with no filters
+        }
+
+        function updateAnalytics(data) {
+            // Update KPIs
+            document.querySelector('.card:has(h3.text-primary)').querySelector('h3').textContent = data.kPIs.totalCustomers;
+            document.querySelector('.card:has(h3.text-success)').querySelector('h3').textContent = data.kPIs.newThisMonth;
+            // ... update other KPIs as needed
+
+            // Update charts
+            if (growthChart) {
+                growthChart.data.labels = data.growthAnalysis.monthlyGrowth.map(m => m.month);
+                growthChart.data.datasets[0].data = data.growthAnalysis.monthlyGrowth.map(m => m.count);
+                growthChart.data.datasets[1].data = data.growthAnalysis.monthlyGrowth.map(m => m.cumulativeCount);
+                growthChart.update();
+            }
+
+            if (genderChart) {
+                genderChart.data.labels = data.demographicAnalysis.genderDistribution.map(g => g.gender);
+                genderChart.data.datasets[0].data = data.demographicAnalysis.genderDistribution.map(g => g.count);
+                genderChart.update();
+            }
+
+            if (cityChart) {
+                cityChart.data.labels = data.demographicAnalysis.cityDistribution.slice(0, 10).map(c => c.city);
+                cityChart.data.datasets[0].data = data.demographicAnalysis.cityDistribution.slice(0, 10).map(c => c.count);
+                cityChart.update();
+            }
+
+            // Update other charts similarly...
+            // For simplicity, you might want to reload the page instead
+            window.location.reload();
+        }
+
+        // Initialize charts on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+        });
+    </script>
+}

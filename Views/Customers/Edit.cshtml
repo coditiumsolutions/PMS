@@ -1,0 +1,207 @@
+@model PMS.Web.Models.Customer
+
+@{
+    ViewData["Title"] = "Edit Customer";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Edit Customer</h2>
+        @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl as string) && ViewBag.ReturnUrl == "CustomersOperation")
+        {
+            <a asp-action="CustomersOperation" class="btn btn-secondary">Back to Operations</a>
+        }
+        else
+        {
+            <a asp-action="@(ViewBag.UseCustomersEdit == true ? "CustomersDetail" : "Index")" class="btn btn-secondary">Back to List</a>
+        }
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="@(ViewBag.UseCustomersEdit == true ? "CustomersEdit" : "Edit")">
+                @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl as string))
+                {
+                    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                }
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <input type="hidden" asp-for="CustomerNo" />
+                <input type="hidden" asp-for="Uid" />
+
+                <!-- Bootstrap 5 Tabs -->
+                <ul class="nav nav-tabs mb-4" id="customerEditTabs" role="tablist">
+                    <li class="nav-item me-1" role="presentation">
+                        <button class="nav-link active bg-light text-dark" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
+                            Personal Detail
+                        </button>
+                    </li>
+                    <li class="nav-item me-1" role="presentation">
+                        <button class="nav-link bg-light text-dark" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+                            Contact Detail
+                        </button>
+                    </li>
+                    <li class="nav-item me-1" role="presentation">
+                        <button class="nav-link bg-light text-dark" id="allotment-tab" data-bs-toggle="tab" data-bs-target="#allotment" type="button" role="tab" aria-controls="allotment" aria-selected="false">
+                            Allotment Detail
+                        </button>
+                    </li>
+                    <li class="nav-item me-1" role="presentation">
+                        <button class="nav-link bg-light text-dark" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
+                            History
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="customerEditTabContent">
+                    <!-- Tab 1: Personal Detail -->
+                    <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CustomerNo" class="form-label fw-semibold"></label>
+                                <input asp-for="CustomerNo" class="form-control" readonly />
+                                <span asp-validation-for="CustomerNo" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CreationDate" class="form-label fw-semibold"></label>
+                                <input asp-for="CreationDate" type="date" class="form-control" />
+                                <span asp-validation-for="CreationDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FullName" class="form-label fw-semibold"></label>
+                                <input asp-for="FullName" class="form-control" />
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FatherName" class="form-label fw-semibold"></label>
+                                <input asp-for="FatherName" class="form-control" />
+                                <span asp-validation-for="FatherName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Cnic" class="form-label fw-semibold"></label>
+                                <input asp-for="Cnic" class="form-control" />
+                                <span asp-validation-for="Cnic" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Gender" class="form-label fw-semibold"></label>
+                                <select asp-for="Gender" class="form-select">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                                <span asp-validation-for="Gender" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CreatedBy" class="form-label fw-semibold"></label>
+                                <input asp-for="CreatedBy" class="form-control" />
+                                <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Contact Detail -->
+                    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ContactNo" class="form-label fw-semibold"></label>
+                                <input asp-for="ContactNo" class="form-control" />
+                                <span asp-validation-for="ContactNo" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label fw-semibold"></label>
+                                <input asp-for="Email" type="email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <h6 class="text-muted mb-3 mt-4">Present Address</h6>
+                        <div class="mb-3">
+                            <label asp-for="PresAddress" class="form-label fw-semibold"></label>
+                            <textarea asp-for="PresAddress" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="PresAddress" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PresCity" class="form-label fw-semibold"></label>
+                                <input asp-for="PresCity" class="form-control" />
+                                <span asp-validation-for="PresCity" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PresCountry" class="form-label fw-semibold"></label>
+                                <input asp-for="PresCountry" class="form-control" />
+                                <span asp-validation-for="PresCountry" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <h6 class="text-muted mb-3 mt-4">Permanent Address</h6>
+                        <div class="mb-3">
+                            <label asp-for="PremAddress" class="form-label fw-semibold"></label>
+                            <textarea asp-for="PremAddress" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="PremAddress" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PremCity" class="form-label fw-semibold"></label>
+                                <input asp-for="PremCity" class="form-control" />
+                                <span asp-validation-for="PremCity" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PremCountry" class="form-label fw-semibold"></label>
+                                <input asp-for="PremCountry" class="form-control" />
+                                <span asp-validation-for="PremCountry" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Allotment Detail -->
+                    <div class="tab-pane fade" id="allotment" role="tabpanel" aria-labelledby="allotment-tab">
+                        <p class="text-muted mb-0">Allotment information is not available yet.</p>
+                    </div>
+
+                    <!-- Tab 4: History -->
+                    <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+                        <p class="text-muted mb-0">Customer history is not available yet.</p>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <input type="submit" value="Save Changes" class="btn btn-primary btn-lg" />
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .nav-tabs .nav-link {
+            transition: all 0.2s ease;
+        }
+        .nav-tabs .nav-link.active {
+            background-color: var(--bs-light) !important;
+            color: var(--bs-dark) !important;
+            font-weight: bold !important;
+            border-bottom: 2px solid var(--bs-primary) !important;
+        }
+        .nav-tabs .nav-link:not(.active):hover {
+            background-color: var(--bs-light) !important;
+            color: var(--bs-dark) !important;
+        }
+    </style>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

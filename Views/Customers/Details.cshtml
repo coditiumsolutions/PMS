@@ -1,0 +1,175 @@
+@model PMS.Web.Models.Customer
+
+@{
+    ViewData["Title"] = "Customer Details";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Customer Details</h2>
+        <div>
+            <a asp-action="History" asp-route-customerId="@Model.CustomerNo" class="btn btn-info">History</a>
+            <a asp-action="@(ViewBag.UseCustomersDetails == true ? "CustomersEdit" : "Edit")" 
+               asp-route-id="@Model.CustomerNo" 
+               asp-route-returnUrl="@ViewBag.ReturnUrl" 
+               class="btn btn-primary">Edit</a>
+            @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl as string) && ViewBag.ReturnUrl == "CustomersOperation")
+            {
+                <a asp-action="CustomersOperation" class="btn btn-secondary">Back to Operations</a>
+            }
+            else
+            {
+                <a asp-action="@(ViewBag.UseCustomersDetails == true ? "CustomersDetail" : "Index")" class="btn btn-secondary">Back to List</a>
+            }
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <!-- Bootstrap 5 Tabs -->
+            <ul class="nav nav-tabs mb-4" id="customerDetailsTabs" role="tablist">
+                <li class="nav-item me-1" role="presentation">
+                    <button class="nav-link active bg-light text-dark" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
+                        Personal Detail
+                    </button>
+                </li>
+                <li class="nav-item me-1" role="presentation">
+                    <button class="nav-link bg-light text-dark" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+                        Contact Detail
+                    </button>
+                </li>
+                <li class="nav-item me-1" role="presentation">
+                    <button class="nav-link bg-light text-dark" id="allotment-tab" data-bs-toggle="tab" data-bs-target="#allotment" type="button" role="tab" aria-controls="allotment" aria-selected="false">
+                        Allotment Detail
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="customerDetailsTabContent">
+                <!-- Tab 1: Personal Information -->
+                <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.CustomerNo)</th>
+                                    <td>@Html.DisplayFor(model => model.CustomerNo)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.FullName)</th>
+                                    <td>@Html.DisplayFor(model => model.FullName)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.FatherName)</th>
+                                    <td>@Html.DisplayFor(model => model.FatherName)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.Cnic)</th>
+                                    <td>@Html.DisplayFor(model => model.Cnic)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.Gender)</th>
+                                    <td>@Html.DisplayFor(model => model.Gender)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.CreationDate)</th>
+                                    <td>@Model.CreationDate.ToString("yyyy-MM-dd")</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.CreatedBy)</th>
+                                    <td>@Html.DisplayFor(model => model.CreatedBy)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Contact & Address Information -->
+                <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <tbody>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.ContactNo)</th>
+                                    <td>@Html.DisplayFor(model => model.ContactNo)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.Email)</th>
+                                    <td>@Html.DisplayFor(model => model.Email)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.PresAddress)</th>
+                                    <td>@Html.DisplayFor(model => model.PresAddress)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.PresCity)</th>
+                                    <td>@Html.DisplayFor(model => model.PresCity)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.PresCountry)</th>
+                                    <td>@Html.DisplayFor(model => model.PresCountry)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.PremAddress)</th>
+                                    <td>@Html.DisplayFor(model => model.PremAddress)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.PremCity)</th>
+                                    <td>@Html.DisplayFor(model => model.PremCity)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.PremCountry)</th>
+                                    <td>@Html.DisplayFor(model => model.PremCountry)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Allotment Detail -->
+                <div class="tab-pane fade" id="allotment" role="tabpanel" aria-labelledby="allotment-tab">
+                    <p class="text-muted mb-0">Allotment information is not available yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .container-fluid {
+            font-size: 0.875rem;
+        }
+        .container-fluid h2 {
+            font-size: 1.5rem;
+        }
+        .table {
+            font-size: 0.875rem;
+        }
+        .table th {
+            font-size: 0.875rem;
+        }
+        .table td {
+            font-size: 0.875rem;
+        }
+        .nav-tabs .nav-link {
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+        .nav-tabs .nav-link.active {
+            background-color: var(--bs-light) !important;
+            color: var(--bs-dark) !important;
+            font-weight: bold !important;
+            border-bottom: 2px solid var(--bs-primary) !important;
+        }
+        .nav-tabs .nav-link:not(.active):hover {
+            background-color: var(--bs-light) !important;
+            color: var(--bs-dark) !important;
+        }
+        .btn {
+            font-size: 0.875rem;
+        }
+    </style>
+}
+

@@ -36,9 +36,18 @@
         <h3 class="sidebar-heading">Payments</h3>
         <ul class="sidebar-nav">
             <li><a asp-controller="Payments" asp-action="Dashboard">Dashboard</a></li>
-            <li><a asp-controller="Payments" asp-action="Details">Details</a></li>
-            <li><a asp-controller="Payments" asp-action="Operations">Operations</a></li>
-            <li><a asp-controller="Payments" asp-action="Summary">Summary</a></li>
+            
+            <li class="sidebar-section-heading">
+                <span class="sidebar-section-title">Challans</span>
+            </li>
+            <li><a asp-controller="Payments" asp-action="AllChallans">All Challans</a></li>
+            <li><a asp-controller="Payments" asp-action="PendingChall">Pending Chall</a></li>
+            <li><a asp-controller="Payments" asp-action="UnVerifiedChall">Un-Verified Chall</a></li>
+            
+            <li class="sidebar-section-heading">
+                <span class="sidebar-section-title">Payments</span>
+            </li>
+            <li><a asp-controller="Payments" asp-action="AllPayments">All Payments</a></li>
             <li><a asp-controller="Payments" asp-action="History">History</a></li>
         </ul>
     }

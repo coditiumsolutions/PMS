@@ -1,0 +1,100 @@
+@model IEnumerable<PMS.Web.Models.Project>
+
+@{
+    ViewData["Title"] = "Projects Configuration";
+    var actionPrefix = ViewBag.ActionPrefix as string ?? "Project";
+    var createAction = actionPrefix + "Create";
+    var detailsAction = actionPrefix + "Details";
+    var editAction = actionPrefix + "Edit";
+    var deleteAction = actionPrefix + "Delete";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Projects Configuration</h2>
+        <a asp-action="@createAction" class="btn btn-primary">Create New</a>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="alert alert-info mb-0">
+                    No projects found. <a asp-action="@createAction">Create a new project</a> to get started.
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Projects List</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col" class="ps-3" style="width: 5%;">ID</th>
+                                <th scope="col" style="width: 15%;">Project Name</th>
+                                <th scope="col" style="width: 10%;">Sub Project</th>
+                                <th scope="col" style="width: 10%;">Prefix</th>
+                                <th scope="col" style="width: 25%;">Project Description</th>
+                                <th scope="col" style="width: 15%;">Created At</th>
+                                <th scope="col" class="pe-3 text-center" style="width: 20%;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-3 fw-medium">@item.Id</td>
+                                    <td class="fw-medium">@item.ProjectName</td>
+                                    <td class="text-nowrap">
+                                        @if (string.IsNullOrWhiteSpace(item.SubProject))
+                                        {
+                                            <span class="text-muted">MAIN</span>
+                                        }
+                                        else
+                                        {
+                                            @item.SubProject
+                                        }
+                                    </td>
+                                    <td class="text-nowrap">
+                                        @if (string.IsNullOrWhiteSpace(item.Prefix))
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                        else
+                                        {
+                                            @item.Prefix
+                                        }
+                                    </td>
+                                    <td>@item.ProjectDescription</td>
+                                    <td class="text-nowrap">
+                                        @if (item.CreatedAt.HasValue)
+                                        {
+                                            @item.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td class="pe-3 text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="@detailsAction" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
+                                            <a asp-action="@editAction" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
+                                            <a asp-action="@deleteAction" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>

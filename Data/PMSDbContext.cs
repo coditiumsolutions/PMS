@@ -15,6 +15,8 @@ public class PMSDbContext : DbContext
     public DbSet<Customer> Customers { get; set; }
     public DbSet<CustomerAuditLog> CustomerAuditLogs { get; set; }
     public DbSet<InventoryDetail> InventoryDetails { get; set; }
+    public DbSet<Challan> Challans { get; set; }
+    public DbSet<Payment> Payments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -95,6 +97,32 @@ public class PMSDbContext : DbContext
             // Set default value for CreationDate
             entity.Property(e => e.CreationDate)
                 .HasDefaultValueSql("GETDATE()");
+        });
+
+        // Configure Challan entity
+        modelBuilder.Entity<Challan>(entity =>
+        {
+            entity.HasKey(e => e.uid);
+            entity.ToTable("Challan");
+            
+            // Configure uid as identity
+            entity.Property(e => e.uid)
+                .ValueGeneratedOnAdd();
+            
+            // Set default value for creationdate
+            entity.Property(e => e.creationdate)
+                .HasDefaultValueSql("GETDATE()");
+        });
+
+        // Configure Payment entity
+        modelBuilder.Entity<Payment>(entity =>
+        {
+            entity.HasKey(e => e.uId);
+            entity.ToTable("Payments");
+            
+            // Configure uId as identity
+            entity.Property(e => e.uId)
+                .ValueGeneratedOnAdd();
         });
     }
 }

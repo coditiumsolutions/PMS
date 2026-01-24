@@ -1,0 +1,206 @@
+@model IEnumerable<PMS.Web.Models.CustomerAuditLog>
+
+@{
+    ViewData["Title"] = "Customer Audit History";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Customer Audit History</h2>
+        @if (!string.IsNullOrEmpty(ViewBag.CustomerId as string))
+        {
+            <a asp-action="Details" asp-route-id="@ViewBag.CustomerId" class="btn btn-secondary">Back to Customer</a>
+        }
+        else
+        {
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        }
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <form method="get" asp-action="History" class="row g-3">
+                <div class="col-md-4">
+                    <label for="customerId" class="form-label">Filter by Customer ID</label>
+                    <input type="text" id="customerId" name="customerId" class="form-control" 
+                           value="@ViewBag.CustomerId" placeholder="Enter Customer ID..." />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+                @if (!string.IsNullOrEmpty(ViewBag.CustomerId as string))
+                {
+                    <div class="col-md-2 d-flex align-items-end">
+                        <a asp-action="History" class="btn btn-outline-secondary">Clear Filter</a>
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+
+    <!-- Audit Logs Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Audit Logs</h5>
+            @if (Model != null && Model.Any())
+            {
+                <span class="badge bg-light text-dark">Total Records: @Model.Count()</span>
+            }
+        </div>
+        <div class="card-body p-0">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width: 5%;">#</th>
+                                <th style="width: 10%;">Customer ID</th>
+                                <th style="width: 8%;">Action</th>
+                                <th style="width: 15%;">Changed Fields</th>
+                                <th style="width: 20%;">Old Values</th>
+                                <th style="width: 20%;">New Values</th>
+                                <th style="width: 10%;">Action By</th>
+                                <th style="width: 12%;">Action Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int index = 1;
+                            }
+                            @foreach (var log in Model)
+                            {
+                                <tr>
+                                    <td>@index</td>
+                                    <td class="fw-medium">@log.CustomerID</td>
+                                    <td>
+                                        @if (log.ActionType == "UPDATE")
+                                        {
+                                            <span class="badge bg-warning text-dark">UPDATE</span>
+                                        }
+                                        else if (log.ActionType == "DELETE")
+                                        {
+                                            <span class="badge bg-danger">DELETE</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@log.ActionType</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <small>@(log.ChangedFields ?? "-")</small>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            @if (!string.IsNullOrEmpty(log.OldValues))
+                                            {
+                                                <button type="button" class="btn btn-sm btn-outline-info" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#oldValuesModal@(log.LogID)">
+                                                    View JSON
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <span>-</span>
+                                            }
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            @if (!string.IsNullOrEmpty(log.NewValues))
+                                            {
+                                                <button type="button" class="btn btn-sm btn-outline-success" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#newValuesModal@(log.LogID)">
+                                                    View JSON
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-danger">NULL</span>
+                                            }
+                                        </small>
+                                    </td>
+                                    <td>@log.ActionBy</td>
+                                    <td>@log.ActionDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                </tr>
+
+                                <!-- Old Values Modal -->
+                                @if (!string.IsNullOrEmpty(log.OldValues))
+                                {
+                                    <div class="modal fade" id="oldValuesModal@(log.LogID)" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Old Values - @log.CustomerID</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <pre class="bg-light p-3 rounded"><code>@log.OldValues</code></pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                <!-- New Values Modal -->
+                                @if (!string.IsNullOrEmpty(log.NewValues))
+                                {
+                                    <div class="modal fade" id="newValuesModal@(log.LogID)" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">New Values - @log.CustomerID</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <pre class="bg-light p-3 rounded"><code>@log.NewValues</code></pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                index++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .container-fluid {
+            font-size: 0.875rem;
+        }
+        .container-fluid h2 {
+            font-size: 1.5rem;
+        }
+        .table {
+            font-size: 0.875rem;
+        }
+        .table th {
+            font-size: 0.875rem;
+        }
+        .table td {
+            font-size: 0.875rem;
+        }
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.35em 0.65em;
+            font-weight: 500;
+        }
+        pre {
+            font-size: 0.8rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+}
+
+

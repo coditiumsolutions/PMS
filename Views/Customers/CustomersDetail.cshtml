@@ -1,0 +1,159 @@
+@model IEnumerable<PMS.Web.Models.Customer>
+
+@{
+    ViewData["Title"] = "Customers";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Customers</h2>
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="searchInput" class="form-label fw-semibold">Search Customers</label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by Customer No, Name, CNIC, or Contact No..." />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="alert alert-info mb-0">
+                    No customers found. <a asp-action="Create">Create a new customer</a> to get started.
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover mb-0" id="customersTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col" class="ps-3">
+                                    @Html.DisplayNameFor(model => model.CustomerNo)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.FullName)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.FatherName)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.Cnic)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.ContactNo)
+                                </th>
+                                <th scope="col" class="pe-3 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-3 fw-medium">
+                                        @Html.DisplayFor(modelItem => item.CustomerNo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.FullName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.FatherName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Cnic)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ContactNo)
+                                    </td>
+                                    <td class="pe-3 text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="CustomersDetails" asp-route-id="@item.CustomerNo" class="btn btn-sm btn-info">Details</a>
+                                            <a asp-action="CustomersEdit" asp-route-id="@item.CustomerNo" class="btn btn-sm btn-warning">Edit</a>
+                                            <a asp-action="Delete" asp-route-id="@item.CustomerNo" class="btn btn-sm btn-danger">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    (function () {
+        const searchInput = document.getElementById('searchInput');
+        const table = document.getElementById('customersTable');
+        
+        if (!searchInput || !table) {
+            return;
+        }
+
+        const tbody = table.getElementsByTagName('tbody')[0];
+        if (!tbody) {
+            return;
+        }
+
+        const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                let matches = false;
+
+                // Search in Customer No, Full Name, Father Name, CNIC, and Contact No columns
+                for (let i = 0; i < cells.length - 1; i++) { // Exclude Actions column
+                    const cellText = cells[i].textContent || cells[i].innerText;
+                    if (cellText.toLowerCase().indexOf(searchTerm) > -1) {
+                        matches = true;
+                        break;
+                    }
+                }
+
+                row.style.display = matches || searchTerm === '' ? '' : 'none';
+            });
+        }
+
+        searchInput.addEventListener('keyup', filterTable);
+        searchInput.addEventListener('input', filterTable);
+    })();
+</script>
+
+@section Styles {
+    <style>
+        .container-fluid {
+            font-size: 0.875rem;
+        }
+        .container-fluid h2 {
+            font-size: 1.5rem;
+        }
+        .table {
+            font-size: 0.875rem;
+        }
+        .table th {
+            font-size: 0.875rem;
+        }
+        .form-label {
+            font-size: 0.875rem;
+        }
+        .btn {
+            font-size: 0.875rem;
+        }
+    </style>
+}

@@ -1,0 +1,71 @@
+@model PMS.Web.Models.Project
+
+@{
+    ViewData["Title"] = "Edit Project";
+    var actionPrefix = ViewBag.ActionPrefix as string ?? "Project";
+    var listAction = actionPrefix == "Proj" ? "Proj" : "Projects";
+    var editAction = actionPrefix + "Edit";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Edit Project</h2>
+        <a asp-action="@listAction" class="btn btn-secondary">Back to List</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form asp-action="@editAction" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="CreatedAt" />
+
+                        <div class="mb-3">
+                            <label asp-for="ProjectName" class="form-label fw-semibold"></label>
+                            <input asp-for="ProjectName" class="form-control" />
+                            <span asp-validation-for="ProjectName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProjectDescription" class="form-label fw-semibold"></label>
+                            <textarea asp-for="ProjectDescription" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="ProjectDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="SubProject" class="form-label fw-semibold"></label>
+                                <input asp-for="SubProject" class="form-control" />
+                                <span asp-validation-for="SubProject" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Prefix" class="form-label fw-semibold"></label>
+                                <input asp-for="Prefix" class="form-control" />
+                                <span asp-validation-for="Prefix" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Created At</label>
+                            <input type="text" class="form-control" value="@(Model.CreatedAt?.ToString("MMM dd, yyyy HH:mm") ?? "N/A")" readonly />
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <a asp-action="@listAction" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

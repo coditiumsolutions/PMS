@@ -1,0 +1,466 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Dashboard</h2>
+        <span class="text-muted">@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</span>
+    </div>
+
+    <!-- 1. KPI Cards Section -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-lg-2">
+            <a href="/Customers" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-primary">
+                    <div class="card-body text-center py-3">
+                        <div class="kpi-icon mb-2">👥</div>
+                        <div class="text-muted small">Total Customers</div>
+                        <div class="fs-3 fw-bold">@ViewBag.TotalCustomers</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a href="/Plots" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-success">
+                    <div class="card-body text-center py-3">
+                        <div class="kpi-icon mb-2">🏘️</div>
+                        <div class="text-muted small">Total Plots</div>
+                        <div class="fs-3 fw-bold">@ViewBag.TotalPlots</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a href="/Payments" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-info">
+                    <div class="card-body text-center py-3">
+                        <div class="kpi-icon mb-2">💰</div>
+                        <div class="text-muted small">Payments Collected</div>
+                        <div class="fs-3 fw-bold">@string.Format("{0:C}", ViewBag.TotalPaymentsCollected)</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a href="/Payments" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-warning">
+                    <div class="card-body text-center py-3">
+                        <div class="kpi-icon mb-2">⏳</div>
+                        <div class="text-muted small">Pending Payments</div>
+                        <div class="fs-3 fw-bold">@ViewBag.PendingPayments</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a href="/Plots" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-secondary">
+                    <div class="card-body text-center py-3">
+                        <div class="kpi-icon mb-2">✅</div>
+                        <div class="text-muted small">Active Allotments</div>
+                        <div class="fs-3 fw-bold">@ViewBag.ActiveAllotments</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a href="/Transfers" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 kpi-card kpi-card-danger">
+                    <div class="card-body text-center py-3">
+                        <div class="kpi-icon mb-2">🔄</div>
+                        <div class="text-muted small">Transfers This Month</div>
+                        <div class="fs-3 fw-bold">@ViewBag.TransfersThisMonth</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 2. Quick Module Tiles -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <h4 class="mb-3">Quick Access</h4>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/Customers" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 module-tile module-tile-customers">
+                    <div class="card-body text-center py-4">
+                        <div class="module-icon mb-3">👥</div>
+                        <h5 class="mb-0">Customers</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/Payments" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 module-tile module-tile-payments">
+                    <div class="card-body text-center py-4">
+                        <div class="module-icon mb-3">💰</div>
+                        <h5 class="mb-0">Payments</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/Plots" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 module-tile module-tile-plots">
+                    <div class="card-body text-center py-4">
+                        <div class="module-icon mb-3">🏘️</div>
+                        <h5 class="mb-0">Plots</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/Plots" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 module-tile module-tile-allotment">
+                    <div class="card-body text-center py-4">
+                        <div class="module-icon mb-3">📋</div>
+                        <h5 class="mb-0">Allotment</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/Transfers" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 module-tile module-tile-transfers">
+                    <div class="card-body text-center py-4">
+                        <div class="module-icon mb-3">🔄</div>
+                        <h5 class="mb-0">Transfers</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/Schedules" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 module-tile module-tile-schedules">
+                    <div class="card-body text-center py-4">
+                        <div class="module-icon mb-3">📅</div>
+                        <h5 class="mb-0">Schedules</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/Reports" class="text-decoration-none">
+                <div class="card shadow-sm border-0 h-100 module-tile module-tile-reports">
+                    <div class="card-body text-center py-4">
+                        <div class="module-icon mb-3">📊</div>
+                        <h5 class="mb-0">Reports</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 3. Alerts & Notifications -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Alerts & Notifications</h5>
+                </div>
+                <div class="card-body">
+                    @{
+                        var alerts = ViewBag.Alerts as List<PMS.Web.Controllers.AlertData>;
+                    }
+                    @if (alerts != null && alerts.Count > 0)
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var alert in alerts)
+                            {
+                                <a href="@alert.Link" class="list-group-item list-group-item-action border-0 px-0 py-2">
+                                    <div class="d-flex align-items-center">
+                                        <span class="alert-icon me-3">@alert.Icon</span>
+                                        <div class="flex-grow-1">
+                                            <span class="fw-semibold">@alert.Message</span>
+                                        </div>
+                                        <span class="badge bg-@alert.Type rounded-pill">@alert.Count</span>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-3">
+                            <p class="mb-0">No alerts at this time</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Recent Activity & Financial Snapshot (Two-Column Layout) -->
+    <div class="row g-3 mb-4">
+        <!-- Left Panel: Recent Activity -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    @{
+                        var recentCustomers = ViewBag.RecentCustomers as List<PMS.Web.Controllers.RecentCustomerData>;
+                    }
+                    @if (recentCustomers != null && recentCustomers.Count > 0)
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var customer in recentCustomers)
+                            {
+                                <div class="list-group-item border-0 px-0 py-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="activity-icon me-3">👤</div>
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold">@customer.FullName</div>
+                                            <small class="text-muted">Customer @customer.CustomerNo added</small>
+                                        </div>
+                                        <small class="text-muted">@customer.CreationDate.ToString("MMM dd, yyyy")</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-3">
+                            <p class="mb-0">No recent activity</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Financial Snapshot -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Financial Snapshot</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                <div>
+                                    <div class="text-muted small">Today's Collection</div>
+                                    <div class="fs-4 fw-bold text-success">@string.Format("{0:C}", ViewBag.TodaysCollection)</div>
+                                </div>
+                                <div class="financial-icon">💵</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                <div>
+                                    <div class="text-muted small">This Month's Collection</div>
+                                    <div class="fs-4 fw-bold text-primary">@string.Format("{0:C}", ViewBag.ThisMonthCollection)</div>
+                                </div>
+                                <div class="financial-icon">📈</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                <div>
+                                    <div class="text-muted small">Outstanding Balance</div>
+                                    <div class="fs-4 fw-bold text-warning">@string.Format("{0:C}", ViewBag.OutstandingBalance)</div>
+                                </div>
+                                <div class="financial-icon">⚠️</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Charts Section -->
+    <div class="row g-3 mb-4">
+        <!-- Monthly Payments Trend -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Monthly Payments Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="paymentsTrendChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sold vs Available Plots -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Plots Overview</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="plotsChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .kpi-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+        .kpi-card-primary {
+            border-left: 4px solid #0d6efd;
+        }
+        .kpi-card-success {
+            border-left: 4px solid #198754;
+        }
+        .kpi-card-info {
+            border-left: 4px solid #0dcaf0;
+        }
+        .kpi-card-warning {
+            border-left: 4px solid #ffc107;
+        }
+        .kpi-card-secondary {
+            border-left: 4px solid #6c757d;
+        }
+        .kpi-card-danger {
+            border-left: 4px solid #dc3545;
+        }
+        .kpi-icon {
+            font-size: 2rem;
+        }
+        .module-tile {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+        .module-tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+        .module-tile-customers {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .module-tile-payments {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .module-tile-plots {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .module-tile-allotment {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        .module-tile-transfers {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+        .module-tile-schedules {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+            color: white;
+        }
+        .module-tile-reports {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+        .module-icon {
+            font-size: 3rem;
+        }
+        .alert-icon {
+            font-size: 1.5rem;
+        }
+        .activity-icon {
+            font-size: 1.5rem;
+        }
+        .financial-icon {
+            font-size: 2rem;
+        }
+        .list-group-item:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Monthly Payments Trend Chart
+        const paymentsTrendCtx = document.getElementById('paymentsTrendChart');
+        if (paymentsTrendCtx) {
+            const monthlyData = @Html.Raw(Json.Serialize(ViewBag.MonthlyPaymentsTrend));
+            new Chart(paymentsTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: monthlyData.map(d => d.month),
+                    datasets: [{
+                        label: 'Payments',
+                        data: monthlyData.map(d => d.amount),
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Sold vs Available Plots Chart
+        const plotsCtx = document.getElementById('plotsChart');
+        if (plotsCtx) {
+            new Chart(plotsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sold', 'Available'],
+                    datasets: [{
+                        data: [@ViewBag.SoldPlots, @ViewBag.AvailablePlots],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 99, 132, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+}
