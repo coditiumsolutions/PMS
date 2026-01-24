@@ -1,11 +1,110 @@
+@model IEnumerable<PMS.Web.Models.InventoryDetail>
+
 @{
     ViewData["Title"] = "Reserved Plots";
 }
 
-<h2>Reserved Plots</h2>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Reserved Plots</h2>
+        <a asp-action="AllPlots" class="btn btn-secondary">View All Plots</a>
+    </div>
 
-<p>View and manage reserved plots.</p>
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="alert alert-info mb-0">
+                    No reserved plots found.
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <div class="alert alert-warning mb-0">
+                    <strong>Total Reserved Plots: @Model.Count()</strong>
+                </div>
+            </div>
+        </div>
 
-<div class="info-box">
-    <p>This page will display all reserved plots with their reservation details.</p>
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                    <table class="table table-bordered table-striped table-hover mb-0" id="reservedPlotsTable">
+                        <thead class="table-dark sticky-top">
+                            <tr>
+                                <th scope="col" class="ps-3">@Html.DisplayNameFor(model => model.Project)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.SubProject)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.Sector)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.Block)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.PlotNo)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.Category)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.UnitSize)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.UnitType)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.AllotmentStatus)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.CustomerNo)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.AllotmentDate)</th>
+                                <th scope="col" class="pe-3 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-3">@Html.DisplayFor(modelItem => item.Project)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.SubProject)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Sector)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Block)</td>
+                                    <td class="fw-medium">@Html.DisplayFor(modelItem => item.PlotNo)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Category)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.UnitSize)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.UnitType)</td>
+                                    <td>
+                                        <span class="badge bg-warning">@Html.DisplayFor(modelItem => item.AllotmentStatus)</span>
+                                    </td>
+                                    <td>@Html.DisplayFor(modelItem => item.CustomerNo)</td>
+                                    <td>@(item.AllotmentDate?.ToString("yyyy-MM-dd") ?? "N/A")</td>
+                                    <td class="pe-3 text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" asp-route-id="@item.UID" class="btn btn-sm btn-info">Details</a>
+                                            <a asp-action="Edit" asp-route-id="@item.UID" class="btn btn-sm btn-warning">Edit</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+@section Styles {
+    <style>
+        .container-fluid {
+            font-size: 0.875rem;
+        }
+        .container-fluid h2 {
+            font-size: 1.5rem;
+        }
+        .table {
+            font-size: 0.875rem;
+        }
+        .table th {
+            font-size: 0.875rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .form-label {
+            font-size: 0.875rem;
+        }
+        .btn {
+            font-size: 0.875rem;
+        }
+    </style>
+}

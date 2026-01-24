@@ -26,9 +26,85 @@ public class PlotsController : Controller
         return View();
     }
 
-    public IActionResult Summary()
+    // GET: Plots/Summary
+    public async Task<IActionResult> Summary()
     {
         ViewBag.ActiveModule = "Plots";
+        
+        var plots = await _context.InventoryDetails.ToListAsync();
+        
+        // Total plots
+        ViewBag.TotalPlots = plots.Count;
+        
+        // Plots by Category
+        var plotsByCategory = plots
+            .Where(p => !string.IsNullOrEmpty(p.Category))
+            .GroupBy(p => p.Category)
+            .Select(g => new KeyValuePair<string, int>(g.Key ?? "Unknown", g.Count()))
+            .OrderByDescending(x => x.Value)
+            .ToList();
+        ViewBag.PlotsByCategory = plotsByCategory;
+        
+        // Plots by Allotment Status
+        var plotsByAllotmentStatus = plots
+            .GroupBy(p => !string.IsNullOrEmpty(p.AllotmentStatus) ? p.AllotmentStatus : "Not Specified")
+            .Select(g => new KeyValuePair<string, int>(g.Key, g.Count()))
+            .OrderByDescending(x => x.Value)
+            .ToList();
+        ViewBag.PlotsByAllotmentStatus = plotsByAllotmentStatus;
+        
+        // Plots by Project
+        var plotsByProject = plots
+            .Where(p => !string.IsNullOrEmpty(p.Project))
+            .GroupBy(p => p.Project ?? "Unknown")
+            .Select(g => new KeyValuePair<string, int>(g.Key, g.Count()))
+            .OrderByDescending(x => x.Value)
+            .ThenBy(x => x.Key)
+            .ToList();
+        ViewBag.PlotsByProject = plotsByProject;
+        
+        // Plots by Unit Type
+        var plotsByUnitType = plots
+            .Where(p => !string.IsNullOrEmpty(p.UnitType))
+            .GroupBy(p => p.UnitType)
+            .Select(g => new KeyValuePair<string, int>(g.Key ?? "Unknown", g.Count()))
+            .OrderByDescending(x => x.Value)
+            .ToList();
+        ViewBag.PlotsByUnitType = plotsByUnitType;
+        
+        // Plots by Development Status
+        var plotsByDevelopmentStatus = plots
+            .Where(p => !string.IsNullOrEmpty(p.DevelopmentStatus))
+            .GroupBy(p => p.DevelopmentStatus)
+            .Select(g => new KeyValuePair<string, int>(g.Key ?? "Unknown", g.Count()))
+            .OrderByDescending(x => x.Value)
+            .ToList();
+        ViewBag.PlotsByDevelopmentStatus = plotsByDevelopmentStatus;
+        
+        // Plots by Construction Status
+        var plotsByConstructionStatus = plots
+            .Where(p => !string.IsNullOrEmpty(p.ConstStatus))
+            .GroupBy(p => p.ConstStatus)
+            .Select(g => new KeyValuePair<string, int>(g.Key ?? "Unknown", g.Count()))
+            .OrderByDescending(x => x.Value)
+            .ToList();
+        ViewBag.PlotsByConstructionStatus = plotsByConstructionStatus;
+        
+        // Available plots count
+        ViewBag.AvailablePlots = plots.Count(p => p.AllotmentStatus?.ToLower() == "available");
+        
+        // Reserved plots count
+        ViewBag.ReservedPlots = plots.Count(p => p.AllotmentStatus?.ToLower() == "reserved");
+        
+        // Allotted plots count
+        ViewBag.AllottedPlots = plots.Count(p => p.AllotmentStatus?.ToLower() == "allotted");
+        
+        // Residential plots count
+        ViewBag.ResidentialPlots = plots.Count(p => p.Category?.ToLower() == "residential");
+        
+        // Commercial plots count
+        ViewBag.CommercialPlots = plots.Count(p => p.Category?.ToLower() == "commercial");
+        
         return View();
     }
 
@@ -51,8 +127,7 @@ public class PlotsController : Controller
         ViewBag.ActiveModule = "Plots";
         var reservedPlots = await _context.InventoryDetails
             .Where(i => i.AllotmentStatus != null && 
-                       (i.AllotmentStatus.ToLower() == "reserved" || 
-                        i.AllotmentStatus.ToLower() == "allotted"))
+                       i.AllotmentStatus.ToLower() == "reserved")
             .OrderByDescending(i => i.UID)
             .ToListAsync();
         return View(reservedPlots);
