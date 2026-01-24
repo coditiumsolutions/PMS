@@ -1,0 +1,98 @@
+@model PMS.Web.Models.InventoryDetail
+
+@{
+    ViewData["Title"] = "Delete Plot";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Delete Plot</h2>
+        <a asp-action="AllPlots" class="btn btn-secondary">Back to List</a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 col-xl-6">
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">⚠️ Warning!</h4>
+                <p class="mb-0">Are you sure you want to delete this plot? This action cannot be undone.</p>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Plot Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered mb-0">
+                        <tbody>
+                            <tr>
+                                <th class="bg-light" style="width: 40%;">@Html.DisplayNameFor(model => model.UID)</th>
+                                <td>@Html.DisplayFor(model => model.UID)</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">@Html.DisplayNameFor(model => model.Project)</th>
+                                <td>@Html.DisplayFor(model => model.Project)</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">@Html.DisplayNameFor(model => model.SubProject)</th>
+                                <td>@Html.DisplayFor(model => model.SubProject)</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">@Html.DisplayNameFor(model => model.Sector)</th>
+                                <td>@Html.DisplayFor(model => model.Sector)</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">@Html.DisplayNameFor(model => model.Block)</th>
+                                <td>@Html.DisplayFor(model => model.Block)</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">@Html.DisplayNameFor(model => model.PlotNo)</th>
+                                <td class="fw-medium">@Html.DisplayFor(model => model.PlotNo)</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">@Html.DisplayNameFor(model => model.Category)</th>
+                                <td>@Html.DisplayFor(model => model.Category)</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">@Html.DisplayNameFor(model => model.UnitSize)</th>
+                                <td>@Html.DisplayFor(model => model.UnitSize)</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">@Html.DisplayNameFor(model => model.UnitType)</th>
+                                <td>@Html.DisplayFor(model => model.UnitType)</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">@Html.DisplayNameFor(model => model.AllotmentStatus)</th>
+                                <td>
+                                    @if (Model.AllotmentStatus?.ToLower() == "allotted" || Model.AllotmentStatus?.ToLower() == "reserved")
+                                    {
+                                        <span class="badge bg-success">@Html.DisplayFor(model => model.AllotmentStatus)</span>
+                                    }
+                                    else if (Model.AllotmentStatus?.ToLower() == "available")
+                                    {
+                                        <span class="badge bg-info">@Html.DisplayFor(model => model.AllotmentStatus)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@Html.DisplayFor(model => model.AllotmentStatus)</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">@Html.DisplayNameFor(model => model.CustomerNo)</th>
+                                <td>@Html.DisplayFor(model => model.CustomerNo)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <form asp-action="Delete" class="mt-4">
+                <input type="hidden" asp-for="UID" />
+                <div class="d-flex gap-2">
+                    <input type="submit" value="Delete Plot" class="btn btn-danger btn-lg" />
+                    <a asp-action="AllPlots" class="btn btn-secondary btn-lg">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

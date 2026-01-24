@@ -1,0 +1,90 @@
+<!-- Dynamic Sidebar -->
+<aside class="sidebar" id="sidebar">
+    @if (ViewBag.ActiveModule == "Customers")
+    {
+        <h3 class="sidebar-heading">Customers</h3>
+        <ul class="sidebar-nav">
+            <li><a asp-controller="Customers" asp-action="Index">Home</a></li>
+            <li><a asp-controller="Customers" asp-action="Dashboard">Dashboard</a></li>
+            <li><a asp-controller="Customers" asp-action="CustomersDetail">Customers</a></li>
+            <li class="nav-item-dropdown">
+                <a href="#" class="nav-parent-link" data-bs-toggle="collapse" data-bs-target="#othersSubmenu" aria-expanded="false" aria-controls="othersSubmenu">
+                    <span>Others</span>
+                    <span class="dropdown-icon">▼</span>
+                </a>
+                <ul class="nav-submenu collapse" id="othersSubmenu">
+                    <li><a asp-controller="Customers" asp-action="CustomersOperation">Operations</a></li>
+                    <li><a asp-controller="Customers" asp-action="Summary">Summary</a></li>
+                    <li><a asp-controller="Customers" asp-action="History">History</a></li>
+                </ul>
+            </li>
+        </ul>
+    }
+    else if (ViewBag.ActiveModule == "Plots")
+    {
+        <h3 class="sidebar-heading">Plots</h3>
+        <ul class="sidebar-nav">
+            <li><a asp-controller="Plots" asp-action="Dashboard">Dashboard</a></li>
+            <li><a asp-controller="Plots" asp-action="AllPlots">All Plots</a></li>
+            <li><a asp-controller="Plots" asp-action="Index">Summary</a></li>
+            <li><a asp-controller="Plots" asp-action="Reserved">Reserved Plots</a></li>
+            <li><a asp-controller="Plots" asp-action="History">History</a></li>
+        </ul>
+    }
+    else if (ViewBag.ActiveModule == "Payments")
+    {
+        <h3 class="sidebar-heading">Payments</h3>
+        <ul class="sidebar-nav">
+            <li><a asp-controller="Payments" asp-action="Dashboard">Dashboard</a></li>
+            <li><a asp-controller="Payments" asp-action="Details">Details</a></li>
+            <li><a asp-controller="Payments" asp-action="Operations">Operations</a></li>
+            <li><a asp-controller="Payments" asp-action="Summary">Summary</a></li>
+            <li><a asp-controller="Payments" asp-action="History">History</a></li>
+        </ul>
+    }
+    else if (ViewBag.ActiveModule == "Schedules")
+    {
+        <h3 class="sidebar-heading">Schedules</h3>
+        <ul class="sidebar-nav">
+            <li><a asp-controller="Schedules" asp-action="Dashboard">Dashboard</a></li>
+            <li><a asp-controller="Schedules" asp-action="Details">Details</a></li>
+            <li><a asp-controller="Schedules" asp-action="Operations">Operations</a></li>
+            <li><a asp-controller="Schedules" asp-action="Summary">Summary</a></li>
+            <li><a asp-controller="Schedules" asp-action="History">History</a></li>
+        </ul>
+    }
+    else if (ViewBag.ActiveModule == "Transfers")
+    {
+        <h3 class="sidebar-heading">Transfers</h3>
+        <ul class="sidebar-nav">
+            <li><a asp-controller="Transfers" asp-action="Dashboard">Dashboard</a></li>
+            <li><a asp-controller="Transfers" asp-action="Details">Details</a></li>
+            <li><a asp-controller="Transfers" asp-action="Operations">Operations</a></li>
+            <li><a asp-controller="Transfers" asp-action="Summary">Summary</a></li>
+            <li><a asp-controller="Transfers" asp-action="History">History</a></li>
+        </ul>
+    }
+    else if (ViewBag.ActiveModule == "Setup")
+    {
+        <h3 class="sidebar-heading">Setup</h3>
+        <ul class="sidebar-nav">
+            <li><a href="/Setup/Configurations">Configurations</a></li>
+            <li><a href="/Setup/Projects">Projects</a></li>
+            <li><a asp-controller="Setup" asp-action="Proj">Proj</a></li>
+            <li><a asp-controller="Setup" asp-action="Roles">Roles</a></li>
+            <li><a asp-controller="Setup" asp-action="Users">Users</a></li>
+        </ul>
+    }
+    else
+    {
+        <ul class="sidebar-nav">
+            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li><a asp-controller="Customers" asp-action="Index">Customers</a></li>
+            <li><a asp-controller="Plots" asp-action="Index">Plots</a></li>
+            <li><a asp-controller="Payments" asp-action="Index">Payments</a></li>
+            <li><a asp-controller="Schedules" asp-action="Index">Schedules</a></li>
+            <li><a asp-controller="Transfers" asp-action="Index">Transfers</a></li>
+            <li><a asp-controller="Setup" asp-action="Index">Setup</a></li>
+        </ul>
+    }
+</aside>

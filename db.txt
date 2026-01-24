@@ -1,0 +1,159 @@
+DATABASE SCHEMA REPORT
+======================
+
+TABLE: __EFMigrationsHistory
+----------------------------
+- MigrationId (nvarchar)
+- ProductVersion (nvarchar)
+
+TABLE: BlockStatus
+------------------
+- UID (int)
+- CustomerNo (nvarchar)
+- BlockedStatus (nvarchar)
+- BlockedDate (date)
+- BlockedBy (nvarchar)
+- BlockedReason (nvarchar)
+- RecordStatus (nvarchar)
+
+TABLE: Challan
+--------------
+- uid (int)
+- customerno (varchar)
+- depsoiteslipno (varchar)
+- bankname (varchar)
+- bankverified (varchar)
+- depositdate (date)
+- bankverifieddate (date)
+- deposittype (varchar)
+- currency (varchar)
+- createdby (varchar)
+- verifiedby (varchar)
+- creationdate (date)
+
+TABLE: Configurations
+---------------------
+- Id (int)
+- ConfigKey (nvarchar)
+- ConfigValue (nvarchar)
+- IsActive (bit)
+
+TABLE: CustomerAuditLog
+-----------------------
+- LogID (int)
+- CustomerID (nvarchar)
+- ActionType (nvarchar)
+- ChangedFields (nvarchar)
+- OldValues (nvarchar)
+- NewValues (nvarchar)
+- ActionBy (nvarchar)
+- ActionDate (datetime)
+- Remarks (nvarchar)
+
+TABLE: Customers
+----------------
+- uid (int)
+- customerno (varchar)
+- fullname (varchar)
+- fathername (varchar)
+- cnic (varchar)
+- contactno (varchar)
+- email (varchar)
+- gender (varchar)
+- presaddress (varchar)
+- premaddress (varchar)
+- prescity (varchar)
+- premcity (varchar)
+- prescountry (varchar)
+- premcountry (varchar)
+- creationdate (date)
+- createdby (varchar)
+
+TABLE: InventoryDetail
+----------------------
+- UID (int)
+- Project (varchar)
+- SubProject (varchar)
+- Sector (varchar)
+- Block (varchar)
+- Street (varchar)
+- PlotNo (varchar)
+- Category (varchar)
+- UnitSize (varchar)
+- UnitType (varchar)
+- DevelopmentStatus (varchar)
+- ConstStatus (varchar)
+- AllotmentStatus (varchar)
+- CustomerNo (varchar)
+- AllotmentDate (date)
+- AllottedBy (varchar)
+- FloorNo (varchar)
+- UnitNo (varchar)
+- CreationDate (date)
+
+TABLE: JointOwners
+------------------
+- uid (int)
+- customerno (varchar)
+- jointname (varchar)
+- jointfname (varchar)
+- jointcnic (varchar)
+- jointcontactno (varchar)
+- jointaddress (varchar)
+
+TABLE: Nominee
+--------------
+- uid (int)
+- customerno (varchar)
+- nominame (varchar)
+- nomifname (varchar)
+- nomicnic (varchar)
+- nomicontactno (varchar)
+- nomirelation (varchar)
+
+TABLE: PaymentPlan
+------------------
+- uid (int)
+- planno (varchar)
+- plandetail (varchar)
+- totalamount (varchar)
+- paymenttype (varchar)
+- comments (text)
+- createdby (varchar)
+- creationdate (date)
+- sizedetail (varchar)
+
+TABLE: paymentplanchild
+-----------------------
+- uid (int)
+- planno (varchar)
+- paymentdesc (varchar)
+- installmentno (varchar)
+- duedate (varchar)
+- dueamount (varchar)
+- surchargepolicy (varchar)
+- surchargerate (varchar)
+- discount (varchar)
+- comments (text)
+- createdby (varchar)
+- creationdate (varchar)
+- depsoiteslipno (varchar)
+- bankname (varchar)
+
+TABLE: Projects
+---------------
+- Id (int)
+- ProjectName (nvarchar)
+- ProjectDescription (nvarchar)
+- CreatedAt (datetime)
+- SubProject (nvarchar)
+- Prefix (nvarchar)
+
+TABLE: RequestedProperty
+------------------------
+- uid (int)
+- customerno (varchar)
+- reqproject (varchar)
+- reqsize (varchar)
+- reqcategory (varchar)
+- reqconstruction (varchar)

@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PMS</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="~/css/site.css" />
+    
+    <!-- Allow optional styles defined in views -->
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    @await Html.PartialAsync("_TopBar")
+    @await Html.PartialAsync("_SecondTopBar")
+    
+    <div class="main-container">
+        @await Html.PartialAsync("_Sidebar")
+        
+        <main class="content-area">
+            @RenderBody()
+        </main>
+    </div>
+    
+    @await Html.PartialAsync("_Footer")
+    
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    
+    <!-- Sidebar Navigation Script -->
+    <script>
+        function initSidebarNavigation() {
+            // Wait for Bootstrap to be available
+            if (typeof bootstrap === 'undefined') {
+                setTimeout(initSidebarNavigation, 50);
+                return;
+            }
+            
+            // Get current URL path
+            const currentPath = window.location.pathname.toLowerCase();
+            const pathParts = currentPath.split('/').filter(p => p);
+            
+            // Helper function to check if a link matches the current path
+            function isLinkActive(link) {
+                const href = link.getAttribute('href');
+                const controller = link.getAttribute('asp-controller');
+                const action = link.getAttribute('asp-action');
+                
+                // Check ASP.NET Core routing attributes first
+                if (controller && action) {
+                    const controllerLower = controller.toLowerCase();
+                    const actionLower = action.toLowerCase();
+                    
+                    // Exact match: controller and action must match URL path exactly
+                    if (pathParts.length >= 2) {
+                        const urlController = pathParts[0];
+                        const urlAction = pathParts[1];
+                        
+                        // Exact match check first
+                        if (urlController === controllerLower && urlAction === actionLower) {
+                            return true;
+                        }
+                        
+                        // Special handling for action name variations (only for specific cases)
+                        const actionVariations = {
+                            'customersoperation': ['customersoperation', 'operation', 'operations'],
+                            'customersdetail': ['customersdetail', 'customersedit', 'customersdetails', 'detail', 'details'],
+                            'customersedit': ['customersedit', 'customersdetails', 'customersdetail'],
+                            'customersdetails': ['customersdetails', 'customersedit', 'customersdetail'],
+                            'details': ['details', 'detail', 'customersdetails', 'customersedit'],
+                            'operations': ['operations', 'operation']
+                        };
+                        
+                        // Only apply variations for specific actions, not for index/allplots
+                        if (actionVariations[actionLower]) {
+                            const variations = actionVariations[actionLower];
+                            if (urlController === controllerLower && variations.includes(urlAction)) {
+                                return true;
+                            }
+                        }
+                    } else if (pathParts.length === 1) {
+                        // Single path part - only match if it's the controller and action is 'index'
+                        const urlController = pathParts[0];
+                        if (urlController === controllerLower && actionLower === 'index') {
+                            return true;
+                        }
+                    }
+                }
+                
+                // Check href attribute as fallback
+                if (href && href !== '#') {
+                    const linkPath = href.toLowerCase();
+                    // Only match if paths are exactly equal (not partial match)
+                    if (currentPath === linkPath) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            }
+            
+            // Special handling: CustomersEdit and CustomersDetails should keep Details link active
+            const isCustomersEditOrDetails = pathParts.length >= 2 && 
+                pathParts[0] === 'customers' && 
+                (pathParts[1] === 'customersedit' || pathParts[1] === 'customersdetails');
+            
+            // Find all navigation links
+            const navLinks = document.querySelectorAll('.sidebar-nav a, .nav-submenu a');
+            
+            // Check each link and mark as active if it matches current path
+            navLinks.forEach(function(link) {
+                const controller = link.getAttribute('asp-controller');
+                const action = link.getAttribute('asp-action');
+                
+                // Special case: If on CustomersEdit or CustomersDetails, highlight CustomersDetail link
+                if (isCustomersEditOrDetails && controller && controller.toLowerCase() === 'customers' && 
+                    action && action.toLowerCase() === 'customersdetail') {
+                    link.classList.add('active');
+                    return;
+                }
+                
+                if (isLinkActive(link)) {
+                    link.classList.add('active');
+                    
+                    // If this is a submenu link, expand the parent dropdown
+                    const submenu = link.closest('.nav-submenu');
+                    if (submenu) {
+                        try {
+                            const submenuElement = bootstrap.Collapse.getInstance(submenu) || new bootstrap.Collapse(submenu, {
+                                toggle: false
+                            });
+                            submenuElement.show();
+                            
+                            const parentLink = document.querySelector('[data-bs-target="#' + submenu.id + '"]');
+                            if (parentLink) {
+                                parentLink.setAttribute('aria-expanded', 'true');
+                            }
+                        } catch (e) {
+                            // Fallback if Bootstrap Collapse fails
+                            submenu.classList.add('show');
+                            const parentLink = document.querySelector('[data-bs-target="#' + submenu.id + '"]');
+                            if (parentLink) {
+                                parentLink.setAttribute('aria-expanded', 'true');
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', initSidebarNavigation);
+    </script>
+    
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

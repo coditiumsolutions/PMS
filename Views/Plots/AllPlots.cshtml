@@ -1,0 +1,212 @@
+@model IEnumerable<PMS.Web.Models.InventoryDetail>
+
+@{
+    ViewData["Title"] = "Plots Detail";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Plots Detail</h2>
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row align-items-end">
+                <div class="col-md-3">
+                    <label for="plotTypeSelect" class="form-label fw-semibold">Plot Type</label>
+                    <select id="plotTypeSelect" class="form-select">
+                        <option value="">Select Plot Type</option>
+                        <option value="Residential">Residential</option>
+                        <option value="Commercial">Commercial</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="plotNoInput" class="form-label fw-semibold">Plot No</label>
+                    <input type="text" id="plotNoInput" class="form-control" placeholder="Enter Plot No" />
+                </div>
+                <div class="col-md-3">
+                    <button type="button" id="searchButton" class="btn btn-primary w-100">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="alert alert-info mb-0">
+                    No plots found. <a asp-action="Create">Create a new plot</a> to get started.
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                    <table class="table table-bordered table-striped table-hover mb-0" id="plotsTable">
+                        <thead class="table-dark sticky-top">
+                            <tr>
+                                <th scope="col" class="ps-3">@Html.DisplayNameFor(model => model.Project)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.SubProject)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.Sector)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.Block)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.PlotNo)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.Category)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.UnitSize)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.UnitType)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.AllotmentStatus)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.CustomerNo)</th>
+                                <th scope="col" class="pe-3 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-3">@Html.DisplayFor(modelItem => item.Project)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.SubProject)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Sector)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Block)</td>
+                                    <td class="fw-medium">@Html.DisplayFor(modelItem => item.PlotNo)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Category)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.UnitSize)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.UnitType)</td>
+                                    <td>
+                                        @if (item.AllotmentStatus?.ToLower() == "allotted" || item.AllotmentStatus?.ToLower() == "reserved")
+                                        {
+                                            <span class="badge bg-success">@Html.DisplayFor(modelItem => item.AllotmentStatus)</span>
+                                        }
+                                        else if (item.AllotmentStatus?.ToLower() == "available")
+                                        {
+                                            <span class="badge bg-info">@Html.DisplayFor(modelItem => item.AllotmentStatus)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@Html.DisplayFor(modelItem => item.AllotmentStatus)</span>
+                                        }
+                                    </td>
+                                    <td>@Html.DisplayFor(modelItem => item.CustomerNo)</td>
+                                    <td class="pe-3 text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" asp-route-id="@item.UID" class="btn btn-sm btn-info">Details</a>
+                                            <a asp-action="Edit" asp-route-id="@item.UID" class="btn btn-sm btn-warning">Edit</a>
+                                            <a asp-action="Delete" asp-route-id="@item.UID" class="btn btn-sm btn-danger">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    (function () {
+        const plotTypeSelect = document.getElementById('plotTypeSelect');
+        const plotNoInput = document.getElementById('plotNoInput');
+        const searchButton = document.getElementById('searchButton');
+        const table = document.getElementById('plotsTable');
+        
+        if (!plotTypeSelect || !plotNoInput || !searchButton || !table) {
+            return;
+        }
+
+        const tbody = table.getElementsByTagName('tbody')[0];
+        if (!tbody) {
+            return;
+        }
+
+        const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+        function filterTable() {
+            const plotType = plotTypeSelect.value.trim();
+            const plotNo = plotNoInput.value.trim().toLowerCase();
+            
+            // If both fields are empty, show all rows
+            if (!plotType && !plotNo) {
+                rows.forEach(row => {
+                    row.style.display = '';
+                });
+                return;
+            }
+            
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                let matches = true;
+                
+                // Check PlotType (Category column - index 5)
+                if (plotType) {
+                    const categoryCell = cells[5];
+                    const categoryText = (categoryCell.textContent || categoryCell.innerText).trim();
+                    if (categoryText !== plotType) {
+                        matches = false;
+                    }
+                }
+                
+                // Check PlotNo (PlotNo column - index 4)
+                if (plotNo && matches) {
+                    const plotNoCell = cells[4];
+                    const plotNoText = (plotNoCell.textContent || plotNoCell.innerText).trim().toLowerCase();
+                    if (plotNoText.indexOf(plotNo) === -1) {
+                        matches = false;
+                    }
+                }
+                
+                row.style.display = matches ? '' : 'none';
+            });
+        }
+
+        // Search button click event
+        searchButton.addEventListener('click', filterTable);
+        
+        // Allow Enter key to trigger search
+        plotNoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                filterTable();
+            }
+        });
+        
+        // Allow Enter key on PlotType select
+        plotTypeSelect.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                filterTable();
+            }
+        });
+    })();
+</script>
+
+@section Styles {
+    <style>
+        .container-fluid {
+            font-size: 0.875rem;
+        }
+        .container-fluid h2 {
+            font-size: 1.5rem;
+        }
+        .table {
+            font-size: 0.875rem;
+        }
+        .table th {
+            font-size: 0.875rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .form-label {
+            font-size: 0.875rem;
+        }
+        .btn {
+            font-size: 0.875rem;
+        }
+    </style>
+}
