@@ -1,23 +1,24 @@
 @model PMS.Web.Models.InventoryDetail
 
 @{
-    ViewData["Title"] = "Edit Plot";
+    ViewData["Title"] = "Create Inventory";
+    var projectOptions = ViewBag.ProjectOptions as List<string> ?? new();
+    var subProjectOptions = ViewBag.SubProjectOptions as List<string> ?? new();
 }
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Edit Plot</h2>
-        <a asp-action="AllPlots" class="btn btn-secondary">Back to List</a>
+        <h2>Create Inventory</h2>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
     </div>
 
     <div class="row">
         <div class="col-lg-12">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <form asp-action="Edit">
+                    <form asp-action="Create">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-                        <input type="hidden" asp-for="UID" />
-                        
+
                         <!-- Project Information Section -->
                         <div class="card mb-4">
                             <div class="card-header bg-primary text-white">
@@ -27,34 +28,50 @@
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
                                         <label asp-for="Project" class="form-label fw-semibold"></label>
-                                        <input asp-for="Project" class="form-control" />
+                                        <select asp-for="Project" class="form-select" required>
+                                            <option value="">Select Project</option>
+                                            @foreach (var project in projectOptions)
+                                            {
+                                            <option value="@project" @(project == Model.Project ? "selected" : "")>
+                                                @project
+                                            </option>
+                                            }
+                                        </select>
                                         <span asp-validation-for="Project" class="text-danger"></span>
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label asp-for="SubProject" class="form-label fw-semibold"></label>
-                                        <input asp-for="SubProject" class="form-control" />
+                                        <select asp-for="SubProject" class="form-select" required>
+                                            <option value="">Select Sub Project</option>
+                                            @foreach (var sub in subProjectOptions)
+                                            {
+                                            <option value="@sub" @(sub == Model.SubProject ? "selected" : "")>
+                                                @sub
+                                            </option>
+                                            }
+                                        </select>
                                         <span asp-validation-for="SubProject" class="text-danger"></span>
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label asp-for="Sector" class="form-label fw-semibold"></label>
-                                        <input asp-for="Sector" class="form-control" />
+                                        <input asp-for="Sector" class="form-control" required />
                                         <span asp-validation-for="Sector" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
                                         <label asp-for="Block" class="form-label fw-semibold"></label>
-                                        <input asp-for="Block" class="form-control" />
+                                        <input asp-for="Block" class="form-control" required />
                                         <span asp-validation-for="Block" class="text-danger"></span>
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label asp-for="Street" class="form-label fw-semibold"></label>
-                                        <input asp-for="Street" class="form-control" />
+                                        <input asp-for="Street" class="form-control" required />
                                         <span asp-validation-for="Street" class="text-danger"></span>
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label asp-for="PlotNo" class="form-label fw-semibold"></label>
-                                        <input asp-for="PlotNo" class="form-control" />
+                                        <input asp-for="PlotNo" class="form-control" required />
                                         <span asp-validation-for="PlotNo" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -67,42 +84,42 @@
                                 <h5 class="mb-0">Unit Information</h5>
                             </div>
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
                                         <label asp-for="Category" class="form-label fw-semibold"></label>
-                                        <select asp-for="Category" class="form-select">
+                                        <select asp-for="Category" class="form-select" required>
                                             <option value="">Select Category</option>
                                             <option value="Residential">Residential</option>
                                             <option value="Commercial">Commercial</option>
                                         </select>
                                         <span asp-validation-for="Category" class="text-danger"></span>
                                     </div>
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-4">
                                         <label asp-for="UnitSize" class="form-label fw-semibold"></label>
-                                        <input asp-for="UnitSize" class="form-control" placeholder="e.g., 5 Marla, 10 Marla" />
+                                        <input asp-for="UnitSize" class="form-control" placeholder="e.g., 5 Marla" />
                                         <span asp-validation-for="UnitSize" class="text-danger"></span>
                                     </div>
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-4">
                                         <label asp-for="UnitType" class="form-label fw-semibold"></label>
-                                        <select asp-for="UnitType" class="form-select">
+                                        <select asp-for="UnitType" class="form-select" id="unitTypeSelect">
                                             <option value="">Select Unit Type</option>
                                             <option value="Plot">Plot</option>
+                                            <option value="Villa">Villa</option>
                                             <option value="Apartment">Apartment</option>
                                             <option value="Shop">Shop</option>
                                             <option value="Office">Office</option>
-                                            <option value="Villa">Villa</option>
                                             <option value="Warehouse">Warehouse</option>
                                         </select>
                                         <span asp-validation-for="UnitType" class="text-danger"></span>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
+                                <div class="row g-3 mt-3" id="unitExtraFields" style="display:none">
+                                    <div class="col-md-4">
                                         <label asp-for="FloorNo" class="form-label fw-semibold"></label>
                                         <input asp-for="FloorNo" class="form-control" />
                                         <span asp-validation-for="FloorNo" class="text-danger"></span>
                                     </div>
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-4">
                                         <label asp-for="UnitNo" class="form-label fw-semibold"></label>
                                         <input asp-for="UnitNo" class="form-control" />
                                         <span asp-validation-for="UnitNo" class="text-danger"></span>
@@ -117,76 +134,39 @@
                                 <h5 class="mb-0">Status Information</h5>
                             </div>
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
                                         <label asp-for="DevelopmentStatus" class="form-label fw-semibold"></label>
                                         <select asp-for="DevelopmentStatus" class="form-select">
-                                            <option value="">Select Status</option>
+                                            <option value="No" selected>No</option>
                                             <option value="Developed">Developed</option>
                                             <option value="Under Development">Under Development</option>
                                         </select>
                                         <span asp-validation-for="DevelopmentStatus" class="text-danger"></span>
                                     </div>
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-4">
                                         <label asp-for="ConstStatus" class="form-label fw-semibold"></label>
                                         <select asp-for="ConstStatus" class="form-select">
-                                            <option value="">Select Status</option>
+                                            <option value="Vacant" selected>Vacant</option>
                                             <option value="Completed">Completed</option>
                                             <option value="Under Construction">Under Construction</option>
-                                            <option value="Vacant">Vacant</option>
                                         </select>
                                         <span asp-validation-for="ConstStatus" class="text-danger"></span>
                                     </div>
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-4">
                                         <label asp-for="AllotmentStatus" class="form-label fw-semibold"></label>
                                         <select asp-for="AllotmentStatus" class="form-select">
-                                            <option value="">Select Status</option>
-                                            <option value="Available">Available</option>
+                                            <option value="Available" selected>Available</option>
                                             <option value="Reserved">Reserved</option>
                                             <option value="Allotted">Allotted</option>
                                         </select>
                                         <span asp-validation-for="AllotmentStatus" class="text-danger"></span>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- Allotment Information Section -->
-                        <div class="card mb-4">
-                            <div class="card-header bg-warning text-dark">
-                                <h5 class="mb-0">Allotment Information</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <label asp-for="CustomerNo" class="form-label fw-semibold"></label>
-                                        <input asp-for="CustomerNo" class="form-control" />
-                                        <span asp-validation-for="CustomerNo" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label asp-for="AllotmentDate" class="form-label fw-semibold"></label>
-                                        <input asp-for="AllotmentDate" type="date" class="form-control" />
-                                        <span asp-validation-for="AllotmentDate" class="text-danger"></span>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label asp-for="AllottedBy" class="form-label fw-semibold"></label>
-                                        <input asp-for="AllottedBy" class="form-control" />
-                                        <span asp-validation-for="AllottedBy" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Additional Information Section -->
-                        <div class="card mb-4">
-                            <div class="card-header bg-secondary text-white">
-                                <h5 class="mb-0">Additional Information</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
                                         <label asp-for="CreationDate" class="form-label fw-semibold"></label>
-                                        <input asp-for="CreationDate" type="date" class="form-control" />
+                                        <input asp-for="CreationDate" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
                                         <span asp-validation-for="CreationDate" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -194,8 +174,8 @@
                         </div>
 
                         <div class="d-flex gap-2 mt-4">
-                            <input type="submit" value="Save Changes" class="btn btn-primary btn-lg" />
-                            <a asp-action="AllPlots" class="btn btn-secondary btn-lg">Cancel</a>
+                            <input type="submit" value="Create Inventory" class="btn btn-primary btn-lg" />
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">Cancel</a>
                         </div>
                     </form>
                 </div>
@@ -206,4 +186,21 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        (function () {
+            const unitTypeSelect = document.getElementById('unitTypeSelect');
+            const unitExtraFields = document.getElementById('unitExtraFields');
+
+            function toggleUnitFields() {
+                const value = (unitTypeSelect.value || '').toLowerCase();
+                const shouldShow = value && value !== 'plot' && value !== 'villa';
+                unitExtraFields.style.display = shouldShow ? '' : 'none';
+            }
+
+            if (unitTypeSelect && unitExtraFields) {
+                unitTypeSelect.addEventListener('change', toggleUnitFields);
+                toggleUnitFields();
+            }
+        })();
+    </script>
 }

@@ -1,13 +1,13 @@
 @model IEnumerable<PMS.Web.Models.InventoryDetail>
 
 @{
-    ViewData["Title"] = "Reserved Plots";
+    ViewData["Title"] = "Reserved Inventory";
 }
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Reserved Plots</h2>
-        <a asp-action="AllPlots" class="btn btn-secondary">View All Plots</a>
+        <h2>Reserved Inventory</h2>
+        <a asp-action="Index" class="btn btn-secondary">View All Inventory</a>
     </div>
 
     @if (Model == null || !Model.Any())

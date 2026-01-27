@@ -1,15 +1,15 @@
 @model PMS.Web.Models.InventoryDetail
 
 @{
-    ViewData["Title"] = "Plot Details";
+    ViewData["Title"] = "Inventory Details";
 }
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Plot Details</h2>
+        <h2>Inventory Details</h2>
         <div>
             <a asp-action="Edit" asp-route-id="@Model.UID" class="btn btn-primary">Edit</a>
-            <a asp-action="AllPlots" class="btn btn-secondary">Back to List</a>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
         </div>
     </div>
 

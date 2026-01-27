@@ -1,13 +1,13 @@
 @model PMS.Web.Models.InventoryDetail
 
 @{
-    ViewData["Title"] = "Delete Plot";
+    ViewData["Title"] = "Delete Inventory";
 }
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Delete Plot</h2>
-        <a asp-action="AllPlots" class="btn btn-secondary">Back to List</a>
+        <h2>Delete Inventory</h2>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
     </div>
 
     <div class="row">
@@ -89,8 +89,8 @@
             <form asp-action="Delete" class="mt-4">
                 <input type="hidden" asp-for="UID" />
                 <div class="d-flex gap-2">
-                    <input type="submit" value="Delete Plot" class="btn btn-danger btn-lg" />
-                    <a asp-action="AllPlots" class="btn btn-secondary btn-lg">Cancel</a>
+                    <input type="submit" value="Delete Inventory" class="btn btn-danger btn-lg" />
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">Cancel</a>
                 </div>
             </form>
         </div>

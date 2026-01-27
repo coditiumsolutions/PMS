@@ -20,15 +20,14 @@
             </li>
         </ul>
     }
-    else if (ViewBag.ActiveModule == "Plots")
+    else if (ViewBag.ActiveModule == "Inventory")
     {
-        <h3 class="sidebar-heading">Plots</h3>
+        <h3 class="sidebar-heading">Inventory</h3>
         <ul class="sidebar-nav">
-            <li><a asp-controller="Plots" asp-action="Dashboard">Dashboard</a></li>
-            <li><a asp-controller="Plots" asp-action="Summary">Summary</a></li>
-            <li><a asp-controller="Plots" asp-action="AllPlots">All Plots</a></li>
-            <li><a asp-controller="Plots" asp-action="Reserved">Reserved Plots</a></li>
-            <li><a asp-controller="Plots" asp-action="History">History</a></li>
+            <li><a asp-controller="Inventory" asp-action="Index">Dashboard</a></li>
+            <li><a asp-controller="Inventory" asp-action="Summary">Summary</a></li>
+            <li><a asp-controller="Inventory" asp-action="Reserved">Reserved Inventory</a></li>
+            <li><a asp-controller="Inventory" asp-action="History">History</a></li>
         </ul>
     }
     else if (ViewBag.ActiveModule == "Payments")
@@ -104,7 +103,7 @@
         <ul class="sidebar-nav">
             <li><a asp-controller="Home" asp-action="Index">Home</a></li>
             <li><a asp-controller="Customers" asp-action="Index">Customers</a></li>
-            <li><a asp-controller="Plots" asp-action="Index">Plots</a></li>
+            <li><a asp-controller="Inventory" asp-action="Index">Inventory</a></li>
             <li><a asp-controller="Payments" asp-action="Index">Payments</a></li>
             <li><a asp-controller="Schedules" asp-action="Index">Schedules</a></li>
             <li><a asp-controller="Transfers" asp-action="Index">Transfers</a></li>

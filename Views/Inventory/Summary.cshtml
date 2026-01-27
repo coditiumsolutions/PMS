@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Plots Summary";
+    ViewData["Title"] = "Inventory Summary";
     var plotsByCategory = ViewBag.PlotsByCategory as List<KeyValuePair<string, int>> ?? new();
     var plotsByAllotmentStatus = ViewBag.PlotsByAllotmentStatus as List<KeyValuePair<string, int>> ?? new();
     var plotsByProject = ViewBag.PlotsByProject as List<KeyValuePair<string, int>> ?? new();
@@ -10,8 +10,8 @@
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-<h2>Plots Summary</h2>
-        <a asp-action="AllPlots" class="btn btn-primary">View All Plots</a>
+        <h2>Inventory Summary</h2>
+        <a asp-action="Index" class="btn btn-primary">View All Inventory</a>
     </div>
 
     <!-- Summary Statistics Cards -->

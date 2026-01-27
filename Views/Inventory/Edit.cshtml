@@ -1,21 +1,22 @@
 @model PMS.Web.Models.InventoryDetail
 
 @{
-    ViewData["Title"] = "Create Plot";
+    ViewData["Title"] = "Edit Inventory";
 }
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Create Plot</h2>
-        <a asp-action="AllPlots" class="btn btn-secondary">Back to List</a>
+        <h2>Edit Inventory</h2>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
     </div>
 
     <div class="row">
         <div class="col-lg-12">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <form asp-action="Create">
+                    <form asp-action="Edit">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        <input type="hidden" asp-for="UID" />
                         
                         <!-- Project Information Section -->
                         <div class="card mb-4">
@@ -193,8 +194,8 @@
                         </div>
 
                         <div class="d-flex gap-2 mt-4">
-                            <input type="submit" value="Create Plot" class="btn btn-primary btn-lg" />
-                            <a asp-action="AllPlots" class="btn btn-secondary btn-lg">Cancel</a>
+                            <input type="submit" value="Save Changes" class="btn btn-primary btn-lg" />
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">Cancel</a>
                         </div>
                     </form>
                 </div>
