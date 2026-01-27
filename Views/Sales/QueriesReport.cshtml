@@ -1,4 +1,5 @@
 @model IEnumerable<PMS.Web.Models.SalesQuery>
+@using System.Text.Encodings.Web
 
 @{
     ViewData["Title"] = "Queries";
@@ -97,7 +98,7 @@
                                     <td class="pe-3 text-center">
                                         <div class="btn-group" role="group">
                                             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
-                                            <button type="button" class="btn btn-sm btn-info" onclick="alert('Description: @item.Description')">Details</button>
+                                            <button type="button" class="btn btn-sm btn-info" onclick="showDetails('@item.Id', '@JavaScriptEncoder.Default.Encode(item.Title ?? "")', '@JavaScriptEncoder.Default.Encode(item.Description ?? "")', '@item.Status', '@item.Email', '@item.MobileNo')">Details</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -178,6 +179,28 @@
             });
         });
     })();
+
+    function showDetails(id, title, description, status, email, mobile) {
+        Swal.fire({
+            title: `Query #${id}: ${title}`,
+            html: `
+                <div class="text-start">
+                    <p><strong>Status:</strong> ${status}</p>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Mobile:</strong> ${mobile}</p>
+                    <hr>
+                    <p><strong>Description:</strong></p>
+                    <div class="bg-light p-3 border rounded" style="white-space: pre-wrap;">${description}</div>
+                </div>
+            `,
+            width: '600px',
+            confirmButtonText: 'Close',
+            customClass: {
+                confirmButton: 'btn btn-primary'
+            },
+            buttonsStyling: false
+        });
+    }
 </script>
 
 @section Styles {
