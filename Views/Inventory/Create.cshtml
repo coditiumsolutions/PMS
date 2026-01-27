@@ -32,9 +32,14 @@
                                             <option value="">Select Project</option>
                                             @foreach (var project in projectOptions)
                                             {
-                                            <option value="@project" @(project == Model.Project ? "selected" : "")>
-                                                @project
-                                            </option>
+                                                if (project == Model.Project)
+                                                {
+                                                    <option value="@project" selected>@project</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@project">@project</option>
+                                                }
                                             }
                                         </select>
                                         <span asp-validation-for="Project" class="text-danger"></span>
@@ -45,9 +50,14 @@
                                             <option value="">Select Sub Project</option>
                                             @foreach (var sub in subProjectOptions)
                                             {
-                                            <option value="@sub" @(sub == Model.SubProject ? "selected" : "")>
-                                                @sub
-                                            </option>
+                                                if (sub == Model.SubProject)
+                                                {
+                                                    <option value="@sub" selected>@sub</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@sub">@sub</option>
+                                                }
                                             }
                                         </select>
                                         <span asp-validation-for="SubProject" class="text-danger"></span>

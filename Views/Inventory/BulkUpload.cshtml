@@ -1,0 +1,142 @@
+@model PMS.Web.ViewModels.InventoryBulkImportViewModel
+
+@{
+    ViewData["Title"] = "Bulk Import Inventory";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Inventory Bulk Import</h2>
+        <div>
+            <a asp-action="DownloadSampleTemplate" class="btn btn-outline-primary">Download Sample Excel/CSV</a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="BulkUpload" asp-controller="Inventory" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="importFile" class="form-label">Upload Excel or CSV</label>
+                    <input type="file" name="importFile" id="importFile" class="form-control" accept=".csv,.xlsx,.xls" required />
+                    <div class="form-text">Required columns: Project, SubProject, Sector, Block, Street, PlotNo.</div>
+                    <span asp-validation-for="StatusMessage" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload and Import</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <h5>Column Requirements</h5>
+            <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Column</th>
+                        <th>Description</th>
+                        <th>Required</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Project</td>
+                        <td>Project name (must exist in Projects table)</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>SubProject</td>
+                        <td>Sub project name</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>Sector</td>
+                        <td>Sector identifier</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>Block</td>
+                        <td>Block name/number</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>Street</td>
+                        <td>Street name</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>PlotNo</td>
+                        <td>Plot identifier</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td>Category</td>
+                        <td>Residential, Commercial, etc.</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>UnitSize</td>
+                        <td>Unit size description (e.g., 5 Marla)</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>UnitType</td>
+                        <td>Plot, Apartment, Villa, etc.</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>FloorNo</td>
+                        <td>Floor number (only for non-Plot/Villa)</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>UnitNo</td>
+                        <td>Unit number (only for non-Plot/Villa)</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>DevelopmentStatus</td>
+                        <td>Default is No; allowed values include Developed</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>ConstStatus</td>
+                        <td>Default Vacant; change if under construction/completed</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>AllotmentStatus</td>
+                        <td>Default Available; can be Reserved/Allotted</td>
+                        <td>No</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model != null && (!string.IsNullOrWhiteSpace(Model.StatusMessage) || Model.Errors.Any()))
+    {
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <h5>Import Status</h5>
+                <p>@Model.StatusMessage</p>
+                <ul>
+                    <li>Inserted: <strong>@Model.Inserted</strong></li>
+                    <li>Duplicates: <strong>@Model.Duplicates</strong></li>
+                    <li>Failed: <strong>@Model.Failed</strong></li>
+                </ul>
+                @if (Model.Errors.Any())
+                {
+                    <div class="mt-3">
+                        <h6>Row Errors</h6>
+                        <ul>
+                            @foreach (var error in Model.Errors)
+                            {
+                                <li>@error</li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

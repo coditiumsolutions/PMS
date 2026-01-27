@@ -1,7 +1,13 @@
+using CsvHelper;
+using ExcelDataReader;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PMS.Web.Data;
 using PMS.Web.Models;
+using PMS.Web.ViewModels;
+using System.Globalization;
+using System.Text;
+using System.IO;
 
 namespace PMS.Web.Controllers;
 
@@ -123,6 +129,239 @@ public class InventoryController : Controller
         ViewBag.StatusCounts = System.Text.Json.JsonSerializer.Serialize(statusGroups.Select(s => s.Count));
         ViewBag.ProjectLabels = System.Text.Json.JsonSerializer.Serialize(projectGroups.Select(p => p.Label));
         ViewBag.ProjectCounts = System.Text.Json.JsonSerializer.Serialize(projectGroups.Select(p => p.Count));
+    }
+
+    // GET: Inventory/BulkUpload
+    public IActionResult BulkUpload()
+    {
+        ViewBag.ActiveModule = "Inventory";
+        return View(new InventoryBulkImportViewModel());
+    }
+
+    // GET: Inventory/DownloadSampleTemplate
+    public IActionResult DownloadSampleTemplate()
+    {
+        var builder = new StringBuilder();
+        builder.AppendLine("Project,SubProject,Sector,Block,Street,PlotNo,Category,UnitSize,UnitType");
+        builder.AppendLine("Northspire,Northspire East,Sector 1,A-1,Main Boulevard,Plot-101,Residential,5 Marla,Plot");
+        builder.AppendLine("Northspire,Northspire West,Sector 3,B-3,Sunset Avenue,Plot-202,Commercial,8 Marla,Apartment");
+        var bytes = Encoding.UTF8.GetBytes(builder.ToString());
+        return File(bytes, "text/csv", "InventoryTemplate.csv");
+    }
+
+    // POST: Inventory/BulkUpload
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> BulkUpload(IFormFile? importFile)
+    {
+        ViewBag.ActiveModule = "Inventory";
+        var result = new InventoryBulkImportViewModel();
+
+        if (importFile == null || importFile.Length == 0)
+        {
+            ModelState.AddModelError("importFile", "Please upload a CSV or Excel file containing the inventory data.");
+            return View(result);
+        }
+
+        var extension = Path.GetExtension(importFile.FileName)?.ToLowerInvariant();
+        if (extension is null or "" || (extension != ".csv" && extension != ".xls" && extension != ".xlsx"))
+        {
+            ModelState.AddModelError("importFile", "Only .csv, .xls, and .xlsx files are supported.");
+            return View(result);
+        }
+
+        List<Dictionary<string, string>> rows;
+        using var memory = new MemoryStream();
+        await importFile.CopyToAsync(memory);
+
+        try
+        {
+            if (extension == ".csv")
+            {
+                rows = ReadRowsFromCsv(memory);
+            }
+            else
+            {
+                rows = ReadRowsFromExcel(memory);
+            }
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("importFile", $"Unable to parse the file: {ex.Message}");
+            return View(result);
+        }
+
+        if (!rows.Any())
+        {
+            ModelState.AddModelError("importFile", "The uploaded file does not contain any data rows.");
+            return View(result);
+        }
+
+        var existingKeys = new HashSet<string>(_context.InventoryDetails
+            .Select(i => CreateInventoryKey(i.Project, i.SubProject, i.PlotNo))
+            .Where(k => !string.IsNullOrWhiteSpace(k)),
+            StringComparer.OrdinalIgnoreCase);
+
+        var seenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var toInsert = new List<InventoryDetail>();
+        var errors = new List<string>();
+        int duplicates = 0;
+        int failed = 0;
+        int rowNumber = 1;
+
+        foreach (var row in rows)
+        {
+            rowNumber++;
+            var project = GetValue(row, "Project");
+            var subProject = GetValue(row, "SubProject");
+            var sector = GetValue(row, "Sector");
+            var block = GetValue(row, "Block");
+            var street = GetValue(row, "Street");
+            var plotNo = GetValue(row, "PlotNo");
+
+            if (string.IsNullOrWhiteSpace(project) ||
+                string.IsNullOrWhiteSpace(subProject) ||
+                string.IsNullOrWhiteSpace(sector) ||
+                string.IsNullOrWhiteSpace(block) ||
+                string.IsNullOrWhiteSpace(street) ||
+                string.IsNullOrWhiteSpace(plotNo))
+            {
+                failed++;
+                errors.Add($"Row {rowNumber}: Required fields (Project/SubProject/Sector/Block/Street/Plot No) must not be empty.");
+                continue;
+            }
+
+            var key = CreateInventoryKey(project, subProject, plotNo);
+            if (existingKeys.Contains(key) || seenKeys.Contains(key))
+            {
+                duplicates++;
+                continue;
+            }
+
+            var inventory = new InventoryDetail
+            {
+                Project = project,
+                SubProject = subProject,
+                Sector = sector,
+                Block = block,
+                Street = street,
+                PlotNo = plotNo,
+                Category = GetValue(row, "Category"),
+                UnitSize = GetValue(row, "UnitSize"),
+                UnitType = GetValue(row, "UnitType"),
+                FloorNo = GetValue(row, "FloorNo"),
+                UnitNo = GetValue(row, "UnitNo"),
+                DevelopmentStatus = string.IsNullOrWhiteSpace(GetValue(row, "DevelopmentStatus")) ? "No" : GetValue(row, "DevelopmentStatus"),
+                ConstStatus = string.IsNullOrWhiteSpace(GetValue(row, "ConstStatus")) ? "Vacant" : GetValue(row, "ConstStatus"),
+                AllotmentStatus = string.IsNullOrWhiteSpace(GetValue(row, "AllotmentStatus")) ? "Available" : GetValue(row, "AllotmentStatus"),
+                CreationDate = ParseDate(GetValue(row, "CreationDate")) ?? DateTime.Today
+            };
+
+            toInsert.Add(inventory);
+            seenKeys.Add(key);
+        }
+
+        if (toInsert.Any())
+        {
+            await _context.InventoryDetails.AddRangeAsync(toInsert);
+            await _context.SaveChangesAsync();
+            result.Inserted = toInsert.Count;
+        }
+
+        result.Duplicates = duplicates;
+        result.Failed = failed;
+        result.Errors = errors;
+        result.StatusMessage = $"Processed {rows.Count} row(s): {result.Inserted} inserted, {duplicates} duplicates, {failed} failed.";
+
+        return View("BulkUpload", result);
+    }
+
+    private static string CreateInventoryKey(string? project, string? subProject, string? plotNo)
+    {
+        return $"{project?.Trim() ?? string.Empty}|{subProject?.Trim() ?? string.Empty}|{plotNo?.Trim() ?? string.Empty}";
+    }
+
+    private static string GetValue(Dictionary<string, string> row, string key)
+    {
+        return row.TryGetValue(key, out var value) ? value : string.Empty;
+    }
+
+    private static DateTime? ParseDate(string value)
+    {
+        if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
+        {
+            return parsed.Date;
+        }
+        return null;
+    }
+
+    private static List<Dictionary<string, string>> ReadRowsFromCsv(Stream stream)
+    {
+        stream.Position = 0;
+        using var reader = new StreamReader(stream, Encoding.UTF8, true, 1024, true);
+        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+        var rows = new List<Dictionary<string, string>>();
+
+
+        csv.Read();
+        csv.ReadHeader();
+
+        while (csv.Read())
+        {
+            var record = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var header in csv.HeaderRecord!)
+            {
+                var field = csv.GetField(header);
+                record[header] = field?.Trim() ?? string.Empty;
+            }
+            rows.Add(record);
+        }
+
+        return rows;
+    }
+
+    private static List<Dictionary<string, string>> ReadRowsFromExcel(Stream stream)
+    {
+        stream.Position = 0;
+        System.Text.Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        using var reader = ExcelReaderFactory.CreateReader(stream);
+        var dataset = reader.AsDataSet();
+
+        if (dataset.Tables.Count == 0)
+        {
+            return new();
+        }
+
+        var table = dataset.Tables[0];
+        if (table.Rows.Count < 1)
+        {
+            return new();
+        }
+
+        var headers = table.Rows[0].ItemArray
+            .Select(x => x?.ToString()?.Trim() ?? string.Empty)
+            .ToList();
+
+        var rows = new List<Dictionary<string, string>>();
+
+        for (var i = 1; i < table.Rows.Count; i++)
+        {
+            var rowDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            for (var j = 0; j < table.Columns.Count; j++)
+            {
+                var header = j < headers.Count ? headers[j] : $"Column{j}";
+                if (string.IsNullOrWhiteSpace(header))
+                {
+                    header = $"Column{j}";
+                }
+
+                var value = table.Rows[i][j]?.ToString()?.Trim() ?? string.Empty;
+                rowDict[header] = value;
+            }
+            rows.Add(rowDict);
+        }
+
+        return rows;
     }
 
     // GET: Inventory/Summary
