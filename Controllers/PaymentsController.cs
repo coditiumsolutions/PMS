@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PMS.Web.Data;
 using PMS.Web.Models;
+using PMS.Web.ViewModels;
 
 namespace PMS.Web.Controllers;
 
@@ -232,6 +233,121 @@ public class PaymentsController : Controller
         await _context.SaveChangesAsync();
 
         return RedirectToAction(nameof(ChallanDetails), new { id });
+    }
+
+    // GET: Payments/ProcessChallanPayments/5
+    public async Task<IActionResult> ProcessChallanPayments(int id)
+    {
+        ViewBag.ActiveModule = "Payments";
+
+        var challan = await _context.Challans
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.uid == id);
+
+        if (challan == null)
+        {
+            return NotFound();
+        }
+
+        var payments = await _context.Payments
+            .AsNoTracking()
+            .Where(p => p.customerno == challan.customerno)
+            .OrderByDescending(p => p.uId)
+            .ToListAsync();
+
+        var viewModel = new ChallanPaymentsViewModel
+        {
+            Challan = challan,
+            Payments = payments,
+            NewPayment = new Payment
+            {
+                customerno = challan.customerno,
+                BankName = challan.bankname ?? string.Empty,
+                DSNo = challan.depsoiteslipno,
+                DSDate = challan.depositdate?.ToString("yyyy-MM-dd")
+            }
+        };
+
+        // Populate dropdown sources
+        ViewBag.BankNames = await _context.Configurations
+            .AsNoTracking()
+            .Where(c => c.ConfigKey == "Bank")
+            .Select(c => c.ConfigValue)
+            .ToListAsync();
+
+        ViewBag.PaymentDescriptions = await _context.Configurations
+            .AsNoTracking()
+            .Where(c => c.ConfigKey == "PaymentDesc")
+            .Select(c => c.ConfigValue)
+            .ToListAsync();
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddPaymentInline(int challanId, [Bind(Prefix = "NewPayment")] Payment input)
+    {
+        if (!Request.Headers.ContainsKey("X-Requested-With"))
+        {
+            return BadRequest();
+        }
+
+        var challan = await _context.Challans
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.uid == challanId);
+
+        if (challan == null)
+        {
+            return NotFound();
+        }
+
+        if (string.IsNullOrWhiteSpace(input.PaidAmount))
+        {
+            return BadRequest(new { errors = new[] { "Paid Amount is required." } });
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+
+            return BadRequest(new { errors });
+        }
+
+        var payment = new Payment
+        {
+            customerno = challan.customerno ?? string.Empty,
+            PaidAmount = input.PaidAmount,
+            PaidDate = input.PaidDate,
+            Method = input.Method,
+            BankName = string.IsNullOrWhiteSpace(input.BankName)
+                ? (challan.bankname ?? string.Empty)
+                : input.BankName,
+            CreatedBy = input.CreatedBy,
+            DSNo = challan.depsoiteslipno,
+            DSDate = challan.depositdate?.ToString("yyyy-MM-dd"),
+            DDNo = input.DDNo,
+            DDDate = input.DDDate,
+            ChequeNo = input.ChequeNo,
+            ChequeDate = input.ChequeDate,
+            InstallNo = input.InstallNo,
+            PaymentDescription = input.PaymentDescription,
+            CreatedOn = DateTime.Now.ToString("yyyy-MM-dd")
+        };
+
+        _context.Payments.Add(payment);
+        await _context.SaveChangesAsync();
+
+        var payments = await _context.Payments
+            .AsNoTracking()
+            .Where(p => p.customerno == challan.customerno)
+            .OrderByDescending(p => p.uId)
+            .ToListAsync();
+
+        return PartialView("_ChallanPaymentsTable", payments);
     }
 }
 

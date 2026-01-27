@@ -1,0 +1,41 @@
+@model IEnumerable<PMS.Web.Models.Payment>
+
+<table class="table table-sm table-bordered table-striped mb-0">
+    <thead class="table-light">
+        <tr>
+            <th class="text-center">ID</th>
+            <th>Paid Amount</th>
+            <th>Paid Date</th>
+            <th>Method</th>
+            <th>Bank Name</th>
+            <th>DS No</th>
+            <th>Install No</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model == null || !Model.Any())
+        {
+            <tr>
+                <td colspan="8" class="text-center text-muted">No payments found for this customer.</td>
+            </tr>
+        }
+        else
+        {
+            foreach (var p in Model)
+            {
+                <tr>
+                    <td class="text-center">@p.uId</td>
+                    <td>@p.PaidAmount</td>
+                    <td>@p.PaidDate</td>
+                    <td>@p.Method</td>
+                    <td>@p.BankName</td>
+                    <td>@p.DSNo</td>
+                    <td>@p.InstallNo</td>
+                    <td>@p.PaymentDescription</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
