@@ -198,5 +198,40 @@ public class PaymentsController : Controller
             .ToList();
         return View(unVerifiedChallans);
     }
+
+    // GET: Payments/ChallanDetails/5
+    public async Task<IActionResult> ChallanDetails(int id)
+    {
+        ViewBag.ActiveModule = "Payments";
+
+        var challan = await _context.Challans
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.uid == id);
+
+        if (challan == null)
+        {
+            return NotFound();
+        }
+
+        return View(challan);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateChallanStatus(int id, string bankverified)
+    {
+        ViewBag.ActiveModule = "Payments";
+
+        var challan = await _context.Challans.FirstOrDefaultAsync(c => c.uid == id);
+        if (challan == null)
+        {
+            return NotFound();
+        }
+
+        challan.bankverified = bankverified;
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(ChallanDetails), new { id });
+    }
 }
 

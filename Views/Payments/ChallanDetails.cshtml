@@ -1,0 +1,141 @@
+@model PMS.Web.Models.Challan
+
+@{
+    ViewData["Title"] = "Challan Details";
+}
+
+<div class="container-fluid mt-3">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Challan Details (@Model.uid)</h4>
+            <div>
+                <button type="button" id="editButton" class="btn btn-primary btn-sm">Edit</button>
+                <button type="submit" form="challanForm" id="saveButton" class="btn btn-success btn-sm d-none">Save</button>
+                <button type="button" id="cancelButton" class="btn btn-outline-secondary btn-sm d-none">Cancel</button>
+            </div>
+        </div>
+
+        <form asp-action="UpdateChallanStatus" method="post" id="challanForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.uid" />
+
+            <div class="card-body">
+                <!-- Row 1: Customer / Deposit Slip -->
+                <div class="row mb-2">
+                    <div class="col-md-3 fw-semibold">Customer No</div>
+                    <div class="col-md-3">@Model.customerno</div>
+                    <div class="col-md-3 fw-semibold">Deposit Slip No</div>
+                    <div class="col-md-3">@Model.depsoiteslipno</div>
+                </div>
+
+                <!-- Row 2: Bank Name / Bank Verified -->
+                <div class="row mb-2">
+                    <div class="col-md-3 fw-semibold">Bank Name</div>
+                    <div class="col-md-3">@Model.bankname</div>
+                    <div class="col-md-3 fw-semibold">Bank Verified</div>
+                    <div class="col-md-3">
+                        @{
+                            var currentStatus = (Model.bankverified ?? string.Empty).Trim();
+                            string displayStatus = string.IsNullOrEmpty(currentStatus) ? "N/A" : currentStatus;
+                            string[] statuses = new[] { "Inprocess", "Pending", "Verified" };
+                        }
+                        <span id="bankStatusDisplay">@displayStatus</span>
+                        <select id="bankStatusEdit" name="bankverified" class="form-select form-select-sm d-none">
+                            @foreach (var status in statuses)
+                            {
+                                var selected = string.Equals(currentStatus, status, StringComparison.OrdinalIgnoreCase);
+                                <option value="@status" selected="@(selected ? "selected" : null)">
+                                    @status
+                                </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 3: Deposit Date / Bank Verified Date -->
+                <div class="row mb-2">
+                    <div class="col-md-3 fw-semibold">Deposit Date</div>
+                    <div class="col-md-3">
+                        @(Model.depositdate?.ToString("yyyy-MM-dd") ?? "N/A")
+                    </div>
+                    <div class="col-md-3 fw-semibold">Bank Verified Date</div>
+                    <div class="col-md-3">
+                        @(Model.bankverifieddate?.ToString("yyyy-MM-dd") ?? "N/A")
+                    </div>
+                </div>
+
+                <!-- Row 4: Deposit Type / Currency -->
+                <div class="row mb-2">
+                    <div class="col-md-3 fw-semibold">Deposit Type</div>
+                    <div class="col-md-3">@Model.deposittype</div>
+                    <div class="col-md-3 fw-semibold">Currency</div>
+                    <div class="col-md-3">@Model.currency</div>
+                </div>
+
+                <!-- Row 5: Created By / Verified By -->
+                <div class="row mb-2">
+                    <div class="col-md-3 fw-semibold">Created By</div>
+                    <div class="col-md-3">@Model.createdby</div>
+                    <div class="col-md-3 fw-semibold">Verified By</div>
+                    <div class="col-md-3">@Model.verifiedby</div>
+                </div>
+
+                <!-- Row 6: Creation Date / (empty) -->
+                <div class="row mb-2">
+                    <div class="col-md-3 fw-semibold">Creation Date</div>
+                    <div class="col-md-3">
+                        @(Model.creationdate?.ToString("yyyy-MM-dd") ?? "N/A")
+                    </div>
+                    <div class="col-md-3"></div>
+                    <div class="col-md-3"></div>
+                </div>
+            </div>
+        </form>
+
+        <div class="card-footer d-flex justify-content-between">
+            <a asp-action="AllChallans" class="btn btn-secondary btn-sm">Back to All Challans</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const editButton = document.getElementById('editButton');
+            const saveButton = document.getElementById('saveButton');
+            const cancelButton = document.getElementById('cancelButton');
+            const displaySpan = document.getElementById('bankStatusDisplay');
+            const dropdown = document.getElementById('bankStatusEdit');
+
+            if (!editButton || !saveButton || !cancelButton || !displaySpan || !dropdown) {
+                return;
+            }
+
+            let originalValue = dropdown.value;
+
+            editButton.addEventListener('click', function () {
+                originalValue = dropdown.value;
+                displaySpan.classList.add('d-none');
+                dropdown.classList.remove('d-none');
+                editButton.classList.add('d-none');
+                saveButton.classList.remove('d-none');
+                cancelButton.classList.remove('d-none');
+            });
+
+            cancelButton.addEventListener('click', function () {
+                dropdown.value = originalValue;
+                displaySpan.textContent = originalValue || 'N/A';
+                displaySpan.classList.remove('d-none');
+                dropdown.classList.add('d-none');
+                editButton.classList.remove('d-none');
+                saveButton.classList.add('d-none');
+                cancelButton.classList.add('d-none');
+            });
+
+            dropdown.addEventListener('change', function () {
+                displaySpan.textContent = dropdown.value;
+            });
+        })();
+    </script>
+}
+
