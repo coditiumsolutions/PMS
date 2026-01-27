@@ -20,6 +20,7 @@ public class PMSDbContext : DbContext
     public DbSet<PaymentPlan> PaymentPlans { get; set; }
     public DbSet<PaymentPlanChild> PaymentPlanChildren { get; set; }
     public DbSet<Transfer> Transfers { get; set; }
+    public DbSet<RequestedProperty> RequestedProperties { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -157,6 +158,36 @@ public class PMSDbContext : DbContext
             // Configure uId as identity
             entity.Property(e => e.uId)
                 .ValueGeneratedOnAdd();
+        });
+
+        // Configure RequestedProperty entity
+        modelBuilder.Entity<RequestedProperty>(entity =>
+        {
+            entity.HasKey(e => e.Uid);
+            entity.ToTable("RequestedProperty");
+
+            entity.Property(e => e.Uid)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.CustomerNo)
+                .HasColumnName("customerno")
+                .HasMaxLength(50);
+
+            entity.Property(e => e.ReqProject)
+                .HasColumnName("reqproject")
+                .HasMaxLength(20);
+
+            entity.Property(e => e.ReqSize)
+                .HasColumnName("reqsize")
+                .HasMaxLength(20);
+
+            entity.Property(e => e.ReqCategory)
+                .HasColumnName("reqcategory")
+                .HasMaxLength(20);
+
+            entity.Property(e => e.ReqConstruction)
+                .HasColumnName("reqconstruction")
+                .HasMaxLength(20);
         });
     }
 }

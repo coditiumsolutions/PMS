@@ -1,5 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
+  <ItemGroup>
+    <Compile Remove="PMS.Web\**" />
+    <Content Remove="PMS.Web\**" />
+    <None Remove="PMS.Web\**" />
+    <EmbeddedResource Remove="PMS.Web\**" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
