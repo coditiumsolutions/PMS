@@ -1,0 +1,41 @@
+@model PMS.Web.Models.PaymentPlan
+
+@{
+    ViewData["Title"] = "Plan Details";
+}
+
+<h2>Plan Details</h2>
+
+<div>
+    <h4>Payment Plan</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.planno)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.planno)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.plandetail)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.plandetail)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.totalamount)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.totalamount)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.paymenttype)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.paymenttype)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.sizedetail)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.sizedetail)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.creationdate)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.creationdate)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.createdby)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.createdby)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.comments)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.comments)</dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="EditPlan" asp-route-id="@Model.uid">Edit</a> |
+    <a asp-action="AllPlans">Back to List</a>
+</div>

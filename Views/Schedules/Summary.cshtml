@@ -1,12 +1,120 @@
 @{
     ViewData["Title"] = "Schedules Summary";
+    var planTypeGroups = ViewBag.PlanTypeGroups as IEnumerable<dynamic>;
+    var childPlanGroups = ViewBag.ChildPlanGroups as IEnumerable<dynamic>;
 }
 
-<h2>Schedules Summary</h2>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Schedules Summary</h2>
+    </div>
 
-<p>Schedule summary and reports.</p>
+    <div class="row g-3 mb-3">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="summary-label">Total Plans</div>
+                    <div class="summary-value">@ViewBag.TotalPlans</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="summary-label">Total Child Payments</div>
+                    <div class="summary-value">@ViewBag.TotalChildPayments</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="summary-label">Total Plan Amount</div>
+                    <div class="summary-value">@ViewBag.TotalPlanAmount</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="summary-label">Total Due Amount</div>
+                    <div class="summary-value">@ViewBag.TotalDueAmount</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="info-box">
-    <p>This page will display schedule summary information and reports.</p>
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Plans by Type</h5>
+                    @if (planTypeGroups == null || !planTypeGroups.Any())
+                    {
+                        <div class="alert alert-info mb-0">No plan data found.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Count</th>
+                                        <th>Total Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in planTypeGroups)
+                                    {
+                                        <tr>
+                                            <td>@item.Type</td>
+                                            <td>@item.Count</td>
+                                            <td>@item.Amount</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Top Plans by Child Payments</h5>
+                    @if (childPlanGroups == null || !childPlanGroups.Any())
+                    {
+                        <div class="alert alert-info mb-0">No child payment data found.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Plan No</th>
+                                        <th>Count</th>
+                                        <th>Total Due</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in childPlanGroups)
+                                    {
+                                        <tr>
+                                            <td>@item.PlanNo</td>
+                                            <td>@item.Count</td>
+                                            <td>@item.Amount</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 

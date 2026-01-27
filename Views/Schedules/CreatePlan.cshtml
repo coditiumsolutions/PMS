@@ -1,0 +1,58 @@
+@model PMS.Web.Models.PaymentPlan
+
+@{
+    ViewData["Title"] = "Create Plan";
+}
+
+<h2>Create Plan</h2>
+
+<form asp-action="CreatePlan" method="post">
+    <div class="form-group">
+        <label asp-for="planno" class="control-label"></label>
+        <input asp-for="planno" class="form-control" />
+        <span asp-validation-for="planno" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="plandetail" class="control-label"></label>
+        <input asp-for="plandetail" class="form-control" />
+        <span asp-validation-for="plandetail" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="totalamount" class="control-label"></label>
+        <input asp-for="totalamount" class="form-control" />
+        <span asp-validation-for="totalamount" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="paymenttype" class="control-label"></label>
+        <input asp-for="paymenttype" class="form-control" />
+        <span asp-validation-for="paymenttype" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="sizedetail" class="control-label"></label>
+        <input asp-for="sizedetail" class="form-control" />
+        <span asp-validation-for="sizedetail" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="creationdate" class="control-label"></label>
+        <input asp-for="creationdate" class="form-control" type="date" />
+        <span asp-validation-for="creationdate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="createdby" class="control-label"></label>
+        <input asp-for="createdby" class="form-control" />
+        <span asp-validation-for="createdby" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="comments" class="control-label"></label>
+        <textarea asp-for="comments" class="form-control"></textarea>
+        <span asp-validation-for="comments" class="text-danger"></span>
+    </div>
+    <div class="form-group mt-3">
+        <button type="submit" class="btn btn-primary">Create</button>
+        <a asp-action="AllPlans" class="btn btn-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

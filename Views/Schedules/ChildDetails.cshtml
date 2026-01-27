@@ -1,0 +1,56 @@
+@model PMS.Web.Models.PaymentPlanChild
+
+@{
+    ViewData["Title"] = "Child Payment Details";
+}
+
+<h2>Child Payment Details</h2>
+
+<div>
+    <h4>Payment Plan Child</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.planno)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.planno)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.paymentdesc)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.paymentdesc)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.installmentno)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.installmentno)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.duedate)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.duedate)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.dueamount)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.dueamount)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.surchargepolicy)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.surchargepolicy)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.surchargerate)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.surchargerate)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.discount)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.discount)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.comments)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.comments)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.createdby)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.createdby)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.creationdate)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.creationdate)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.depsoiteslipno)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.depsoiteslipno)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.bankname)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.bankname)</dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="EditChild" asp-route-id="@Model.uid">Edit</a> |
+    <a asp-action="AllPayments">Back to List</a>
+</div>

@@ -1,0 +1,67 @@
+@model IEnumerable<PMS.Web.Models.PaymentPlanChild>
+
+@{
+    ViewData["Title"] = "All Payments";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>All Payments</h2>
+        <a asp-action="CreateChild" class="btn btn-primary">Create Payment</a>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="alert alert-info mb-0">No child payments found.</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                    <table class="table table-bordered table-striped table-hover mb-0">
+                        <thead class="table-dark sticky-top">
+                            <tr>
+                                <th class="ps-3">Plan No</th>
+                                <th>Payment Desc</th>
+                                <th>Installment No</th>
+                                <th>Due Date</th>
+                                <th>Due Amount</th>
+                                <th>Surcharge</th>
+                                <th>Discount</th>
+                                <th>Bank</th>
+                                <th>Deposit Slip</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-3 fw-medium">@Html.DisplayFor(modelItem => item.planno)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.paymentdesc)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.installmentno)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.duedate)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.dueamount)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.surchargerate)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.discount)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.bankname)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.depsoiteslipno)</td>
+                                    <td>
+                                        <a asp-action="ChildDetails" asp-route-id="@item.uid">Details</a> |
+                                        <a asp-action="EditChild" asp-route-id="@item.uid">Edit</a> |
+                                        <a asp-action="DeleteChild" asp-route-id="@item.uid">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>

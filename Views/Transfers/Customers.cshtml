@@ -1,0 +1,183 @@
+@model IEnumerable<PMS.Web.Models.Customer>
+
+@{
+    ViewData["Title"] = "Customers";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Customers</h2>
+    </div>
+
+    <!-- Search Bar & Create Transfer -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row align-items-end">
+                <div class="col-md-4">
+                    <label for="searchInput" class="form-label fw-semibold">Search Customers</label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by Customer No, Name, CNIC, or Contact No..." />
+                </div>
+                <div class="col-md-4 mt-2 mt-md-0">
+                    <button type="button" id="btnCreateTransfer" class="btn btn-primary" title="Select exactly one customer below to create a transfer">
+                        <i class="bi bi-plus-circle me-1"></i> Create Transfer
+                    </button>
+                    <small class="text-muted d-block mt-1">Select exactly one customer (checkbox), then click to open the transfer form.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="alert alert-info mb-0">
+                    No customers found.
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover mb-0" id="customersTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col" class="text-center" style="width: 3rem;">
+                                    <span class="visually-hidden">Select</span>
+                                </th>
+                                <th scope="col" class="ps-3">
+                                    @Html.DisplayNameFor(model => model.CustomerNo)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.FullName)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.FatherName)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.Cnic)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.ContactNo)
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr class="customer-row" data-customer-no="@item.CustomerNo">
+                                    <td class="text-center align-middle">
+                                        <input type="checkbox" class="form-check-input customer-select" value="@item.CustomerNo" aria-label="Select customer @item.CustomerNo" />
+                                    </td>
+                                    <td class="ps-3 fw-medium">
+                                        @Html.DisplayFor(modelItem => item.CustomerNo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.FullName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.FatherName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Cnic)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ContactNo)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    (function () {
+        const searchInput = document.getElementById('searchInput');
+        const table = document.getElementById('customersTable');
+        const btnCreateTransfer = document.getElementById('btnCreateTransfer');
+        const createTransferUrl = '@Url.Action("Create", "Transfers")';
+
+        if (!searchInput || !table) {
+            return;
+        }
+
+        const tbody = table.getElementsByTagName('tbody')[0];
+        if (!tbody) {
+            return;
+        }
+
+        const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                let matches = false;
+                // Skip first cell (checkbox) when searching
+                for (let i = 1; i < cells.length; i++) {
+                    const cellText = cells[i].textContent || cells[i].innerText;
+                    if (cellText.toLowerCase().indexOf(searchTerm) > -1) {
+                        matches = true;
+                        break;
+                    }
+                }
+                row.style.display = matches || searchTerm === '' ? '' : 'none';
+            });
+        }
+
+        // Single selection: uncheck others when one is checked
+        tbody.addEventListener('change', function (e) {
+            if (e.target.classList.contains('customer-select') && e.target.checked) {
+                document.querySelectorAll('.customer-select').forEach(cb => {
+                    if (cb !== e.target) cb.checked = false;
+                });
+            }
+        });
+
+        if (btnCreateTransfer) {
+            btnCreateTransfer.addEventListener('click', function () {
+                const checked = document.querySelectorAll('.customer-select:checked');
+                if (checked.length !== 1) {
+                    alert('Select single record to generate the transfer.');
+                    return;
+                }
+                const customerNo = checked[0].value;
+                window.location.href = createTransferUrl + '?customerNo=' + encodeURIComponent(customerNo);
+            });
+        }
+
+        searchInput.addEventListener('keyup', filterTable);
+        searchInput.addEventListener('input', filterTable);
+    })();
+</script>
+
+@section Styles {
+    <style>
+        .container-fluid {
+            font-size: 0.875rem;
+        }
+        .container-fluid h2 {
+            font-size: 1.5rem;
+        }
+        .table {
+            font-size: 0.875rem;
+        }
+        .table th {
+            font-size: 0.875rem;
+        }
+        .form-label {
+            font-size: 0.875rem;
+        }
+        .btn {
+            font-size: 0.875rem;
+        }
+    </style>
+}

@@ -1,0 +1,216 @@
+@model PMS.Web.Models.Transfer
+
+@{
+    ViewData["Title"] = "Create Transfer";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Create Transfer</h2>
+        <a asp-action="AllTransfers" class="btn btn-secondary">Back to List</a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <!-- Transfer Information Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Transfer Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="CustomerNo" class="form-label fw-semibold"></label>
+                                        <select asp-for="CustomerNo" asp-items="ViewBag.CustomerNumbers" class="form-select">
+                                            <option value="">Select Customer No</option>
+                                        </select>
+                                        <span asp-validation-for="CustomerNo" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="TransferType" class="form-label fw-semibold"></label>
+                                        <select asp-for="TransferType" asp-items="ViewBag.TransferTypes" class="form-select">
+                                            <option value="">Select Transfer Type</option>
+                                        </select>
+                                        <span asp-validation-for="TransferType" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="NatureOfTransfer" class="form-label fw-semibold"></label>
+                                        <input asp-for="NatureOfTransfer" class="form-control" />
+                                        <span asp-validation-for="NatureOfTransfer" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="InitiatingOffice" class="form-label fw-semibold"></label>
+                                        <input asp-for="InitiatingOffice" class="form-control" />
+                                        <span asp-validation-for="InitiatingOffice" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="OwnerType" class="form-label fw-semibold"></label>
+                                        <input asp-for="OwnerType" class="form-control" />
+                                        <span asp-validation-for="OwnerType" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="SellerInfo" class="form-label fw-semibold"></label>
+                                        <input asp-for="SellerInfo" class="form-control" />
+                                        <span asp-validation-for="SellerInfo" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buyer Information Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">Buyer Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="BuyerName" class="form-label fw-semibold"></label>
+                                        <input asp-for="BuyerName" class="form-control" />
+                                        <span asp-validation-for="BuyerName" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="BuyerFatherName" class="form-label fw-semibold"></label>
+                                        <input asp-for="BuyerFatherName" class="form-control" />
+                                        <span asp-validation-for="BuyerFatherName" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="BuyerCnic" class="form-label fw-semibold"></label>
+                                        <input asp-for="BuyerCnic" class="form-control" />
+                                        <span asp-validation-for="BuyerCnic" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="BuyerContactNo" class="form-label fw-semibold"></label>
+                                        <input asp-for="BuyerContactNo" class="form-control" />
+                                        <span asp-validation-for="BuyerContactNo" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="BuyerEmail" class="form-label fw-semibold"></label>
+                                        <input asp-for="BuyerEmail" type="email" class="form-control" />
+                                        <span asp-validation-for="BuyerEmail" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="BuyerGender" class="form-label fw-semibold"></label>
+                                        <select asp-for="BuyerGender" class="form-select">
+                                            <option value="">Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <span asp-validation-for="BuyerGender" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buyer Address Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">Buyer Address</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="BuyerPresAddress" class="form-label fw-semibold"></label>
+                                        <input asp-for="BuyerPresAddress" class="form-control" />
+                                        <span asp-validation-for="BuyerPresAddress" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="BuyerPremAddress" class="form-label fw-semibold"></label>
+                                        <input asp-for="BuyerPremAddress" class="form-control" />
+                                        <span asp-validation-for="BuyerPremAddress" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="BuyerPresCity" class="form-label fw-semibold"></label>
+                                        <input asp-for="BuyerPresCity" class="form-control" />
+                                        <span asp-validation-for="BuyerPresCity" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="BuyerPremCity" class="form-label fw-semibold"></label>
+                                        <input asp-for="BuyerPremCity" class="form-control" />
+                                        <span asp-validation-for="BuyerPremCity" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="BuyerPresCountry" class="form-label fw-semibold"></label>
+                                        <input asp-for="BuyerPresCountry" class="form-control" />
+                                        <span asp-validation-for="BuyerPresCountry" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="BuyerPremCountry" class="form-label fw-semibold"></label>
+                                        <input asp-for="BuyerPremCountry" class="form-control" />
+                                        <span asp-validation-for="BuyerPremCountry" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NDC Information Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0">NDC Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label asp-for="NdcExist" class="form-label fw-semibold"></label>
+                                        <select asp-for="NdcExist" class="form-select">
+                                            <option value="">Select</option>
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                        <span asp-validation-for="NdcExist" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label asp-for="NdcAmount" class="form-label fw-semibold"></label>
+                                        <input asp-for="NdcAmount" class="form-control" />
+                                        <span asp-validation-for="NdcAmount" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label asp-for="NdcDetail" class="form-label fw-semibold"></label>
+                                        <input asp-for="NdcDetail" class="form-control" />
+                                        <span asp-validation-for="NdcDetail" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">Additional Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="CreationDate" class="form-label fw-semibold"></label>
+                                        <input asp-for="CreationDate" type="date" class="form-control" />
+                                        <span asp-validation-for="CreationDate" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="CreatedBy" class="form-label fw-semibold"></label>
+                                        <input asp-for="CreatedBy" class="form-control" />
+                                        <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="AllTransfers" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create Transfer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

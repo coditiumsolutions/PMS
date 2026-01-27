@@ -1,12 +1,81 @@
 @{
     ViewData["Title"] = "Schedules Dashboard";
+    var planTypeLabels = ViewBag.PlanTypeLabels as string ?? "[]";
+    var planTypeCounts = ViewBag.PlanTypeCounts as string ?? "[]";
+    var childPlanLabels = ViewBag.ChildPlanLabels as string ?? "[]";
+    var childPlanCounts = ViewBag.ChildPlanCounts as string ?? "[]";
 }
 
-<h2>Schedules Dashboard</h2>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Schedules Dashboard</h2>
+    </div>
 
-<p>Schedule dashboard overview and statistics.</p>
-
-<div class="info-box">
-    <p>This page will display schedule dashboard metrics and overview.</p>
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Plans by Type</h5>
+                    <canvas id="plansByTypeChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Top Plans by Child Payments</h5>
+                    <canvas id="childPlansChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const planTypeLabels = @Html.Raw(planTypeLabels);
+    const planTypeCounts = @Html.Raw(planTypeCounts);
+    const childPlanLabels = @Html.Raw(childPlanLabels);
+    const childPlanCounts = @Html.Raw(childPlanCounts);
+
+    if (planTypeLabels.length > 0) {
+        new Chart(document.getElementById('plansByTypeChart'), {
+            type: 'bar',
+            data: {
+                labels: planTypeLabels,
+                datasets: [{
+                    label: 'Plans',
+                    data: planTypeCounts,
+                    backgroundColor: '#0d6efd'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    if (childPlanLabels.length > 0) {
+        new Chart(document.getElementById('childPlansChart'), {
+            type: 'bar',
+            data: {
+                labels: childPlanLabels,
+                datasets: [{
+                    label: 'Child Payments',
+                    data: childPlanCounts,
+                    backgroundColor: '#198754'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+</script>
 

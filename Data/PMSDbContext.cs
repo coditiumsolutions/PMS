@@ -17,6 +17,9 @@ public class PMSDbContext : DbContext
     public DbSet<InventoryDetail> InventoryDetails { get; set; }
     public DbSet<Challan> Challans { get; set; }
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<PaymentPlan> PaymentPlans { get; set; }
+    public DbSet<PaymentPlanChild> PaymentPlanChildren { get; set; }
+    public DbSet<Transfer> Transfers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -119,6 +122,37 @@ public class PMSDbContext : DbContext
         {
             entity.HasKey(e => e.uId);
             entity.ToTable("Payments");
+            
+            // Configure uId as identity
+            entity.Property(e => e.uId)
+                .ValueGeneratedOnAdd();
+        });
+
+        // Configure PaymentPlan entity
+        modelBuilder.Entity<PaymentPlan>(entity =>
+        {
+            entity.HasKey(e => e.uid);
+            entity.ToTable("PaymentPlan");
+
+            entity.Property(e => e.uid)
+                .ValueGeneratedOnAdd();
+        });
+
+        // Configure PaymentPlanChild entity
+        modelBuilder.Entity<PaymentPlanChild>(entity =>
+        {
+            entity.HasKey(e => e.uid);
+            entity.ToTable("paymentplanchild");
+
+            entity.Property(e => e.uid)
+                .ValueGeneratedOnAdd();
+        });
+
+        // Configure Transfer entity
+        modelBuilder.Entity<Transfer>(entity =>
+        {
+            entity.HasKey(e => e.uId);
+            entity.ToTable("Transfer");
             
             // Configure uId as identity
             entity.Property(e => e.uId)

@@ -1,0 +1,83 @@
+@model PMS.Web.Models.PaymentPlanChild
+
+@{
+    ViewData["Title"] = "Create Child Payment";
+}
+
+<h2>Create Child Payment</h2>
+
+<form asp-action="CreateChild" method="post">
+    <div class="form-group">
+        <label asp-for="planno" class="control-label"></label>
+        <input asp-for="planno" class="form-control" />
+        <span asp-validation-for="planno" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="paymentdesc" class="control-label"></label>
+        <input asp-for="paymentdesc" class="form-control" />
+        <span asp-validation-for="paymentdesc" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="installmentno" class="control-label"></label>
+        <input asp-for="installmentno" class="form-control" />
+        <span asp-validation-for="installmentno" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="duedate" class="control-label"></label>
+        <input asp-for="duedate" class="form-control" />
+        <span asp-validation-for="duedate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="dueamount" class="control-label"></label>
+        <input asp-for="dueamount" class="form-control" />
+        <span asp-validation-for="dueamount" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="surchargepolicy" class="control-label"></label>
+        <input asp-for="surchargepolicy" class="form-control" />
+        <span asp-validation-for="surchargepolicy" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="surchargerate" class="control-label"></label>
+        <input asp-for="surchargerate" class="form-control" />
+        <span asp-validation-for="surchargerate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="discount" class="control-label"></label>
+        <input asp-for="discount" class="form-control" />
+        <span asp-validation-for="discount" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="comments" class="control-label"></label>
+        <textarea asp-for="comments" class="form-control"></textarea>
+        <span asp-validation-for="comments" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="createdby" class="control-label"></label>
+        <input asp-for="createdby" class="form-control" />
+        <span asp-validation-for="createdby" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="creationdate" class="control-label"></label>
+        <input asp-for="creationdate" class="form-control" />
+        <span asp-validation-for="creationdate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="depsoiteslipno" class="control-label"></label>
+        <input asp-for="depsoiteslipno" class="form-control" />
+        <span asp-validation-for="depsoiteslipno" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="bankname" class="control-label"></label>
+        <input asp-for="bankname" class="form-control" />
+        <span asp-validation-for="bankname" class="text-danger"></span>
+    </div>
+    <div class="form-group mt-3">
+        <button type="submit" class="btn btn-primary">Create</button>
+        <a asp-action="AllPayments" class="btn btn-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

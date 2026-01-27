@@ -15,9 +15,17 @@ public class SetupController : Controller
         _context = context;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         ViewBag.ActiveModule = "Setup";
+        
+        // Load configurations for summary
+        var configurations = await _context.Configurations.ToListAsync();
+        ViewBag.TotalConfigurations = configurations.Count;
+        ViewBag.ActiveConfigurations = configurations.Count(c => c.IsActive);
+        ViewBag.InactiveConfigurations = configurations.Count(c => !c.IsActive);
+        ViewBag.Configurations = configurations;
+        
         return View();
     }
 

@@ -56,10 +56,16 @@
         <h3 class="sidebar-heading">Schedules</h3>
         <ul class="sidebar-nav">
             <li><a asp-controller="Schedules" asp-action="Dashboard">Dashboard</a></li>
-            <li><a asp-controller="Schedules" asp-action="Details">Details</a></li>
-            <li><a asp-controller="Schedules" asp-action="Operations">Operations</a></li>
+            <li class="sidebar-section-heading">
+                <span class="sidebar-section-title">Plans</span>
+            </li>
+            <li><a asp-controller="Schedules" asp-action="AllPlans">All Plans</a></li>
+
+            <li class="sidebar-section-heading">
+                <span class="sidebar-section-title">Child Plans</span>
+            </li>
+            <li><a asp-controller="Schedules" asp-action="AllPayments">All Payments</a></li>
             <li><a asp-controller="Schedules" asp-action="Summary">Summary</a></li>
-            <li><a asp-controller="Schedules" asp-action="History">History</a></li>
         </ul>
     }
     else if (ViewBag.ActiveModule == "Transfers")
@@ -67,8 +73,10 @@
         <h3 class="sidebar-heading">Transfers</h3>
         <ul class="sidebar-nav">
             <li><a asp-controller="Transfers" asp-action="Dashboard">Dashboard</a></li>
-            <li><a asp-controller="Transfers" asp-action="Details">Details</a></li>
-            <li><a asp-controller="Transfers" asp-action="Operations">Operations</a></li>
+            <li><a asp-controller="Transfers" asp-action="Customers">Customers</a></li>
+            <li><a asp-controller="Transfers" asp-action="AllTransfers">All Transfers</a></li>
+            <li><a asp-controller="Transfers" asp-action="Payments">Payments</a></li>
+            <li><a asp-controller="Transfers" asp-action="TransferFees">Transfer Fees</a></li>
             <li><a asp-controller="Transfers" asp-action="Summary">Summary</a></li>
             <li><a asp-controller="Transfers" asp-action="History">History</a></li>
         </ul>

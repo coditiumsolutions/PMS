@@ -1,0 +1,31 @@
+@model PMS.Web.Models.PaymentPlan
+
+@{
+    ViewData["Title"] = "Delete Plan";
+}
+
+<h2>Delete Plan</h2>
+
+<h4>Are you sure you want to delete this plan?</h4>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.planno)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.planno)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.plandetail)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.plandetail)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.totalamount)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.totalamount)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.paymenttype)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.paymenttype)</dd>
+    </dl>
+
+    <form asp-action="DeletePlan" method="post">
+        <input type="hidden" asp-for="uid" />
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-action="AllPlans" class="btn btn-secondary">Back</a>
+    </form>
+</div>
