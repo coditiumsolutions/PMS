@@ -19,76 +19,69 @@
             @Html.AntiForgeryToken()
             <input type="hidden" name="id" value="@Model.uid" />
 
-            <div class="card-body">
-                <!-- Row 1: Customer / Deposit Slip -->
-                <div class="row mb-2">
-                    <div class="col-md-3 fw-semibold">Customer No</div>
-                    <div class="col-md-3">@Model.customerno</div>
-                    <div class="col-md-3 fw-semibold">Deposit Slip No</div>
-                    <div class="col-md-3">@Model.depsoiteslipno</div>
-                </div>
-
-                <!-- Row 2: Bank Name / Bank Verified -->
-                <div class="row mb-2">
-                    <div class="col-md-3 fw-semibold">Bank Name</div>
-                    <div class="col-md-3">@Model.bankname</div>
-                    <div class="col-md-3 fw-semibold">Bank Verified</div>
-                    <div class="col-md-3">
-                        @{
-                            var currentStatus = (Model.bankverified ?? string.Empty).Trim();
-                            string displayStatus = string.IsNullOrEmpty(currentStatus) ? "N/A" : currentStatus;
-                            string[] statuses = new[] { "Inprocess", "Pending", "Verified" };
-                        }
-                        <span id="bankStatusDisplay">@displayStatus</span>
-                        <select id="bankStatusEdit" name="bankverified" class="form-select form-select-sm d-none">
-                            @foreach (var status in statuses)
-                            {
-                                var selected = string.Equals(currentStatus, status, StringComparison.OrdinalIgnoreCase);
-                                <option value="@status" selected="@(selected ? "selected" : null)">
-                                    @status
-                                </option>
-                            }
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Row 3: Deposit Date / Bank Verified Date -->
-                <div class="row mb-2">
-                    <div class="col-md-3 fw-semibold">Deposit Date</div>
-                    <div class="col-md-3">
-                        @(Model.depositdate?.ToString("yyyy-MM-dd") ?? "N/A")
-                    </div>
-                    <div class="col-md-3 fw-semibold">Bank Verified Date</div>
-                    <div class="col-md-3">
-                        @(Model.bankverifieddate?.ToString("yyyy-MM-dd") ?? "N/A")
-                    </div>
-                </div>
-
-                <!-- Row 4: Deposit Type / Currency -->
-                <div class="row mb-2">
-                    <div class="col-md-3 fw-semibold">Deposit Type</div>
-                    <div class="col-md-3">@Model.deposittype</div>
-                    <div class="col-md-3 fw-semibold">Currency</div>
-                    <div class="col-md-3">@Model.currency</div>
-                </div>
-
-                <!-- Row 5: Created By / Verified By -->
-                <div class="row mb-2">
-                    <div class="col-md-3 fw-semibold">Created By</div>
-                    <div class="col-md-3">@Model.createdby</div>
-                    <div class="col-md-3 fw-semibold">Verified By</div>
-                    <div class="col-md-3">@Model.verifiedby</div>
-                </div>
-
-                <!-- Row 6: Creation Date / (empty) -->
-                <div class="row mb-2">
-                    <div class="col-md-3 fw-semibold">Creation Date</div>
-                    <div class="col-md-3">
-                        @(Model.creationdate?.ToString("yyyy-MM-dd") ?? "N/A")
-                    </div>
-                    <div class="col-md-3"></div>
-                    <div class="col-md-3"></div>
-                </div>
+            <div class="card-body p-0">
+                <table class="table table-sm table-bordered mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="w-25">Customer No</th>
+                            <td class="w-25">@Model.customerno</td>
+                            <th class="w-25">Deposit Slip No</th>
+                            <td class="w-25">@Model.depsoiteslipno</td>
+                        </tr>
+                        <tr>
+                            <th>Bank Name</th>
+                            <td>@Model.bankname</td>
+                            <th>Bank Verified</th>
+                            <td>
+                                @{
+                                    var currentStatus = (Model.bankverified ?? string.Empty).Trim();
+                                    string displayStatus = string.IsNullOrEmpty(currentStatus) ? "N/A" : currentStatus;
+                                    string[] statuses = new[] { "Inprocess", "Pending", "Verified" };
+                                }
+                                <span id="bankStatusDisplay">@displayStatus</span>
+                                <select id="bankStatusEdit" name="bankverified" class="form-select form-select-sm d-none">
+                                    @foreach (var status in statuses)
+                                    {
+                                        var selected = string.Equals(currentStatus, status, StringComparison.OrdinalIgnoreCase);
+                                        <option value="@status" selected="@(selected ? "selected" : null)">
+                                            @status
+                                        </option>
+                                    }
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Deposit Date</th>
+                            <td>
+                                @(Model.depositdate?.ToString("yyyy-MM-dd") ?? "N/A")
+                            </td>
+                            <th>Bank Verified Date</th>
+                            <td>
+                                @(Model.bankverifieddate?.ToString("yyyy-MM-dd") ?? "N/A")
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Deposit Type</th>
+                            <td>@Model.deposittype</td>
+                            <th>Currency</th>
+                            <td>@Model.currency</td>
+                        </tr>
+                        <tr>
+                            <th>Created By</th>
+                            <td>@Model.createdby</td>
+                            <th>Verified By</th>
+                            <td>@Model.verifiedby</td>
+                        </tr>
+                        <tr>
+                            <th>Creation Date</th>
+                            <td>
+                                @(Model.creationdate?.ToString("yyyy-MM-dd") ?? "N/A")
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </form>
 

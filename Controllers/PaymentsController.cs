@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using PMS.Web.Data;
 using PMS.Web.Models;
 using PMS.Web.ViewModels;
@@ -215,6 +216,132 @@ public class PaymentsController : Controller
         }
 
         return View(challan);
+    }
+
+    // GET: Payments/CreateChallan
+    public async Task<IActionResult> CreateChallan(string? customerno = null)
+    {
+        ViewBag.ActiveModule = "Payments";
+
+        var challan = new Challan
+        {
+            customerno = customerno,
+            creationdate = DateTime.Today,
+            currency = "Rs"
+        };
+
+        // Dropdown sources
+        ViewBag.BankNames = await _context.Configurations
+            .AsNoTracking()
+            .Where(c => c.ConfigKey == "Bank")
+            .Select(c => c.ConfigValue)
+            .ToListAsync();
+
+        ViewBag.BankVerifiedStatuses = await _context.Configurations
+            .AsNoTracking()
+            .Where(c => c.ConfigKey == "Bank")
+            .Select(c => c.ConfigValue)
+            .ToListAsync();
+
+        ViewBag.DepositTypes = new List<string> { "Cash", "DD", "Cheque" };
+        ViewBag.Currencies = new List<string> { "Rs", "Dollar" };
+
+        return View(challan);
+    }
+
+    // POST: Payments/CreateChallan
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateChallan(Challan challan)
+    {
+        ViewBag.ActiveModule = "Payments";
+
+        // Local helper to repopulate dropdowns whenever we need to redisplay the form
+        async Task PopulateDropdowns()
+        {
+            ViewBag.BankNames = await _context.Configurations
+                .AsNoTracking()
+                .Where(c => c.ConfigKey == "Bank")
+                .Select(c => c.ConfigValue)
+                .ToListAsync();
+
+            ViewBag.BankVerifiedStatuses = await _context.Configurations
+                .AsNoTracking()
+                .Where(c => c.ConfigKey == "Bank")
+                .Select(c => c.ConfigValue)
+                .ToListAsync();
+
+            ViewBag.DepositTypes = new List<string> { "Cash", "DD", "Cheque" };
+            ViewBag.Currencies = new List<string> { "Rs", "Dollar" };
+        }
+
+        // Basic model validation
+        if (!ModelState.IsValid)
+        {
+            await PopulateDropdowns();
+            return View(challan);
+        }
+
+        // Server-side check for existing challan with same customer and bank
+        if (!string.IsNullOrWhiteSpace(challan.customerno) &&
+            !string.IsNullOrWhiteSpace(challan.bankname))
+        {
+            var duplicateExists = await _context.Challans
+                .AsNoTracking()
+                .AnyAsync(c =>
+                    c.customerno == challan.customerno &&
+                    c.bankname == challan.bankname);
+
+            if (duplicateExists)
+            {
+                ModelState.AddModelError(string.Empty,
+                    "A challan already exists for this customer and bank. Please use a different bank or update the existing challan.");
+
+                await PopulateDropdowns();
+                return View(challan);
+            }
+        }
+
+        if (!challan.creationdate.HasValue)
+        {
+            challan.creationdate = DateTime.Today;
+        }
+
+        _context.Challans.Add(challan);
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            TempData["ChallanMessage"] = "Challan saved successfully.";
+            TempData["ChallanMessageType"] = "success";
+            return RedirectToAction(nameof(AllChallans));
+        }
+        catch (DbUpdateException ex)
+        {
+            var sqlEx = ex.InnerException as SqlException;
+            if (sqlEx != null && (sqlEx.Number == 2627 || sqlEx.Number == 2601) &&
+                sqlEx.Message.Contains("UQ_Deposit_Bank"))
+            {
+                ModelState.AddModelError(string.Empty,
+                    "A challan with this customer and bank already exists. Please check existing challans or choose a different bank.");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty,
+                    "The record could not be saved due to a database error. Please try again or contact support.");
+            }
+
+            await PopulateDropdowns();
+            return View(challan);
+        }
+        catch (Exception)
+        {
+            ModelState.AddModelError(string.Empty,
+                "An unexpected error occurred while saving. Please try again.");
+
+            await PopulateDropdowns();
+            return View(challan);
+        }
     }
 
     [HttpPost]

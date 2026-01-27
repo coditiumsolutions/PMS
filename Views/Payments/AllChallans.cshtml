@@ -11,9 +11,20 @@
 }
 
 <div class="container-fluid">
+    @if (TempData["ChallanMessage"] != null)
+    {
+        var msgType = (TempData["ChallanMessageType"] as string) ?? "success";
+        var alertClass = msgType == "success" ? "alert-success" : "alert-danger";
+        <div class="alert @alertClass alert-dismissible fade show mb-3" role="alert">
+            @TempData["ChallanMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>All Challans (@totalRecords)</h2>
-        <button type="button" id="processPaymentButton" class="btn btn-success btn-sm" disabled>Process Payment</button>
+        <div class="btn-group">
+            <button type="button" id="processPaymentButton" class="btn btn-success btn-sm" disabled>Process Payment</button>
+        </div>
     </div>
 
     <!-- Filter Section -->
@@ -76,7 +87,7 @@
                         <tbody>
                             @foreach (var item in Model)
                             {
-                                <tr data-challan-id="@item.uid" class="challan-row">
+                                <tr data-challan-id="@item.uid" data-customerno="@item.customerno" class="challan-row">
                                     <td class="text-center">
                                         <input type="checkbox"
                                                class="challan-select"
@@ -204,6 +215,7 @@
         (function () {
             const table = document.getElementById('challansTable');
             const processButton = document.getElementById('processPaymentButton');
+            const addChallanButton = document.getElementById('addChallanButton');
             if (!table) return;
 
             table.addEventListener('dblclick', function (event) {
@@ -246,6 +258,22 @@
                     const challanId = selected.getAttribute('data-challan-id');
                     if (!challanId) return;
                     const url = '@Url.Action("ProcessChallanPayments", "Payments")/' + challanId;
+                    window.location.href = url;
+                });
+            }
+
+            if (addChallanButton) {
+                addChallanButton.addEventListener('click', function () {
+                    const selected = table.querySelector('input.challan-select:checked');
+                    if (!selected) {
+                        alert('Please select a challan row first.');
+                        return;
+                    }
+                    const row = selected.closest('tr.challan-row');
+                    if (!row) return;
+                    const customerNo = row.getAttribute('data-customerno') || '';
+                    const baseUrl = '@Url.Action("CreateChallan", "Payments")';
+                    const url = baseUrl + '?customerno=' + encodeURIComponent(customerNo);
                     window.location.href = url;
                 });
             }
