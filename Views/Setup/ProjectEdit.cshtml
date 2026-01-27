@@ -29,12 +29,6 @@
                             <span asp-validation-for="ProjectName" class="text-danger"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="ProjectDescription" class="form-label fw-semibold"></label>
-                            <textarea asp-for="ProjectDescription" class="form-control" rows="4"></textarea>
-                            <span asp-validation-for="ProjectDescription" class="text-danger"></span>
-                        </div>
-
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label asp-for="SubProject" class="form-label fw-semibold"></label>
@@ -47,6 +41,12 @@
                                 <input asp-for="Prefix" class="form-control" />
                                 <span asp-validation-for="Prefix" class="text-danger"></span>
                             </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ProjectDescription" class="form-label fw-semibold"></label>
+                            <textarea asp-for="ProjectDescription" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="ProjectDescription" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">

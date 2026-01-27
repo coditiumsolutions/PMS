@@ -20,6 +20,7 @@ public class PMSDbContext : DbContext
     public DbSet<PaymentPlan> PaymentPlans { get; set; }
     public DbSet<PaymentPlanChild> PaymentPlanChildren { get; set; }
     public DbSet<Transfer> Transfers { get; set; }
+    public DbSet<RequestedProperty> RequestedProperties { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,15 +31,22 @@ public class PMSDbContext : DbContext
         {
             // Set CustomerNo as primary key
             entity.HasKey(e => e.CustomerNo);
-            
+
             // Configure CustomerNo - not auto-generated (user-provided)
             entity.Property(e => e.CustomerNo)
                 .ValueGeneratedNever();
-            
+
             // Configure Uid as identity but not primary key
             entity.Property(e => e.Uid)
                 .ValueGeneratedOnAdd();
-            
+
+            // Map property names to actual database column names where they differ
+            entity.Property(e => e.Cnic)
+                .HasColumnName("CnicNo");
+
+            entity.Property(e => e.CreatedBy)
+                .HasColumnName("Createdby");
+
             // Map to Customers table
             entity.ToTable("Customers");
         });
@@ -157,6 +165,36 @@ public class PMSDbContext : DbContext
             // Configure uId as identity
             entity.Property(e => e.uId)
                 .ValueGeneratedOnAdd();
+        });
+
+        // Configure RequestedProperty entity
+        modelBuilder.Entity<RequestedProperty>(entity =>
+        {
+            entity.HasKey(e => e.Uid);
+            entity.ToTable("RequestedProperty");
+
+            entity.Property(e => e.Uid)
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.CustomerNo)
+                .HasColumnName("customerno")
+                .HasMaxLength(50);
+
+            entity.Property(e => e.ReqProject)
+                .HasColumnName("reqproject")
+                .HasMaxLength(20);
+
+            entity.Property(e => e.ReqSize)
+                .HasColumnName("reqsize")
+                .HasMaxLength(20);
+
+            entity.Property(e => e.ReqCategory)
+                .HasColumnName("reqcategory")
+                .HasMaxLength(20);
+
+            entity.Property(e => e.ReqConstruction)
+                .HasColumnName("reqconstruction")
+                .HasMaxLength(20);
         });
     }
 }

@@ -1,7 +1,7 @@
 DATABASE SCHEMA REPORT
 ======================
 
-Generated: 2026-01-27 00:57:56
+Generated: 2026-01-27 10:00:00
 
 TABLE: __EFMigrationsHistory
 ----------------------------
@@ -56,7 +56,7 @@ TABLE: CustomerAuditLog
 - OldValues (nvarchar(max), nullable)
 - NewValues (nvarchar(max), nullable)
 - ActionBy (nvarchar(50))
-- ActionDate (datetime, default: (getdate()))
+- ActionDate (datetime, nullable)
 - Remarks (nvarchar(500), nullable)
 
 TABLE: Customers
@@ -65,19 +65,18 @@ TABLE: Customers
 - CustomerNo (varchar(50))
 - FullName (varchar(100))
 - FatherName (varchar(100))
-- cnic (varchar(60))
-- contactno (varchar(100), nullable)
-- email (varchar(60), nullable)
-- gender (varchar(60), nullable)
-- presaddress (varchar(100), nullable)
-- premaddress (varchar(100), nullable)
-- prescity (varchar(60), nullable)
-- premcity (varchar(60), nullable)
-- prescountry (varchar(60), nullable)
-- premcountry (varchar(60), nullable)
-- creationdate (date, nullable)
-- createdby (varchar(100), nullable)
-- CnicNo (varchar(60), nullable)
+- CnicNo (varchar(60))
+- ContactNo (varchar(100), nullable)
+- Email (varchar(60), nullable)
+- Gender (varchar(60), nullable)
+- PresAddress (varchar(100), nullable)
+- PremAddress (varchar(100), nullable)
+- PresCity (varchar(60), nullable)
+- PremCity (varchar(60), nullable)
+- PresCountry (varchar(60), nullable)
+- PremCountry (varchar(60), nullable)
+- CreationDate (date, nullable)
+- Createdby (varchar(100), nullable)
 
 TABLE: InventoryDetail
 ----------------------
@@ -128,7 +127,7 @@ TABLE: PaymentPlan
 - plandetail (varchar(50), nullable)
 - totalamount (varchar(255), nullable)
 - paymenttype (varchar(60), nullable)
-- comments (text(2147483647), nullable)
+- comments (text, nullable)
 - createdby (varchar(100), nullable)
 - creationdate (date, nullable)
 - sizedetail (varchar(50), nullable)
@@ -144,11 +143,9 @@ TABLE: paymentplanchild
 - surchargepolicy (varchar(20), nullable)
 - surchargerate (varchar(50), nullable)
 - discount (varchar(50), nullable)
-- comments (text(2147483647), nullable)
+- comments (text, nullable)
 - createdby (varchar(50), nullable)
 - creationdate (varchar(60), nullable)
-- depsoiteslipno (varchar(100))
-- bankname (varchar(50))
 
 TABLE: Payments
 ---------------
@@ -214,6 +211,23 @@ TABLE: Transfer
 - NdcAmount (varchar(50), nullable)
 - NdcDetail (varchar(100), nullable)
 
+<<<<<<< HEAD
+=======
+TABLE: TransferFee
+------------------
+- UID (int)
+- EffectiveDate (varchar(50), nullable)
+- SubProject (varchar(50), nullable)
+- TransferType (varchar(50), nullable)
+- PaymentType (varchar(50), nullable)
+- FeeAmount (varchar(100), nullable)
+- PlotSize (varchar(60), nullable)
+- IsPlaza (varchar(10), nullable)
+- PlotFloor (varchar(50), nullable)
+- CreatedOn (varchar(50), nullable)
+- CreatedBy (varchar(50), nullable)
+
+>>>>>>> ae1eaa2 (Schedules: inline child payments, layout tweaks, config-driven dropdown)
 TABLE: TransferPayment
 ----------------------
 - uId (int)
@@ -229,4 +243,19 @@ TABLE: TransferPayment
 - AmountPaid (varchar(100), nullable)
 - CreatedOn (varchar(50), nullable)
 - CreatedBy (varchar(50), nullable)
+<<<<<<< HEAD
 - Consumed (bit, default: ((0)))
+=======
+- Consumed (bit)
+
+TABLE: Users
+------------
+- uid (int)
+- EmployeeId (varchar(50), nullable)
+- Username (nvarchar(100))
+- PasswordHash (nvarchar(255))
+- Role (nvarchar(max), nullable)
+- CreatedBy (varchar(max), nullable)
+- CreatedOn (varchar(max), nullable)
+- History (varchar(max), nullable)
+>>>>>>> ae1eaa2 (Schedules: inline child payments, layout tweaks, config-driven dropdown)

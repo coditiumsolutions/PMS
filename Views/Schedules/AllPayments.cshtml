@@ -5,9 +5,12 @@
 }
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>All Payments</h2>
-        <a asp-action="CreateChild" class="btn btn-primary">Create Payment</a>
+    <div class="d-flex flex-column align-items-center mb-3">
+        <h2 class="mb-2">All Payments</h2>
+        <div class="input-group input-group-sm" style="max-width: 320px;">
+            <span class="input-group-text fw-semibold">Search&nbsp;Plot&nbsp;No</span>
+            <input id="payment-search" type="text" class="form-control" placeholder="Enter plot / plan no" />
+        </div>
     </div>
 
     @if (Model == null || !Model.Any())
@@ -23,18 +26,14 @@
         <div class="card shadow-sm">
             <div class="card-body p-0">
                 <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-                    <table class="table table-bordered table-striped table-hover mb-0">
+                    <table class="table table-bordered table-striped table-hover mb-0" id="payments-table">
                         <thead class="table-dark sticky-top">
                             <tr>
                                 <th class="ps-3">Plan No</th>
                                 <th>Payment Desc</th>
-                                <th>Installment No</th>
+                                <th>Inst No</th>
                                 <th>Due Date</th>
                                 <th>Due Amount</th>
-                                <th>Surcharge</th>
-                                <th>Discount</th>
-                                <th>Bank</th>
-                                <th>Deposit Slip</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -47,14 +46,11 @@
                                     <td>@Html.DisplayFor(modelItem => item.installmentno)</td>
                                     <td>@Html.DisplayFor(modelItem => item.duedate)</td>
                                     <td>@Html.DisplayFor(modelItem => item.dueamount)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.surchargerate)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.discount)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.bankname)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.depsoiteslipno)</td>
                                     <td>
-                                        <a asp-action="ChildDetails" asp-route-id="@item.uid">Details</a> |
-                                        <a asp-action="EditChild" asp-route-id="@item.uid">Edit</a> |
-                                        <a asp-action="DeleteChild" asp-route-id="@item.uid">Delete</a>
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="ChildDetails" asp-route-id="@item.uid" class="btn btn-sm btn-info">Detail</a>
+                                            <a asp-action="EditChild" asp-route-id="@item.uid" class="btn btn-sm btn-warning">Edit</a>
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -65,3 +61,28 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const input = document.getElementById('payment-search');
+            const table = document.getElementById('payments-table');
+            if (!input || !table) return;
+
+            const rows = table.querySelectorAll('tbody tr');
+
+            input.addEventListener('input', function () {
+                const term = this.value.toLowerCase().trim();
+                rows.forEach(row => {
+                    const firstCell = row.querySelector('td');
+                    const text = firstCell ? (firstCell.textContent || '').toLowerCase() : '';
+                    if (!term || text.includes(term)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        })();
+    </script>
+}

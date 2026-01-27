@@ -52,12 +52,4 @@ public class PaymentPlanChild
     [Display(Name = "Creation Date")]
     [StringLength(60)]
     public string? creationdate { get; set; }
-
-    [Display(Name = "Deposit Slip No")]
-    [StringLength(100)]
-    public string? depsoiteslipno { get; set; }
-
-    [Display(Name = "Bank Name")]
-    [StringLength(50)]
-    public string? bankname { get; set; }
 }
