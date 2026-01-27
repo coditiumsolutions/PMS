@@ -2,3 +2,45 @@ Projects
 Configuration
 Payments Plan
 Customers
+
+
+APIs
+====
+
+1) Fetch all queries
+   - Endpoint: https://hrm.btkdeals.com/queries.php
+   - Method: GET
+   - Response: JSON { status, count, data[] }
+
+2) Update a query
+   - Endpoint: https://hrm.btkdeals.com/updatequery.php
+   - Method: POST
+   - Params:
+       id (required, querystring or body)
+       query_type, title, description, created_by, email, mobile_no, address,
+       status, responder_remarks, comments, updated_by (optional; send what you want to update)
+   - Response: JSON { status, message }
+
+Notes
+-----
+- Content-Type: application/x-www-form-urlencoded or multipart/form-data for POST.
+- For enums, use one of:
+  query_type: Sales | Complain | Transfer | General | Other
+  status: Pending | Replied | Ongoing | Resolved | Discarded
+API Instructions (short)
+
+1) List all queries
+   - Endpoint: GET /queries.php
+   - Returns: JSON { status, count, data: [ ...rows... ] }
+
+2) Update a query
+   - Endpoint: POST /updatequery.php?id={queryId}
+     (or put id in body as "id")
+   - Body (send only fields you want to change):
+     query_type, title, description, created_by, email,
+     mobile_no, address, status, responder_remarks, comments, updated_by
+   - Response: JSON { status, message }
+
+Notes
+- Content-Type not required for simple form posts; for JSON, send as application/json and parse server-side before POSTing.
+- All timestamps are handled server-side (updated_at).

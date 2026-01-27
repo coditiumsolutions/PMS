@@ -81,6 +81,14 @@
             <li><a asp-controller="Transfers" asp-action="History">History</a></li>
         </ul>
     }
+    else if (ViewBag.ActiveModule == "Sales")
+    {
+        <h3 class="sidebar-heading">Sales</h3>
+        <ul class="sidebar-nav">
+            <li><a asp-controller="Sales" asp-action="Index">Dashboard</a></li>
+            <li><a asp-controller="Sales" asp-action="QueriesReport">Queries</a></li>
+        </ul>
+    }
     else if (ViewBag.ActiveModule == "Setup")
     {
         <h3 class="sidebar-heading">Setup</h3>
@@ -101,6 +109,7 @@
             <li><a asp-controller="Payments" asp-action="Index">Payments</a></li>
             <li><a asp-controller="Schedules" asp-action="Index">Schedules</a></li>
             <li><a asp-controller="Transfers" asp-action="Index">Transfers</a></li>
+            <li><a asp-controller="Sales" asp-action="Index">Sales</a></li>
             <li><a asp-controller="Setup" asp-action="Index">Setup</a></li>
         </ul>
     }

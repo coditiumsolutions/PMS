@@ -1,0 +1,172 @@
+@model IEnumerable<PMS.Web.Models.SalesQuery>
+
+@{
+    ViewData["Title"] = "Sales Dashboard";
+    var typeLabels = ViewBag.TypeLabels as string ?? "[]";
+    var typeCounts = ViewBag.TypeCounts as string ?? "[]";
+    var statusLabels = ViewBag.StatusLabels as string ?? "[]";
+    var statusCounts = ViewBag.StatusCounts as string ?? "[]";
+    var dateLabels = ViewBag.DateLabels as string ?? "[]";
+    var dateCounts = ViewBag.DateCounts as string ?? "[]";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Sales Dashboard</h2>
+        <a asp-action="QueriesReport" class="btn btn-outline-primary btn-sm">View Detailed Report</a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 opacity-75">Total Queries</h6>
+                    <h3 class="card-title mb-0">@Model.Count()</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 opacity-75">Resolved</h6>
+                    <h3 class="card-title mb-0">@Model.Count(q => q.Status?.ToLower() == "resolved")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 bg-warning text-dark">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 opacity-75">Pending</h6>
+                    <h3 class="card-title mb-0">@Model.Count(q => q.Status?.ToLower() == "pending")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 opacity-75">Recent (24h)</h6>
+                    @{
+                        var yesterday = DateTime.Now.AddDays(-1);
+                        var recentCount = Model.Count(q => DateTime.TryParse(q.CreatedAt, out var dt) && dt > yesterday);
+                    }
+                    <h3 class="card-title mb-0">@recentCount</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3 text-muted">Queries by Type</h5>
+                    <canvas id="queryTypeChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3 text-muted">Queries by Status</h5>
+                    <canvas id="queryStatusChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3 text-muted">Query Trend (Last Active Days)</h5>
+                    <canvas id="queryTrendChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const typeLabels = @Html.Raw(typeLabels);
+    const typeCounts = @Html.Raw(typeCounts);
+    const statusLabels = @Html.Raw(statusLabels);
+    const statusCounts = @Html.Raw(statusCounts);
+    const dateLabels = @Html.Raw(dateLabels);
+    const dateCounts = @Html.Raw(dateCounts);
+
+    const colors = ['#0d6efd', '#198754', '#ffc107', '#0dcaf0', '#6610f2', '#6f42c1', '#d63384'];
+
+    if (typeLabels.length > 0) {
+        new Chart(document.getElementById('queryTypeChart'), {
+            type: 'doughnut',
+            data: {
+                labels: typeLabels,
+                datasets: [{
+                    data: typeCounts,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    }
+
+    if (statusLabels.length > 0) {
+        new Chart(document.getElementById('queryStatusChart'), {
+            type: 'bar',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    label: 'Count',
+                    data: statusCounts,
+                    backgroundColor: '#0d6efd'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    if (dateLabels.length > 0) {
+        new Chart(document.getElementById('queryTrendChart'), {
+            type: 'line',
+            data: {
+                labels: dateLabels,
+                datasets: [{
+                    label: 'Queries',
+                    data: dateCounts,
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+</script>
+
+@section Styles {
+    <style>
+        .container-fluid { font-size: 0.875rem; }
+        .card-title { font-size: 1.1rem; font-weight: 600; }
+        .opacity-75 { opacity: 0.75; }
+    </style>
+}

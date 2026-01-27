@@ -1,0 +1,210 @@
+@model IEnumerable<PMS.Web.Models.SalesQuery>
+
+@{
+    ViewData["Title"] = "Queries";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Sales Queries</h2>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row align-items-end">
+                <div class="col-md-3">
+                    <label for="queryTypeSelect" class="form-label fw-semibold">Query Type</label>
+                    <select id="queryTypeSelect" class="form-select">
+                        <option value="">All Types</option>
+                        <option value="Complain">Complain</option>
+                        <option value="Inquiry">Inquiry</option>
+                        <option value="Feedback">Feedback</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="statusSelect" class="form-label fw-semibold">Status</label>
+                    <select id="statusSelect" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="In Progress">In Progress</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="searchInput" class="form-label fw-semibold">Search (Title/Email)</label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Enter keywords..." />
+                </div>
+                <div class="col-md-3">
+                    <button type="button" id="searchButton" class="btn btn-primary w-100">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="alert alert-info mb-0">
+                    No sales queries found.
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                    <table class="table table-bordered table-striped table-hover mb-0" id="salesTable">
+                        <thead class="table-dark sticky-top">
+                            <tr>
+                                <th scope="col" class="ps-3">ID</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Title</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Mobile No</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Created At</th>
+                                <th scope="col" class="pe-3 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-3">@item.Id</td>
+                                    <td>@item.QueryType</td>
+                                    <td class="fw-medium">@item.Title</td>
+                                    <td>@item.Email</td>
+                                    <td>@item.MobileNo</td>
+                                    <td>
+                                        @if (item.Status?.ToLower() == "resolved")
+                                        {
+                                            <span class="badge bg-success">@item.Status</span>
+                                        }
+                                        else if (item.Status?.ToLower() == "pending")
+                                        {
+                                            <span class="badge bg-warning text-dark">@item.Status</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-info">@item.Status</span>
+                                        }
+                                    </td>
+                                    <td>@item.CreatedAt</td>
+                                    <td class="pe-3 text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
+                                            <button type="button" class="btn btn-sm btn-info" onclick="alert('Description: @item.Description')">Details</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    (function () {
+        const queryTypeSelect = document.getElementById('queryTypeSelect');
+        const statusSelect = document.getElementById('statusSelect');
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const table = document.getElementById('salesTable');
+        
+        if (!queryTypeSelect || !statusSelect || !searchInput || !searchButton || !table) {
+            return;
+        }
+
+        const tbody = table.getElementsByTagName('tbody')[0];
+        if (!tbody) {
+            return;
+        }
+
+        const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+        function filterTable() {
+            const queryType = queryTypeSelect.value.trim();
+            const status = statusSelect.value.trim();
+            const keyword = searchInput.value.trim().toLowerCase();
+            
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                let matches = true;
+                
+                // Check QueryType (Type column - index 1)
+                if (queryType) {
+                    const typeText = (cells[1].textContent || cells[1].innerText).trim();
+                    if (typeText !== queryType) {
+                        matches = false;
+                    }
+                }
+                
+                // Check Status (Status column - index 5)
+                if (status && matches) {
+                    const statusText = (cells[5].textContent || cells[5].innerText).trim();
+                    if (statusText !== status) {
+                        matches = false;
+                    }
+                }
+
+                // Check Keyword (Title - index 2, Email - index 3)
+                if (keyword && matches) {
+                    const titleText = (cells[2].textContent || cells[2].innerText).trim().toLowerCase();
+                    const emailText = (cells[3].textContent || cells[3].innerText).trim().toLowerCase();
+                    if (titleText.indexOf(keyword) === -1 && emailText.indexOf(keyword) === -1) {
+                        matches = false;
+                    }
+                }
+                
+                row.style.display = matches ? '' : 'none';
+            });
+        }
+
+        searchButton.addEventListener('click', filterTable);
+        
+        [queryTypeSelect, statusSelect, searchInput].forEach(el => {
+            el.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    filterTable();
+                }
+            });
+        });
+    })();
+</script>
+
+@section Styles {
+    <style>
+        .container-fluid {
+            font-size: 0.875rem;
+        }
+        .container-fluid h2 {
+            font-size: 1.5rem;
+        }
+        .table {
+            font-size: 0.875rem;
+        }
+        .table th {
+            font-size: 0.875rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .form-label {
+            font-size: 0.875rem;
+        }
+        .btn {
+            font-size: 0.875rem;
+        }
+        .badge {
+            font-weight: 500;
+        }
+    </style>
+}
