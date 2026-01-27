@@ -142,48 +142,167 @@ public class CustomersController : Controller
         return View("Details", customer);
     }
 
-    // GET: Customers/Create
-    public IActionResult Create()
+    // GET: Customers/Create (also used as edit page when id is provided)
+    public async Task<IActionResult> Create(string? id)
     {
         ViewBag.ActiveModule = "Customers";
-        return View();
+
+        // New customer case
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            var newModel = new CustomerCreateViewModel
+            {
+                Customer = new Customer
+                {
+                    CreationDate = DateTime.Today
+                },
+                RequestedProperty = new RequestedProperty()
+            };
+
+            return View(newModel);
+        }
+
+        // Existing customer (edit) case
+        var existingCustomer = await _context.Customers
+            .FirstOrDefaultAsync(c => c.CustomerNo == id);
+
+        if (existingCustomer == null)
+        {
+            return NotFound();
+        }
+
+        var existingRequested = await _context.RequestedProperties
+            .FirstOrDefaultAsync(r => r.CustomerNo == id);
+
+        var model = new CustomerCreateViewModel
+        {
+            Customer = existingCustomer,
+            RequestedProperty = existingRequested ?? new RequestedProperty
+            {
+                CustomerNo = existingCustomer.CustomerNo
+            }
+        };
+
+        return View(model);
     }
 
     // POST: Customers/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("CustomerNo,FullName,FatherName,Cnic,ContactNo,Email,Gender,PresAddress,PremAddress,PresCity,PremCity,PresCountry,PremCountry,CreationDate,CreatedBy")] Customer customer)
+    public async Task<IActionResult> Create(CustomerCreateViewModel model)
     {
         ViewBag.ActiveModule = "Customers";
-        
-        // Check if CustomerNo already exists
-        if (await _context.Customers.AnyAsync(c => c.CustomerNo == customer.CustomerNo))
-        {
-            ModelState.AddModelError("CustomerNo", "Customer No already exists. Please use a different Customer No.");
-        }
+
+        var customer = model.Customer;
+        var requestedProperty = model.RequestedProperty;
+
+        // Determine if this is an insert or an update based on CustomerNo
+        var isNewCustomer = string.IsNullOrWhiteSpace(customer.CustomerNo);
+
+        // Remove validation for CustomerNo if it's new (auto-generated) or empty
+        ModelState.Remove("Customer.CustomerNo");
+        ModelState.Remove("model.Customer.CustomerNo");
 
         if (ModelState.IsValid)
         {
+            // Use a transaction so Customer and RequestedProperty are saved together
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                _context.Add(customer);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            catch (DbUpdateException ex)
-            {
-                if (ex.InnerException?.Message.Contains("PRIMARY KEY") == true || 
-                    ex.InnerException?.Message.Contains("duplicate key") == true)
+                if (isNewCustomer)
                 {
-                    ModelState.AddModelError("CustomerNo", "Customer No already exists. Please use a different Customer No.");
+                    // Generate a new CustomerNo following CUST0001, CUST0002... pattern
+                    customer.CustomerNo = await GenerateNewCustomerNoAsync();
+                    _context.Customers.Add(customer);
                 }
                 else
                 {
-                    ModelState.AddModelError("", "An error occurred while saving. Please try again.");
+                    // Update existing customer record
+                    var existingCustomer = await _context.Customers
+                        .FirstOrDefaultAsync(c => c.CustomerNo == customer.CustomerNo);
+
+                    if (existingCustomer == null)
+                    {
+                        ModelState.AddModelError(string.Empty, $"Customer {customer.CustomerNo} not found for updating.");
+                        return View(model);
+                    }
+                    else
+                    {
+                        // Update existing customer properties
+                        existingCustomer.FullName = customer.FullName;
+                        existingCustomer.FatherName = customer.FatherName;
+                        existingCustomer.Cnic = customer.Cnic;
+                        existingCustomer.ContactNo = customer.ContactNo;
+                        existingCustomer.Email = customer.Email;
+                        existingCustomer.Gender = customer.Gender;
+                        existingCustomer.PresAddress = customer.PresAddress;
+                        existingCustomer.PremAddress = customer.PremAddress;
+                        existingCustomer.PresCity = customer.PresCity;
+                        existingCustomer.PremCity = customer.PremCity;
+                        existingCustomer.PresCountry = customer.PresCountry;
+                        existingCustomer.PremCountry = customer.PremCountry;
+                        existingCustomer.CreationDate = customer.CreationDate;
+                        existingCustomer.CreatedBy = customer.CreatedBy;
+                    }
                 }
+
+                // Only create/update RequestedProperty if at least one requested field is provided
+                var hasRequestedData =
+                    !string.IsNullOrWhiteSpace(requestedProperty.ReqProject) ||
+                    !string.IsNullOrWhiteSpace(requestedProperty.ReqSize) ||
+                    !string.IsNullOrWhiteSpace(requestedProperty.ReqCategory) ||
+                    !string.IsNullOrWhiteSpace(requestedProperty.ReqConstruction);
+
+                if (hasRequestedData)
+                {
+                    // Ensure we always link to the correct CustomerNo
+                    requestedProperty.CustomerNo = customer.CustomerNo;
+
+                    var existingRequested = await _context.RequestedProperties
+                        .FirstOrDefaultAsync(r => r.CustomerNo == customer.CustomerNo);
+
+                    if (existingRequested == null)
+                    {
+                        _context.RequestedProperties.Add(requestedProperty);
+                    }
+                    else
+                    {
+                        existingRequested.ReqProject = requestedProperty.ReqProject;
+                        existingRequested.ReqSize = requestedProperty.ReqSize;
+                        existingRequested.ReqCategory = requestedProperty.ReqCategory;
+                        existingRequested.ReqConstruction = requestedProperty.ReqConstruction;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                TempData["SuccessMessage"] = "Customer information has been saved successfully.";
+                return RedirectToAction(nameof(Create), new { id = customer.CustomerNo });
+            }
+            catch (DbUpdateException ex)
+            {
+                await transaction.RollbackAsync();
+                var dbMessage = ex.InnerException?.Message ?? ex.Message;
+                ModelState.AddModelError(string.Empty, $"Database error while saving customer: {dbMessage}");
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                ModelState.AddModelError(string.Empty, $"Unexpected error while saving customer: {ex.Message}");
             }
         }
-        return View(customer);
+        else
+        {
+            // If validation failed, collect all errors to display them more clearly
+            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+            if (errors.Any())
+            {
+                ModelState.AddModelError(string.Empty, "Please fix the validation errors on all tabs before saving.");
+            }
+        }
+
+        return View(model);
     }
 
     // GET: Customers/Edit/CUST001
@@ -669,5 +788,32 @@ public class CustomersController : Controller
     private bool CustomerExists(string id)
     {
         return _context.Customers.Any(e => e.CustomerNo == id);
+    }
+
+    /// <summary>
+    /// Generates a new sequential CustomerNo using the pattern CUST0001, CUST0002, ...
+    /// This follows the existing Customers table definition in db.txt (CustomerNo as varchar(50)).
+    /// </summary>
+    private async Task<string> GenerateNewCustomerNoAsync()
+    {
+        const string prefix = "CUST";
+
+        // Get all existing numeric parts for codes starting with the prefix
+        var existingNumbers = await _context.Customers
+            .Where(c => c.CustomerNo.StartsWith(prefix))
+            .Select(c => c.CustomerNo.Substring(prefix.Length))
+            .ToListAsync();
+
+        var maxNumber = 0;
+        foreach (var numString in existingNumbers)
+        {
+            if (int.TryParse(numString, out var n) && n > maxNumber)
+            {
+                maxNumber = n;
+            }
+        }
+
+        var nextNumber = maxNumber + 1;
+        return $"{prefix}{nextNumber:D4}";
     }
 }
