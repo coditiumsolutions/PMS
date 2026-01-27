@@ -56,27 +56,33 @@
     </div>
 
     <div class="row g-3">
-        <div class="col-lg-6">
+        <div class="col-md-6">
             <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Queries by Type</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title mb-3 text-muted">Queries by Type</h5>
-                    <canvas id="queryTypeChart" height="200"></canvas>
+                    <canvas id="queryTypeChart" height="150"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-md-6">
             <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Queries by Status</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title mb-3 text-muted">Queries by Status</h5>
-                    <canvas id="queryStatusChart" height="200"></canvas>
+                    <canvas id="queryStatusChart" height="150"></canvas>
                 </div>
             </div>
         </div>
         <div class="col-12">
             <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Query Trend (Last Active Days)</h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title mb-3 text-muted">Query Trend (Last Active Days)</h5>
-                    <canvas id="queryTrendChart" height="100"></canvas>
+                    <canvas id="queryTrendChart" height="70"></canvas>
                 </div>
             </div>
         </div>
@@ -106,8 +112,9 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom' }
+                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10 } }
                 }
             }
         });
@@ -126,6 +133,7 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 scales: {
                     y: { beginAtZero: true, ticks: { stepSize: 1 } }
                 },
@@ -152,6 +160,7 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 scales: {
                     y: { beginAtZero: true, ticks: { stepSize: 1 } }
                 },
