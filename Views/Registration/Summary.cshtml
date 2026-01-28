@@ -1,0 +1,153 @@
+@{
+    ViewData["Title"] = "Registration Summary";
+    var statusGroups = ViewBag.StatusGroups as IEnumerable<dynamic>;
+    var projectGroups = ViewBag.ProjectGroups as IEnumerable<dynamic>;
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Registration Summary</h2>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-3">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="summary-label">Total Registrations</div>
+                    <div class="summary-value">@ViewBag.TotalRegistrations</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="summary-label">Pending</div>
+                    <div class="summary-value text-warning">@ViewBag.PendingRegistrations</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="summary-label">Approved</div>
+                    <div class="summary-value text-success">@ViewBag.ApprovedRegistrations</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="summary-label">Rejected</div>
+                    <div class="summary-value text-danger">@ViewBag.RejectedRegistrations</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Breakdown -->
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Registrations by Status</h5>
+                </div>
+                <div class="card-body">
+                    @if (statusGroups != null && statusGroups.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th class="text-end">Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var group in statusGroups)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (group.Status?.ToLower() == "pending")
+                                                {
+                                                    <span class="badge bg-warning">@group.Status</span>
+                                                }
+                                                else if (group.Status?.ToLower() == "approved" || group.Status?.ToLower() == "completed")
+                                                {
+                                                    <span class="badge bg-success">@group.Status</span>
+                                                }
+                                                else if (group.Status?.ToLower() == "rejected" || group.Status?.ToLower() == "cancelled")
+                                                {
+                                                    <span class="badge bg-danger">@group.Status</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@group.Status</span>
+                                                }
+                                            </td>
+                                            <td class="text-end fw-bold">@group.Count</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No data available</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Breakdown -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Top Projects by Registrations</h5>
+                </div>
+                <div class="card-body">
+                    @if (projectGroups != null && projectGroups.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Project ID</th>
+                                        <th class="text-end">Registrations</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var group in projectGroups)
+                                    {
+                                        <tr>
+                                            <td>Project #@group.ProjectID</td>
+                                            <td class="text-end fw-bold">@group.Count</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No project data available</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .summary-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+    .summary-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #212529;
+    }
+</style>

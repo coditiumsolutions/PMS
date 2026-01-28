@@ -77,6 +77,7 @@ TABLE: Customers
 - PremCountry (varchar(60), nullable)
 - CreationDate (date, nullable)
 - Createdby (varchar(100), nullable)
+- RegistrationID (int, nullable)
 
 TABLE: InventoryDetail
 ----------------------
@@ -211,8 +212,6 @@ TABLE: Transfer
 - NdcAmount (varchar(50), nullable)
 - NdcDetail (varchar(100), nullable)
 
-<<<<<<< HEAD
-=======
 TABLE: TransferFee
 ------------------
 - UID (int)
@@ -227,7 +226,6 @@ TABLE: TransferFee
 - CreatedOn (varchar(50), nullable)
 - CreatedBy (varchar(50), nullable)
 
->>>>>>> ae1eaa2 (Schedules: inline child payments, layout tweaks, config-driven dropdown)
 TABLE: TransferPayment
 ----------------------
 - uId (int)
@@ -243,10 +241,7 @@ TABLE: TransferPayment
 - AmountPaid (varchar(100), nullable)
 - CreatedOn (varchar(50), nullable)
 - CreatedBy (varchar(50), nullable)
-<<<<<<< HEAD
 - Consumed (bit, default: ((0)))
-=======
-- Consumed (bit)
 
 TABLE: Users
 ------------
@@ -258,4 +253,16 @@ TABLE: Users
 - CreatedBy (varchar(max), nullable)
 - CreatedOn (varchar(max), nullable)
 - History (varchar(max), nullable)
->>>>>>> ae1eaa2 (Schedules: inline child payments, layout tweaks, config-driven dropdown)
+
+TABLE: Registration
+-------------------
+- RegID (int, primary key, identity)
+- FullName (nvarchar(150), nullable)
+- CNIC (nvarchar(50), nullable)
+- Phone (nvarchar(50), nullable)
+- Email (nvarchar(150), nullable)
+- ProjectID (int, nullable)
+- RequestedSize (nvarchar(100), nullable)
+- Remarks (nvarchar(max), nullable)
+- CreatedAt (datetime, nullable, default: (getdate()))
+- Status (nvarchar(50), nullable, default: ('Pending'))

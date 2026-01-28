@@ -7,7 +7,9 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Customers</h2>
-        <a asp-action="Create" class="btn btn-primary">Create New</a>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create New
+        </a>
     </div>
 
     <!-- Search Bar -->
@@ -36,54 +38,60 @@
     {
         <div class="card shadow-sm">
             <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover mb-0" id="customersTable">
-                        <thead class="table-dark">
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto; overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch;">
+                    <table class="table table-bordered table-hover mb-0" id="customersTable" style="width: 100%; table-layout: auto; min-width: 600px;">
+                        <thead class="sticky-top" style="background-color: #071a2e; color: white;">
                             <tr>
-                                <th scope="col" class="ps-3">
+                                <th scope="col" class="ps-2 text-center" style="width: 100px; min-width: 100px;">Actions</th>
+                                <th scope="col" class="sortable" data-sort="text">
                                     @Html.DisplayNameFor(model => model.CustomerNo)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
                                 </th>
-                                <th scope="col">
+                                <th scope="col" class="sortable" data-sort="text">
                                     @Html.DisplayNameFor(model => model.FullName)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
                                 </th>
-                                <th scope="col">
+                                <th scope="col" class="sortable" data-sort="text">
                                     @Html.DisplayNameFor(model => model.FatherName)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
                                 </th>
-                                <th scope="col">
+                                <th scope="col" class="sortable" data-sort="text">
                                     @Html.DisplayNameFor(model => model.Cnic)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
                                 </th>
-                                <th scope="col">
+                                <th scope="col" class="sortable" data-sort="text">
                                     @Html.DisplayNameFor(model => model.ContactNo)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
                                 </th>
-                                <th scope="col" class="pe-3 text-center">Actions</th>
+                                <th scope="col" class="sortable pe-3" data-sort="date">
+                                    @Html.DisplayNameFor(model => model.CreationDate)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model)
                             {
                                 <tr>
-                                    <td class="ps-3 fw-medium">
-                                        @Html.DisplayFor(modelItem => item.CustomerNo)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.FullName)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.FatherName)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Cnic)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.ContactNo)
-                                    </td>
-                                    <td class="pe-3 text-center">
-                                        <div class="btn-group" role="group">
-                                            <a asp-action="CustomersDetails" asp-route-id="@item.CustomerNo" class="btn btn-sm btn-info">Details</a>
-                                            <a asp-action="CustomersEdit" asp-route-id="@item.CustomerNo" class="btn btn-sm btn-warning">Edit</a>
-                                            <a asp-action="Delete" asp-route-id="@item.CustomerNo" class="btn btn-sm btn-danger">Delete</a>
+                                    <td class="ps-2 text-center" style="width: 100px; min-width: 100px;">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a asp-action="CustomersDetails" asp-route-id="@item.CustomerNo" class="btn btn-sm btn-info" title="View Details" style="padding: 0.1rem 0.2rem;">
+                                                <i class="bi bi-eye" style="font-size: 0.7rem;"></i>
+                                            </a>
+                                            <a asp-action="CustomersEdit" asp-route-id="@item.CustomerNo" class="btn btn-sm btn-warning" title="Edit" style="padding: 0.1rem 0.2rem;">
+                                                <i class="bi bi-pencil" style="font-size: 0.7rem;"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.CustomerNo" class="btn btn-sm btn-danger" title="Delete" style="padding: 0.1rem 0.2rem;">
+                                                <i class="bi bi-trash" style="font-size: 0.7rem;"></i>
+                                            </a>
                                         </div>
                                     </td>
+                                    <td class="fw-medium">@Html.DisplayFor(modelItem => item.CustomerNo)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.FullName)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.FatherName)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Cnic)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.ContactNo)</td>
+                                    <td class="pe-3" data-sort-value="@(item.CreationDate.ToString("yyyy-MM-dd"))">@item.CreationDate.ToString("MMM dd, yyyy")</td>
                                 </tr>
                             }
                         </tbody>
@@ -96,64 +104,278 @@
 
 <script>
     (function () {
+        // Search functionality
         const searchInput = document.getElementById('searchInput');
         const table = document.getElementById('customersTable');
         
-        if (!searchInput || !table) {
-            return;
-        }
+        if (searchInput && table) {
+            const tbody = table.getElementsByTagName('tbody')[0];
+            if (tbody) {
+                const rows = Array.from(tbody.getElementsByTagName('tr'));
 
-        const tbody = table.getElementsByTagName('tbody')[0];
-        if (!tbody) {
-            return;
-        }
+                function filterTable() {
+                    const searchTerm = searchInput.value.toLowerCase().trim();
+                    
+                    rows.forEach(row => {
+                        const cells = row.getElementsByTagName('td');
+                        let matches = false;
 
-        const rows = Array.from(tbody.getElementsByTagName('tr'));
+                        // Search in Customer No, Full Name, Father Name, CNIC, and Contact No columns
+                        // Skip first column (Actions) and last column (CreationDate)
+                        for (let i = 1; i < cells.length - 1; i++) {
+                            const cellText = cells[i].textContent || cells[i].innerText;
+                            if (cellText.toLowerCase().indexOf(searchTerm) > -1) {
+                                matches = true;
+                                break;
+                            }
+                        }
 
-        function filterTable() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            
-            rows.forEach(row => {
-                const cells = row.getElementsByTagName('td');
-                let matches = false;
-
-                // Search in Customer No, Full Name, Father Name, CNIC, and Contact No columns
-                for (let i = 0; i < cells.length - 1; i++) { // Exclude Actions column
-                    const cellText = cells[i].textContent || cells[i].innerText;
-                    if (cellText.toLowerCase().indexOf(searchTerm) > -1) {
-                        matches = true;
-                        break;
-                    }
+                        row.style.display = matches || searchTerm === '' ? '' : 'none';
+                    });
                 }
 
-                row.style.display = matches || searchTerm === '' ? '' : 'none';
-            });
+                searchInput.addEventListener('keyup', filterTable);
+                searchInput.addEventListener('input', filterTable);
+            }
         }
 
-        searchInput.addEventListener('keyup', filterTable);
-        searchInput.addEventListener('input', filterTable);
+        // Table sorting functionality
+        if (table) {
+            const tbody = table.querySelector('tbody');
+            const headers = table.querySelectorAll('thead th.sortable');
+            let currentSort = { column: -1, direction: 'asc' };
+            
+            headers.forEach((header, index) => {
+                header.addEventListener('click', () => {
+                    const sortType = header.getAttribute('data-sort');
+                    const isAsc = currentSort.column === index && currentSort.direction === 'asc';
+                    
+                    // Update sort direction
+                    currentSort.column = index;
+                    currentSort.direction = isAsc ? 'desc' : 'asc';
+                    
+                    // Update header icons
+                    headers.forEach((h, i) => {
+                        h.classList.remove('sorted-asc', 'sorted-desc');
+                        if (i === index) {
+                            h.classList.add(isAsc ? 'sorted-desc' : 'sorted-asc');
+                        }
+                    });
+                    
+                    // Sort rows
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+                    rows.sort((a, b) => {
+                        // Skip sorting if clicking on Actions column (index 0)
+                        if (index === 0) return 0;
+                        
+                        const aCell = a.cells[index];
+                        const bCell = b.cells[index];
+                        
+                        let aValue = aCell.getAttribute('data-sort-value') || aCell.textContent.trim();
+                        let bValue = bCell.getAttribute('data-sort-value') || bCell.textContent.trim();
+                        
+                        if (sortType === 'number') {
+                            aValue = parseInt(aValue) || 0;
+                            bValue = parseInt(bValue) || 0;
+                            return isAsc ? bValue - aValue : aValue - bValue;
+                        } else if (sortType === 'date') {
+                            aValue = new Date(aValue) || new Date(0);
+                            bValue = new Date(bValue) || new Date(0);
+                            return isAsc ? bValue - aValue : aValue - bValue;
+                        } else {
+                            aValue = aValue.toLowerCase();
+                            bValue = bValue.toLowerCase();
+                            if (aValue < bValue) return isAsc ? 1 : -1;
+                            if (aValue > bValue) return isAsc ? -1 : 1;
+                            return 0;
+                        }
+                    });
+                    
+                    // Re-append sorted rows
+                    rows.forEach(row => tbody.appendChild(row));
+                });
+            });
+        }
     })();
 </script>
 
-@section Styles {
-    <style>
-        .container-fluid {
-            font-size: 0.875rem;
-        }
-        .container-fluid h2 {
-            font-size: 1.5rem;
-        }
-        .table {
-            font-size: 0.875rem;
-        }
-        .table th {
-            font-size: 0.875rem;
-        }
-        .form-label {
-            font-size: 0.875rem;
-        }
-        .btn {
-            font-size: 0.875rem;
-        }
-    </style>
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '@TempData["SuccessMessage"]',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#0d6efd',
+            timer: 3000,
+            timerProgressBar: true
+        });
+    </script>
 }
+
+<style>
+    .container-fluid {
+        overflow-x: hidden;
+        max-width: 100%;
+    }
+    
+    #customersTable {
+        font-size: 0.85rem;
+        width: 100%;
+        table-layout: auto;
+    }
+    
+    #customersTable thead th {
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+        white-space: nowrap;
+        background-color: #071a2e !important;
+        color: white !important;
+        border-color: #071a2e !important;
+        padding: 0.5rem 0.4rem;
+        font-size: 0.8rem;
+    }
+    
+    #customersTable thead th.sortable:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    #customersTable thead th.sortable i {
+        opacity: 0.7;
+        font-size: 0.7rem;
+        transition: opacity 0.2s;
+        color: white;
+    }
+    
+    #customersTable thead th.sortable:hover i {
+        opacity: 1;
+        color: white;
+    }
+    
+    #customersTable thead th.sortable.sorted-asc i::before {
+        content: "\f128"; /* bi-arrow-up */
+    }
+    
+    #customersTable thead th.sortable.sorted-desc i::before {
+        content: "\f12a"; /* bi-arrow-down */
+    }
+    
+    #customersTable tbody tr {
+        transition: background-color 0.15s ease;
+    }
+    
+    #customersTable tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+    
+    #customersTable tbody tr:nth-child(odd) {
+        background-color: #ffffff;
+    }
+    
+    #customersTable tbody tr:hover {
+        background-color: #e9ecef !important;
+    }
+    
+    #customersTable tbody td {
+        vertical-align: middle;
+        padding: 0.4rem 0.3rem;
+        white-space: nowrap;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 0.8rem;
+    }
+    
+    #customersTable tbody td:first-child {
+        white-space: normal;
+        max-width: 100px;
+        overflow: visible;
+        padding: 0.3rem 0.2rem;
+    }
+    
+    #customersTable .btn-group {
+        display: inline-flex;
+        gap: 1px;
+    }
+    
+    #customersTable .btn-group .btn {
+        padding: 0.1rem 0.2rem;
+        border-radius: 0.2rem;
+        min-width: 24px;
+    }
+    
+    #customersTable .btn-group .btn i {
+        font-size: 0.7rem;
+    }
+    
+    /* Ensure horizontal scrollbar is visible */
+    .table-responsive {
+        overflow-x: auto !important;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .table-responsive::-webkit-scrollbar {
+        height: 12px;
+        width: 12px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 6px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 6px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    
+    /* Responsive adjustments */
+    @@media (max-width: 1200px) {
+        #customersTable {
+            font-size: 0.8rem;
+        }
+        
+        #customersTable tbody td {
+            padding: 0.35rem 0.25rem;
+            max-width: 120px;
+        }
+        
+        #customersTable thead th {
+            padding: 0.45rem 0.35rem;
+            font-size: 0.75rem;
+        }
+    }
+    
+    @@media (max-width: 768px) {
+        #customersTable {
+            font-size: 0.75rem;
+            min-width: 550px;
+        }
+        
+        #customersTable tbody td {
+            padding: 0.3rem 0.2rem;
+            max-width: 100px;
+        }
+        
+        #customersTable thead th {
+            padding: 0.4rem 0.25rem;
+            font-size: 0.7rem;
+        }
+        
+        #customersTable .btn-group .btn {
+            padding: 0.08rem 0.15rem;
+            min-width: 20px;
+        }
+        
+        #customersTable .btn-group .btn i {
+            font-size: 0.65rem;
+        }
+    }
+</style>

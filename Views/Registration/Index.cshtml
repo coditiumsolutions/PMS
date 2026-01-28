@@ -1,0 +1,331 @@
+@model IEnumerable<PMS.Web.Models.Registration>
+
+@{
+    ViewData["Title"] = "Registrations";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Registrations</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create New
+        </a>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="alert alert-info mb-0">
+                    No registrations found. <a asp-action="Create">Create a new registration</a> to get started.
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto; overflow-x: auto; width: 100%;">
+                    <table class="table table-bordered table-hover mb-0" id="registrationsTable" style="width: 100%; table-layout: auto; min-width: 800px;">
+                        <thead class="sticky-top" style="background-color: #071a2e; color: white;">
+                            <tr>
+                                <th scope="col" class="ps-3 text-center" style="width: 140px; min-width: 140px;">Actions</th>
+                                <th scope="col" class="sortable" data-sort="number">
+                                    @Html.DisplayNameFor(model => model.RegID)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
+                                </th>
+                                <th scope="col" class="sortable" data-sort="text">
+                                    @Html.DisplayNameFor(model => model.FullName)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
+                                </th>
+                                <th scope="col" class="sortable" data-sort="text">
+                                    @Html.DisplayNameFor(model => model.CNIC)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
+                                </th>
+                                <th scope="col" class="sortable" data-sort="text">
+                                    @Html.DisplayNameFor(model => model.Phone)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
+                                </th>
+                                <th scope="col" class="sortable" data-sort="text">
+                                    @Html.DisplayNameFor(model => model.Email)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
+                                </th>
+                                <th scope="col" class="sortable" data-sort="text">
+                                    Project
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
+                                </th>
+                                <th scope="col" class="sortable" data-sort="text">
+                                    @Html.DisplayNameFor(model => model.RequestedSize)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
+                                </th>
+                                <th scope="col" class="sortable" data-sort="text">
+                                    @Html.DisplayNameFor(model => model.Status)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
+                                </th>
+                                <th scope="col" class="sortable pe-3" data-sort="date">
+                                    @Html.DisplayNameFor(model => model.CreatedAt)
+                                    <i class="bi bi-arrow-down-up ms-1"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var registrationIdsWithCustomers = ViewBag.RegistrationIdsWithCustomers as List<int> ?? new List<int>();
+                            }
+                            @foreach (var item in Model)
+                            {
+                                var hasCustomer = registrationIdsWithCustomers.Contains(item.RegID);
+                                var isApproved = item.Status?.ToLower() == "approved";
+                                var canCreateCustomer = isApproved && !hasCustomer;
+                                
+                                <tr>
+                                    <td class="ps-3 text-center" style="width: 140px; min-width: 140px;">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a asp-action="Details" asp-route-id="@item.RegID" class="btn btn-sm btn-info" title="View Details" style="padding: 0.15rem 0.3rem;">
+                                                <i class="bi bi-eye" style="font-size: 0.75rem;"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@item.RegID" class="btn btn-sm btn-warning" title="Edit" style="padding: 0.15rem 0.3rem;">
+                                                <i class="bi bi-pencil" style="font-size: 0.75rem;"></i>
+                                            </a>
+                                            @if (canCreateCustomer)
+                                            {
+                                                <a href="@Url.Action("Create", "Customers", new { registrationId = item.RegID })" class="btn btn-sm btn-success" title="Create Customer" style="padding: 0.15rem 0.3rem;">
+                                                    <i class="bi bi-person-plus" style="font-size: 0.75rem;"></i>
+                                                </a>
+                                            }
+                                            else if (hasCustomer)
+                                            {
+                                                <span class="btn btn-sm btn-secondary" title="Customer already created" style="cursor: not-allowed; opacity: 0.6; padding: 0.15rem 0.3rem;">
+                                                    <i class="bi bi-person-check" style="font-size: 0.75rem;"></i>
+                                                </span>
+                                            }
+                                            else if (!isApproved)
+                                            {
+                                                <span class="btn btn-sm btn-secondary" title="Registration must be approved to create customer" style="cursor: not-allowed; opacity: 0.6; padding: 0.15rem 0.3rem;">
+                                                    <i class="bi bi-lock" style="font-size: 0.75rem;"></i>
+                                                </span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td class="fw-medium">@Html.DisplayFor(modelItem => item.RegID)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.FullName)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.CNIC)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Phone)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                                    <td data-sort-value="@(item.Project?.ProjectName ?? "")">
+                                        @(item.Project?.ProjectName ?? "-")
+                                    </td>
+                                    <td>@Html.DisplayFor(modelItem => item.RequestedSize)</td>
+                                    <td>
+                                        @if (item.Status?.ToLower() == "pending")
+                                        {
+                                            <span class="badge bg-warning text-dark">@Html.DisplayFor(modelItem => item.Status)</span>
+                                        }
+                                        else if (item.Status?.ToLower() == "approved" || item.Status?.ToLower() == "completed")
+                                        {
+                                            <span class="badge bg-success">@Html.DisplayFor(modelItem => item.Status)</span>
+                                        }
+                                        else if (item.Status?.ToLower() == "rejected" || item.Status?.ToLower() == "cancelled")
+                                        {
+                                            <span class="badge bg-danger">@Html.DisplayFor(modelItem => item.Status)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@Html.DisplayFor(modelItem => item.Status)</span>
+                                        }
+                                    </td>
+                                    <td class="pe-3" data-sort-value="@(item.CreatedAt?.ToString("yyyy-MM-dd") ?? "")">@(item.CreatedAt?.ToString("MMM dd, yyyy") ?? "")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .container-fluid {
+        overflow-x: hidden;
+        max-width: 100%;
+    }
+    
+    #registrationsTable {
+        font-size: 0.9rem;
+        width: 100%;
+        table-layout: auto;
+    }
+    
+    #registrationsTable thead th {
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+        white-space: nowrap;
+        background-color: #071a2e !important;
+        color: white !important;
+        border-color: #071a2e !important;
+        padding: 0.75rem 0.5rem;
+    }
+    
+    #registrationsTable thead th.sortable:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    #registrationsTable thead th.sortable i {
+        opacity: 0.7;
+        font-size: 0.75rem;
+        transition: opacity 0.2s;
+        color: white;
+    }
+    
+    #registrationsTable thead th.sortable:hover i {
+        opacity: 1;
+        color: white;
+    }
+    
+    #registrationsTable thead th.sortable.sorted-asc i::before {
+        content: "\f128"; /* bi-arrow-up */
+    }
+    
+    #registrationsTable thead th.sortable.sorted-desc i::before {
+        content: "\f12a"; /* bi-arrow-down */
+    }
+    
+    #registrationsTable tbody tr {
+        transition: background-color 0.15s ease;
+    }
+    
+    #registrationsTable tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+    
+    #registrationsTable tbody tr:nth-child(odd) {
+        background-color: #ffffff;
+    }
+    
+    #registrationsTable tbody tr:hover {
+        background-color: #e9ecef !important;
+    }
+    
+    #registrationsTable tbody td {
+        vertical-align: middle;
+        padding: 0.5rem 0.4rem;
+        white-space: nowrap;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    #registrationsTable tbody td:first-child {
+        white-space: normal;
+        max-width: 140px;
+        overflow: visible;
+    }
+    
+    #registrationsTable .btn-group {
+        display: inline-flex;
+        gap: 2px;
+    }
+    
+    #registrationsTable .btn-group .btn {
+        padding: 0.15rem 0.3rem;
+        border-radius: 0.25rem;
+        min-width: 28px;
+    }
+    
+    #registrationsTable .btn-group .btn i {
+        font-size: 0.75rem;
+    }
+    
+    /* Responsive adjustments */
+    @@media (max-width: 1200px) {
+        #registrationsTable {
+            font-size: 0.85rem;
+        }
+        
+        #registrationsTable tbody td {
+            padding: 0.4rem 0.3rem;
+            max-width: 150px;
+        }
+    }
+    
+    @@media (max-width: 768px) {
+        #registrationsTable {
+            font-size: 0.8rem;
+        }
+        
+        #registrationsTable tbody td {
+            padding: 0.35rem 0.25rem;
+            max-width: 120px;
+        }
+        
+        #registrationsTable thead th {
+            padding: 0.5rem 0.3rem;
+            font-size: 0.8rem;
+        }
+    }
+</style>
+
+<script>
+    (function() {
+        const table = document.getElementById('registrationsTable');
+        if (!table) return;
+        
+        const tbody = table.querySelector('tbody');
+        const headers = table.querySelectorAll('thead th.sortable');
+        let currentSort = { column: -1, direction: 'asc' };
+        
+        headers.forEach((header, index) => {
+            header.addEventListener('click', () => {
+                const sortType = header.getAttribute('data-sort');
+                const isAsc = currentSort.column === index && currentSort.direction === 'asc';
+                
+                // Update sort direction
+                currentSort.column = index;
+                currentSort.direction = isAsc ? 'desc' : 'asc';
+                
+                // Update header icons
+                headers.forEach((h, i) => {
+                    h.classList.remove('sorted-asc', 'sorted-desc');
+                    if (i === index) {
+                        h.classList.add(isAsc ? 'sorted-desc' : 'sorted-asc');
+                    }
+                });
+                
+                // Sort rows
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                rows.sort((a, b) => {
+                    // Skip sorting if clicking on Actions column (index 0)
+                    if (index === 0) return 0;
+                    
+                    const aCell = a.cells[index];
+                    const bCell = b.cells[index];
+                    
+                    let aValue = aCell.getAttribute('data-sort-value') || aCell.textContent.trim();
+                    let bValue = bCell.getAttribute('data-sort-value') || bCell.textContent.trim();
+                    
+                    if (sortType === 'number') {
+                        aValue = parseInt(aValue) || 0;
+                        bValue = parseInt(bValue) || 0;
+                        return isAsc ? bValue - aValue : aValue - bValue;
+                    } else if (sortType === 'date') {
+                        aValue = new Date(aValue) || new Date(0);
+                        bValue = new Date(bValue) || new Date(0);
+                        return isAsc ? bValue - aValue : aValue - bValue;
+                    } else {
+                        aValue = aValue.toLowerCase();
+                        bValue = bValue.toLowerCase();
+                        if (aValue < bValue) return isAsc ? 1 : -1;
+                        if (aValue > bValue) return isAsc ? -1 : 1;
+                        return 0;
+                    }
+                });
+                
+                // Re-append sorted rows
+                rows.forEach(row => tbody.appendChild(row));
+            });
+        });
+    })();
+</script>

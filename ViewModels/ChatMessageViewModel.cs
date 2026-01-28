@@ -15,6 +15,7 @@ public class QueryResultViewModel
     public List<Dictionary<string, object>> Rows { get; set; } = new();
     public string? Error { get; set; }
     public string? GeneratedQuery { get; set; }
+    public string? ActualDataQuery { get; set; } // The SELECT * query used to fetch actual data (when COUNT was converted)
 }
 
 public class ChatRequestViewModel

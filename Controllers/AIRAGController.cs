@@ -11,15 +11,18 @@ public class AIRAGController : Controller
     private readonly GroqAIService _groqService;
     private readonly SQLQueryService _sqlService;
     private readonly ILogger<AIRAGController> _logger;
+    private readonly IConfiguration _configuration;
 
     public AIRAGController(
         GroqAIService groqService,
         SQLQueryService sqlService,
-        ILogger<AIRAGController> logger)
+        ILogger<AIRAGController> logger,
+        IConfiguration configuration)
     {
         _groqService = groqService;
         _sqlService = sqlService;
         _logger = logger;
+        _configuration = configuration;
     }
 
     // GET: AIRAG
@@ -40,17 +43,27 @@ public class AIRAGController : Controller
                 return Json(new { success = false, error = "Message cannot be empty." });
             }
 
+            // Load configuration limits
+            var maxSchemaSize = int.Parse(_configuration["Groq:MaxSchemaSize"] ?? "50000");
+            
             // Load database schema from db.txt file
             var dbSchemaPath = Path.Combine(Directory.GetCurrentDirectory(), "db.txt");
             var dbSchema = "DATABASE SCHEMA NOT FOUND";
             if (System.IO.File.Exists(dbSchemaPath))
             {
-                dbSchema = await System.IO.File.ReadAllTextAsync(dbSchemaPath);
+                var fullSchema = await System.IO.File.ReadAllTextAsync(dbSchemaPath);
+                // Truncate schema if too large (configurable limit)
+                dbSchema = fullSchema.Length > maxSchemaSize 
+                    ? fullSchema.Substring(0, maxSchemaSize) + $"\n\n[Schema truncated for size - showing first {maxSchemaSize} characters of {fullSchema.Length} total...]"
+                    : fullSchema;
             }
             else
             {
                 // Fallback to dynamic schema if file doesn't exist
-                dbSchema = await _sqlService.GetDatabaseSchemaAsync();
+                var dynamicSchema = await _sqlService.GetDatabaseSchemaAsync();
+                dbSchema = dynamicSchema.Length > maxSchemaSize 
+                    ? dynamicSchema.Substring(0, maxSchemaSize) + $"\n\n[Schema truncated for size - showing first {maxSchemaSize} characters of {dynamicSchema.Length} total...]"
+                    : dynamicSchema;
             }
 
             // Build system prompt with database schema
@@ -61,6 +74,23 @@ CRITICAL SECURITY RULES:
 - NEVER generate INSERT, UPDATE, DELETE, DROP, ALTER, CREATE, TRUNCATE, or any data modification statements
 - If a user asks to modify data, politely explain that you can only read data, not modify it
 - Only SELECT statements are allowed - this is enforced at multiple security layers
+
+DATABASE TYPE: Microsoft SQL Server (MSSQL)
+CRITICAL SQL SERVER DATE FUNCTIONS (USE THESE - DO NOT USE EXTRACT):
+- Current date/time: GETDATE() or CURRENT_TIMESTAMP
+- Extract year: YEAR(date_column) - NOT EXTRACT(YEAR FROM date_column)
+- Extract month: MONTH(date_column) - NOT EXTRACT(MONTH FROM date_column)
+- Extract day: DAY(date_column) - NOT EXTRACT(DAY FROM date_column)
+- Date part: DATEPART(year, date_column), DATEPART(month, date_column), etc.
+- Date arithmetic: DATEADD(day, 1, date_column), DATEADD(month, 1, date_column)
+- Date difference: DATEDIFF(day, date1, date2)
+- FORBIDDEN: EXTRACT() function does NOT exist in SQL Server - NEVER use it
+
+DATE QUERY EXAMPLES FOR SQL SERVER:
+- This month: WHERE YEAR(CreationDate) = YEAR(GETDATE()) AND MONTH(CreationDate) = MONTH(GETDATE())
+- This year: WHERE YEAR(CreationDate) = YEAR(GETDATE())
+- Last 30 days: WHERE CreationDate >= DATEADD(day, -30, GETDATE())
+- Date range: WHERE CreationDate BETWEEN '2025-01-01' AND '2025-01-31'
 
 DATABASE SCHEMA (EXACT TABLE AND COLUMN NAMES - USE THESE EXACTLY):
 {dbSchema}
@@ -102,19 +132,26 @@ INSTRUCTIONS:
 6. Always use proper SQL syntax with exact table and column names from the schema.
 7. Return ONLY the SQL SELECT query, nothing else. No explanations, no markdown, just the SQL.
 
-Example questions and queries (using EXACT table names):
+Example questions and queries (using EXACT table names and SQL Server date functions):
 - ""How many inventories in Phase 1?"" → SELECT COUNT(*) FROM InventoryDetail WHERE Project LIKE '%Phase 1%' OR SubProject LIKE '%Phase 1%'
 - ""How many plots are available in Road 1 of Block A?"" → SELECT COUNT(*) FROM InventoryDetail WHERE Street = 'Road 1' AND Block = 'A' AND AllotmentStatus = 'Available'
 - ""Show me all allotted plots in Block B"" → SELECT * FROM InventoryDetail WHERE Block = 'B' AND AllotmentStatus IN ('Allotted', 'Sold')
 - ""How many customers do we have?"" → SELECT COUNT(*) FROM Customers
+- ""How many new customers this month?"" → SELECT COUNT(*) FROM Customers WHERE YEAR(CreationDate) = YEAR(GETDATE()) AND MONTH(CreationDate) = MONTH(GETDATE())
+- ""How many customers this year?"" → SELECT COUNT(*) FROM Customers WHERE YEAR(CreationDate) = YEAR(GETDATE())
 - ""Hello"" → (respond naturally, no SQL)";
 
-            // Convert conversation history to ChatMessage format
+            // Load configuration limits
+            var maxConversationHistory = int.Parse(_configuration["Groq:MaxConversationHistory"] ?? "20");
+            var maxMessageLength = int.Parse(_configuration["Groq:MaxMessageLength"] ?? "2000");
+            
+            // Convert conversation history to ChatMessage format (configurable limit)
             var conversationHistory = request.ConversationHistory?
+                .TakeLast(maxConversationHistory) // Configurable limit
                 .Select(m => new ChatMessage
                 {
                     Role = m.Role,
-                    Content = m.Content
+                    Content = m.Content.Length > maxMessageLength ? m.Content.Substring(0, maxMessageLength) + "..." : m.Content
                 })
                 .ToList();
 
@@ -150,10 +187,19 @@ CRITICAL RULES:
 2. You MUST use EXACT table names from the database schema provided earlier. Do NOT invent table names or use plural/lowercase variations.
 3. For inventory/plots questions, use table name: InventoryDetail (exact case)
 4. Check the schema for exact column names before generating the query.
+5. DATABASE IS MICROSOFT SQL SERVER - Use SQL Server date functions:
+   - Current date: GETDATE() or CURRENT_TIMESTAMP
+   - Extract year: YEAR(date_column) - NEVER use EXTRACT(YEAR FROM date_column)
+   - Extract month: MONTH(date_column) - NEVER use EXTRACT(MONTH FROM date_column)
+   - Extract day: DAY(date_column) - NEVER use EXTRACT(DAY FROM date_column)
+   - This month: WHERE YEAR(CreationDate) = YEAR(GETDATE()) AND MONTH(CreationDate) = MONTH(GETDATE())
+   - This year: WHERE YEAR(CreationDate) = YEAR(GETDATE())
+   - Last N days: WHERE CreationDate >= DATEADD(day, -N, GETDATE())
+   - FORBIDDEN: EXTRACT() function does NOT exist in SQL Server - NEVER use EXTRACT()
 
 User question: ""{request.Message}""
 
-Return ONLY a valid SQL SELECT query using EXACT table and column names from the schema, nothing else. No explanations, no markdown, just the SQL SELECT statement.";
+Return ONLY a valid SQL SELECT query using EXACT table and column names from the schema and SQL Server date functions, nothing else. No explanations, no markdown, just the SQL SELECT statement.";
 
                 var sqlQuery = await _groqService.GenerateResponseAsync(queryGenerationPrompt, request.Message, conversationHistory);
                 
@@ -211,11 +257,26 @@ Return ONLY a valid SQL SELECT query using EXACT table and column names from the
                     }
                 }
 
-                // Step 3: Execute the query
-                var queryResult = await _sqlService.ExecuteQueryAsync(sqlQuery);
+                // Step 3: Check if this is a COUNT query and convert it to SELECT * to get actual data
+                var originalQuery = sqlQuery;
+                var isCountQuery = IsCountQuery(sqlQuery);
+                var dataQuery = sqlQuery;
+                
+                if (isCountQuery)
+                {
+                    // Convert COUNT query to SELECT * query to fetch actual data
+                    dataQuery = ConvertCountToSelectAll(sqlQuery);
+                    _logger.LogInformation($"Converted COUNT query to SELECT *: {dataQuery}");
+                }
+
+                // Step 3.1: Execute the query (use dataQuery which is SELECT * if it was a COUNT query)
+                var queryResult = await _sqlService.ExecuteQueryAsync(dataQuery);
 
                 if (queryResult.Success)
                 {
+                    // If it was a COUNT query, calculate the count from rows
+                    var rowCount = queryResult.Rows.Count;
+                    
                     response.QueryResult = new QueryResultViewModel
                     {
                         Success = true,
@@ -223,37 +284,88 @@ Return ONLY a valid SQL SELECT query using EXACT table and column names from the
                         Rows = queryResult.Rows.Select(r => 
                             r.ToDictionary(kvp => kvp.Key, kvp => kvp.Value == DBNull.Value ? (object?)null : kvp.Value)
                         ).ToList(),
-                        GeneratedQuery = sqlQuery
+                        GeneratedQuery = originalQuery, // Show original COUNT query
+                        ActualDataQuery = isCountQuery ? dataQuery : null // Store the SELECT * query if it was converted
                     };
 
                     // Step 4: Use AI to interpret and summarize the results in natural language
+                    // Load configuration limits
+                    var maxResultRows = int.Parse(_configuration["Groq:MaxResultRows"] ?? "100");
+                    var maxCellValueLength = int.Parse(_configuration["Groq:MaxCellValueLength"] ?? "500");
+                    var maxResultJsonSize = int.Parse(_configuration["Groq:MaxResultJsonSize"] ?? "50000");
+                    
+                    // Limit result data to prevent payload size issues (configurable limits)
                     var columnsJson = JsonSerializer.Serialize(queryResult.Columns);
-                    var rowsJson = JsonSerializer.Serialize(queryResult.Rows);
+                    
+                    // Limit rows and truncate large values (configurable limits)
+                    var limitedRows = queryResult.Rows.Take(maxResultRows).Select(row => 
+                        row.ToDictionary(
+                            kvp => kvp.Key, 
+                            kvp => {
+                                var value = kvp.Value == DBNull.Value ? null : kvp.Value;
+                                var strValue = value?.ToString() ?? "";
+                                // Truncate individual cell values (configurable limit)
+                                return strValue.Length > maxCellValueLength ? strValue.Substring(0, maxCellValueLength) + "..." : value;
+                            }
+                        )
+                    ).ToList();
+                    
+                    var rowsJson = JsonSerializer.Serialize(limitedRows);
+                    
+                    // Truncate JSON if still too large (configurable limit)
+                    if (rowsJson.Length > maxResultJsonSize)
+                    {
+                        rowsJson = rowsJson.Substring(0, maxResultJsonSize) + $"...[truncated - showing first {maxResultJsonSize} characters of {rowsJson.Length} total]";
+                    }
+                    
+                    // Build interpretation prompt with emphasis on empty results
+                    var emptyResultsInstruction = rowCount == 0 
+                        ? "⚠️ CRITICAL: NUMBER OF ROWS IS 0 - NO DATA FOUND. You MUST tell the user that nothing was found and suggest trying a different search."
+                        : $"NUMBER OF ROWS: {rowCount} - Data found, provide details.";
                     
                     var interpretationPrompt = $@"You are a helpful AI assistant for a Property Management System. 
 A user asked a question, you generated and executed a SQL query, and here are the results.
-Provide a natural, friendly response that directly answers the user's question using the actual data from the results.
 
 USER'S QUESTION: ""{request.Message}""
 QUERY COLUMNS: {columnsJson}
-QUERY RESULTS (as JSON array): {rowsJson}
+QUERY RESULTS (showing first 50 rows, as JSON array): {rowsJson}
+{emptyResultsInstruction}
 
 INSTRUCTIONS:
-1. Read the query results and extract the actual values from the data.
-2. Provide a direct answer using the actual values from the results.
-3. Format it naturally, like: ""We have 1 customer with NIC number: 42401-2381527-5"" or ""Found 5 available plots in Sector A"".
-4. Include specific values from the results in your response.
-5. Keep it concise (1-2 sentences).
-6. Be friendly and professional.
-7. Do NOT mention technical details like table names, SQL, or column names unless specifically asked.
-8. If the result is a count, mention the count and any relevant details from the query.
+1. FIRST CHECK - CRITICAL: If NUMBER OF ROWS is 0 (the query returned no data), you MUST respond EXACTLY with this message: ""No results found in the database matching your search criteria. Please try a different search with different parameters, or check if the data exists with different criteria.""
+2. If NUMBER OF ROWS > 0:
+   a. Read the query results and extract the actual values from the data.
+   b. Provide a direct answer using the actual values from the results.
+   c. Format it naturally, like: ""We have 1 customer with NIC number: 42401-2381527-5"" or ""Found 5 available plots in Sector A"".
+   d. Include specific values from the results in your response (e.g., actual CNIC numbers, names, plot numbers, etc.).
+3. Keep it concise (1-2 sentences).
+4. Be friendly and professional.
+5. Do NOT mention technical details like table names, SQL, or column names unless specifically asked.
+6. If the result is a count query with data, mention the count ({rowCount}) and include relevant details from the actual data rows.
 
 Example responses:
-- For COUNT query with value 1: ""We have 1 customer with NIC number: 42401-2381527-5""
-- For COUNT query with value 5: ""There are 5 available plots in Sector A""
+- For 0 rows: ""No results found in the database matching your search criteria. Please try a different search with different parameters, or check if the data exists with different criteria.""
+- For COUNT query with 1 row: ""We have 1 customer with NIC number: 42401-2381527-5""
+- For COUNT query with 5 rows: ""There are 5 available plots in Sector A""
 - For data rows: ""Found 3 customers matching your criteria: [list key details]""";
 
                     response.Content = await _groqService.GenerateResponseAsync(interpretationPrompt, "", conversationHistory);
+                    
+                    // Ensure clear message when no rows found
+                    if (rowCount == 0)
+                    {
+                        // Check if the AI response already mentions "no results" or "not found"
+                        var contentLower = response.Content.ToLowerInvariant();
+                        if (!contentLower.Contains("no result") && 
+                            !contentLower.Contains("not found") && 
+                            !contentLower.Contains("nothing found") &&
+                            !contentLower.Contains("no data") &&
+                            !contentLower.Contains("0 result"))
+                        {
+                            // Override with clear message if AI didn't follow instructions
+                            response.Content = "No results found in the database matching your search criteria. Please try a different search with different parameters, or check if the data exists with different criteria.";
+                        }
+                    }
                 }
                 else
                 {
@@ -284,9 +396,133 @@ Answer user questions naturally and helpfully. If they ask about database capabi
         }
     }
 
+    private string FixExtractFunction(string sqlQuery)
+    {
+        if (string.IsNullOrWhiteSpace(sqlQuery))
+            return sqlQuery;
+
+        try
+        {
+            var fixedQuery = sqlQuery;
+            
+            // Replace EXTRACT(YEAR FROM column) with YEAR(column)
+            fixedQuery = System.Text.RegularExpressions.Regex.Replace(
+                fixedQuery,
+                @"EXTRACT\s*\(\s*YEAR\s+FROM\s+([^)]+)\s*\)",
+                "YEAR($1)",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+            
+            // Replace EXTRACT(MONTH FROM column) with MONTH(column)
+            fixedQuery = System.Text.RegularExpressions.Regex.Replace(
+                fixedQuery,
+                @"EXTRACT\s*\(\s*MONTH\s+FROM\s+([^)]+)\s*\)",
+                "MONTH($1)",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+            
+            // Replace EXTRACT(DAY FROM column) with DAY(column)
+            fixedQuery = System.Text.RegularExpressions.Regex.Replace(
+                fixedQuery,
+                @"EXTRACT\s*\(\s*DAY\s+FROM\s+([^)]+)\s*\)",
+                "DAY($1)",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+            
+            // Replace CURRENT_DATE with GETDATE() or CAST(GETDATE() AS DATE)
+            fixedQuery = System.Text.RegularExpressions.Regex.Replace(
+                fixedQuery,
+                @"CURRENT_DATE",
+                "CAST(GETDATE() AS DATE)",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase
+            );
+            
+            return fixedQuery;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning($"Error fixing EXTRACT function: {ex.Message}");
+            return sqlQuery;
+        }
+    }
+
+    private bool IsCountQuery(string sqlQuery)
+    {
+        if (string.IsNullOrWhiteSpace(sqlQuery))
+            return false;
+
+        var upperQuery = sqlQuery.Trim().ToUpperInvariant();
+        
+        // Check for COUNT(*) or COUNT(column) patterns
+        // Match patterns like: SELECT COUNT(*) FROM ... or SELECT COUNT(ColumnName) FROM ...
+        var countPattern = @"SELECT\s+COUNT\s*\(";
+        return System.Text.RegularExpressions.Regex.IsMatch(upperQuery, countPattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+    }
+
+    private string ConvertCountToSelectAll(string countQuery)
+    {
+        if (string.IsNullOrWhiteSpace(countQuery))
+            return countQuery;
+
+        try
+        {
+            // Pattern to match: SELECT COUNT(*) or SELECT COUNT(column) [AS alias] FROM ...
+            // We want to capture everything from FROM onwards
+            var pattern = @"SELECT\s+COUNT\s*\([^)]*\)(?:\s+AS\s+\w+)?\s+(FROM\s+.*)";
+            var match = System.Text.RegularExpressions.Regex.Match(countQuery, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Singleline);
+            
+            if (match.Success && match.Groups.Count > 1)
+            {
+                // Extract everything from FROM clause onwards
+                var fromClauseAndBeyond = match.Groups[1].Value.Trim();
+                return $"SELECT * {fromClauseAndBeyond}";
+            }
+            
+            // Fallback: try to find FROM clause manually and replace SELECT COUNT(*) with SELECT *
+            var fromIndex = countQuery.ToUpperInvariant().IndexOf("FROM");
+            if (fromIndex > 0)
+            {
+                var fromClause = countQuery.Substring(fromIndex);
+                return $"SELECT * {fromClause}";
+            }
+            
+            // Last resort: simple replacement
+            var simplePattern = @"SELECT\s+COUNT\s*\([^)]*\)";
+            var replaced = System.Text.RegularExpressions.Regex.Replace(countQuery, simplePattern, "SELECT *", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            
+            return replaced;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning($"Error converting COUNT query: {ex.Message}. Using original query.");
+            return countQuery;
+        }
+    }
+
     private async Task<QueryAuditResult> AuditQueryAgainstSchemaAsync(string sqlQuery, string dbSchema, string userQuestion)
     {
-        var auditPrompt = $@"You are a SQL query auditor. Your job is to validate that a SQL query uses correct table and column names from the database schema.
+        // First, check for EXTRACT function usage (SQL Server doesn't support it)
+        var upperQuery = sqlQuery.ToUpperInvariant();
+        if (upperQuery.Contains("EXTRACT"))
+        {
+            // Try to fix EXTRACT usage automatically
+            var fixedQuery = FixExtractFunction(sqlQuery);
+            if (fixedQuery != sqlQuery)
+            {
+                _logger.LogWarning($"Query contains EXTRACT function (not supported in SQL Server). Attempting to fix: {sqlQuery}");
+                return new QueryAuditResult
+                {
+                    IsValid = false,
+                    Error = "EXTRACT function is not supported in Microsoft SQL Server. Use YEAR(), MONTH(), or DAY() functions instead.",
+                    SuggestedFix = fixedQuery
+                };
+            }
+        }
+
+        var auditPrompt = $@"You are a SQL query auditor for Microsoft SQL Server. Your job is to validate that a SQL query uses correct table and column names from the database schema and SQL Server-compatible functions.
+
+DATABASE TYPE: Microsoft SQL Server (MSSQL)
+CRITICAL: EXTRACT() function does NOT exist in SQL Server. Use YEAR(), MONTH(), DAY() instead.
 
 DATABASE SCHEMA:
 {dbSchema}
@@ -300,11 +536,14 @@ USER'S ORIGINAL QUESTION:
 INSTRUCTIONS:
 1. Check if all table names in the SQL query exist in the database schema above.
 2. Check if all column names in the SQL query exist in the referenced tables.
-3. If the query uses incorrect table or column names, provide a corrected version.
-4. Pay special attention to:
+3. Check if the query uses SQL Server-compatible functions (NOT EXTRACT - use YEAR, MONTH, DAY instead).
+4. If the query uses incorrect table or column names, or incompatible functions, provide a corrected version.
+5. Pay special attention to:
    - Table name case sensitivity (e.g., InventoryDetail not inventories or Plots)
    - Column name case sensitivity (e.g., Project not phase, AllotmentStatus not status)
    - When users mention ""Phase"", the correct columns are Project or SubProject (not a Phase column)
+   - Date functions: Use YEAR(date), MONTH(date), DAY(date) - NOT EXTRACT(YEAR FROM date)
+   - Current date: Use GETDATE() or CURRENT_TIMESTAMP - NOT CURRENT_DATE
 
 RESPOND IN THIS EXACT JSON FORMAT (no other text):
 {{
@@ -316,6 +555,7 @@ RESPOND IN THIS EXACT JSON FORMAT (no other text):
 Examples:
 - Query uses ""inventories"" table → isValid: false, error: ""Table 'inventories' does not exist. Use 'InventoryDetail' instead."", suggestedFix: ""SELECT COUNT(*) FROM InventoryDetail WHERE...""
 - Query uses ""Phase"" column → isValid: false, error: ""Column 'Phase' does not exist in InventoryDetail. Use 'Project' or 'SubProject' with LIKE operator."", suggestedFix: ""SELECT COUNT(*) FROM InventoryDetail WHERE Project LIKE '%Phase 1%' OR SubProject LIKE '%Phase 1%'""
+- Query uses EXTRACT(YEAR FROM date) → isValid: false, error: ""EXTRACT function not supported in SQL Server. Use YEAR(date) instead."", suggestedFix: ""SELECT COUNT(*) FROM Customers WHERE YEAR(CreationDate) = YEAR(GETDATE()) AND MONTH(CreationDate) = MONTH(GETDATE())""
 - Query is correct → isValid: true, error: """", suggestedFix: """"";
 
         try

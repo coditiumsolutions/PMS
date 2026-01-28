@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PMS.Web.Data;
 using System.Data;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace PMS.Web.Services;
 
@@ -10,10 +11,12 @@ public class SQLQueryService
 {
     private readonly PMSDbContext _context;
     private readonly string _connectionString;
+    private readonly IConfiguration _configuration;
 
     public SQLQueryService(PMSDbContext context, IConfiguration configuration)
     {
         _context = context;
+        _configuration = configuration;
         _connectionString = configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
     }
 
@@ -110,11 +113,19 @@ public class SQLQueryService
                 return result;
             }
             
-            // Additional security checks - block dangerous keywords even if they appear after SELECT
+            // Additional security checks - block dangerous keywords with word boundaries
+            // Use regex to match whole words (not substrings within column names like "customerno")
             var dangerousKeywords = new[] { "INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "CREATE", "TRUNCATE", "EXEC", "EXECUTE" };
             foreach (var keyword in dangerousKeywords)
             {
-                if (upperQuery.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                // Match keyword as whole word using word boundaries (\b)
+                // This prevents matching substrings like:
+                // - "CREATE" in "customerno" 
+                // - "DELETE" in "deleted"
+                // - "UPDATE" in "updated"
+                // Word boundary ensures keyword is not part of another word
+                var pattern = $@"\b{Regex.Escape(keyword)}\b";
+                if (Regex.IsMatch(upperQuery, pattern, RegexOptions.IgnoreCase))
                 {
                     result.Error = $"Security violation: '{keyword}' is not allowed. Only SELECT queries are permitted.";
                     return result;
@@ -145,9 +156,12 @@ public class SQLQueryService
             }
             result.Columns = columns;
 
-            // Get rows
+            // Get rows (limit to maximum rows for performance and security)
+            var maxRows = int.Parse(_configuration["Groq:MaxSelectRows"] ?? "50");
             var rows = new List<Dictionary<string, object>>();
-            while (await reader.ReadAsync())
+            int rowCount = 0;
+            
+            while (await reader.ReadAsync() && rowCount < maxRows)
             {
                 var row = new Dictionary<string, object>();
                 for (int i = 0; i < reader.FieldCount; i++)
@@ -157,10 +171,14 @@ public class SQLQueryService
                     row[columnName] = value ?? DBNull.Value;
                 }
                 rows.Add(row);
+                rowCount++;
             }
 
             result.Rows = rows;
             result.Success = true;
+            
+            // Note: Results are limited to maximum {maxRows} rows for performance and security
+            // If more rows exist, they are not returned
         }
         catch (Exception ex)
         {

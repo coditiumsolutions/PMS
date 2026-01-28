@@ -8,26 +8,61 @@
     <div class="row">
         <div class="col-lg-10 col-xl-8">
             <form asp-action="Create" id="customer-create-form">
-                <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div asp-validation-summary="All" class="alert alert-danger" role="alert" id="validationSummary">
+                        <strong>Please fix the following errors:</strong>
+                    </div>
+                }
 
-                <!-- Tabs navigation -->
-                        <ul class="nav nav-tabs mb-3" id="customerCreateTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
-                                    Personal Info
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
-                                    Contact Info
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="requested-tab" data-bs-toggle="tab" data-bs-target="#requested" type="button" role="tab" aria-controls="requested" aria-selected="false">
-                                    Requested Property
-                                </button>
-                            </li>
-                        </ul>
+                @if (ViewBag.FromRegistration == true)
+                {
+                    <div class="alert alert-info mb-3">
+                        <i class="bi bi-info-circle"></i> Creating customer from Registration #@ViewBag.RegistrationID. Some fields have been pre-filled.
+                    </div>
+                }
+
+                <!-- Hidden field for RegistrationID -->
+                <input type="hidden" asp-for="Customer.RegistrationID" />
+
+                <!-- Wizard Progress Steps -->
+                <div class="wizard-progress mb-4">
+                    <div class="wizard-steps">
+                        <div class="wizard-step active" data-step="1">
+                            <div class="wizard-step-number">1</div>
+                            <div class="wizard-step-label">Personal Info</div>
+                        </div>
+                        <div class="wizard-step-line"></div>
+                        <div class="wizard-step" data-step="2">
+                            <div class="wizard-step-number">2</div>
+                            <div class="wizard-step-label">Contact Info</div>
+                        </div>
+                        <div class="wizard-step-line"></div>
+                        <div class="wizard-step" data-step="3">
+                            <div class="wizard-step-number">3</div>
+                            <div class="wizard-step-label">Requested Property</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs navigation (hidden, controlled by wizard) -->
+                <ul class="nav nav-tabs mb-3 d-none" id="customerCreateTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
+                            Personal Info
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+                            Contact Info
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="requested-tab" data-bs-toggle="tab" data-bs-target="#requested" type="button" role="tab" aria-controls="requested" aria-selected="false">
+                            Requested Property
+                        </button>
+                    </li>
+                </ul>
 
                         <div class="tab-content" id="customerCreateTabsContent">
                             <!-- Personal Info Tab -->
@@ -38,20 +73,6 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label asp-for="Customer.CustomerNo" class="form-label fw-semibold"></label>
-                                                @if (string.IsNullOrWhiteSpace(Model.Customer.CustomerNo))
-                                                {
-                                                    <!-- New customer: allow entering or leave blank to auto-generate -->
-                                                    <input asp-for="Customer.CustomerNo" class="form-control" />
-                                                }
-                                                else
-                                                {
-                                                    <!-- Existing customer: show as read-only -->
-                                                    <input asp-for="Customer.CustomerNo" class="form-control" readonly />
-                                                }
-                                                <span asp-validation-for="Customer.CustomerNo" class="text-danger"></span>
-                                            </div>
                                             <div class="col-md-6 mb-3">
                                                 <label asp-for="Customer.CreationDate" class="form-label fw-semibold"></label>
                                                 <input asp-for="Customer.CreationDate" type="date" class="form-control" />
@@ -167,12 +188,55 @@
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label asp-for="RequestedProperty.ReqProject" class="form-label fw-semibold"></label>
-                                                <input asp-for="RequestedProperty.ReqProject" class="form-control" />
+                                                @{
+                                                    var projectOptions = ViewBag.ProjectOptions as List<PMS.Web.Models.Project> ?? new List<PMS.Web.Models.Project>();
+                                                }
+                                                <select asp-for="RequestedProperty.ReqProject" id="ReqProject" class="form-select">
+                                                    <option value="">Select Project</option>
+                                                    @foreach (var project in projectOptions)
+                                                    {
+                                                        if (Model.RequestedProperty?.ReqProject == project.ProjectName)
+                                                        {
+                                                            <option value="@project.ProjectName" data-prefix="@project.Prefix" selected>@project.ProjectName</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@project.ProjectName" data-prefix="@project.Prefix">@project.ProjectName</option>
+                                                        }
+                                                    }
+                                                </select>
                                                 <span asp-validation-for="RequestedProperty.ReqProject" class="text-danger"></span>
                                             </div>
                                             <div class="col-md-6 mb-3">
+                                                <label asp-for="Customer.CustomerNo" class="form-label fw-semibold"></label>
+                                                <!-- Use asp-for to ensure proper model binding - this field WILL submit -->
+                                                @if (string.IsNullOrWhiteSpace(Model.Customer.CustomerNo))
+                                                {
+                                                    <!-- Auto-generated Customer No - styled as readonly but still submits -->
+                                                    <input asp-for="Customer.CustomerNo" id="Customer_CustomerNo" class="form-control" style="background-color: #e9ecef; cursor: not-allowed;" placeholder="Select a project to generate Customer No" />
+                                                }
+                                                else
+                                                {
+                                                    <!-- Existing customer: show as read-only -->
+                                                    <input asp-for="Customer.CustomerNo" id="Customer_CustomerNo" class="form-control" style="background-color: #e9ecef; cursor: not-allowed;" />
+                                                }
+                                                <small class="form-text text-muted">Customer No will be auto-generated based on selected project</small>
+                                                <span asp-validation-for="Customer.CustomerNo" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
                                                 <label asp-for="RequestedProperty.ReqSize" class="form-label fw-semibold"></label>
-                                                <input asp-for="RequestedProperty.ReqSize" class="form-control" />
+                                                @{
+                                                    var sizeOptions = ViewBag.SizeOptions as List<string> ?? new List<string>();
+                                                }
+                                                <select asp-for="RequestedProperty.ReqSize" class="form-select">
+                                                    <option value="">Select Size</option>
+                                                    @foreach (var size in sizeOptions)
+                                                    {
+                                                        <option value="@size">@size</option>
+                                                    }
+                                                </select>
                                                 <span asp-validation-for="RequestedProperty.ReqSize" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -180,7 +244,16 @@
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label asp-for="RequestedProperty.ReqCategory" class="form-label fw-semibold"></label>
-                                                <input asp-for="RequestedProperty.ReqCategory" class="form-control" />
+                                                @{
+                                                    var categoryOptions = ViewBag.CategoryOptions as List<string> ?? new List<string>();
+                                                }
+                                                <select asp-for="RequestedProperty.ReqCategory" class="form-select">
+                                                    <option value="">Select Category</option>
+                                                    @foreach (var category in categoryOptions)
+                                                    {
+                                                        <option value="@category">@category</option>
+                                                    }
+                                                </select>
                                                 <span asp-validation-for="RequestedProperty.ReqCategory" class="text-danger"></span>
                                             </div>
                                             <div class="col-md-6 mb-3">
@@ -210,10 +283,22 @@
                             </div>
                 </div>
 
-                <!-- Shaded area: action buttons below the form -->
+                <!-- Wizard Navigation Buttons -->
                 <div class="card shadow-sm mt-4">
                     <div class="card-body">
-                        <input type="submit" value="Create Customer" class="btn btn-primary btn-lg" />
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary btn-lg" id="prevBtn" onclick="changeStep(-1)" style="display: none;">
+                                <i class="bi bi-arrow-left"></i> Previous
+                            </button>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-primary btn-lg" id="nextBtn" onclick="changeStep(1)">
+                                    Next <i class="bi bi-arrow-right"></i>
+                                </button>
+                                <button type="submit" class="btn btn-success btn-lg" id="submitBtn" style="display: none;">
+                                    <i class="bi bi-check-circle"></i> Create Customer
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -221,11 +306,297 @@
     </div>
 </div>
 
+@section Styles {
+    <style>
+        .wizard-progress {
+            padding: 20px 0;
+        }
+        
+        .wizard-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .wizard-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+        }
+        
+        .wizard-step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            border: 3px solid #e9ecef;
+        }
+        
+        .wizard-step.active .wizard-step-number {
+            background-color: #0d6efd;
+            color: white;
+            border-color: #0d6efd;
+        }
+        
+        .wizard-step.completed .wizard-step-number {
+            background-color: #198754;
+            color: white;
+            border-color: #198754;
+        }
+        
+        .wizard-step.completed .wizard-step-number::before {
+            content: "✓";
+            font-size: 1.5rem;
+        }
+        
+        .wizard-step-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .wizard-step.active .wizard-step-label {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+        
+        .wizard-step.completed .wizard-step-label {
+            color: #198754;
+        }
+        
+        .wizard-step-line {
+            flex: 1;
+            height: 3px;
+            background-color: #e9ecef;
+            margin: 0 10px;
+            margin-top: -35px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .wizard-step.completed + .wizard-step-line {
+            background-color: #198754;
+        }
+        
+        .wizard-step.active ~ .wizard-step-line {
+            background-color: #e9ecef;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        @@media (max-width: 768px) {
+            .wizard-step-label {
+                font-size: 0.75rem;
+            }
+            
+            .wizard-step-number {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+}
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        function showStep(step) {
+            // Hide all tab panes
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('show', 'active');
+            });
+            
+            // Show current tab pane
+            const panes = ['personal', 'contact', 'requested'];
+            const currentPane = document.getElementById(panes[step - 1]);
+            if (currentPane) {
+                currentPane.classList.add('show', 'active');
+            }
+            
+            // Update wizard steps
+            document.querySelectorAll('.wizard-step').forEach((stepEl, index) => {
+                const stepNum = index + 1;
+                stepEl.classList.remove('active', 'completed');
+                
+                if (stepNum < step) {
+                    stepEl.classList.add('completed');
+                } else if (stepNum === step) {
+                    stepEl.classList.add('active');
+                }
+            });
+            
+            // Update navigation buttons
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (step === 1) {
+                prevBtn.style.display = 'none';
+            } else {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            if (step === totalSteps) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'inline-block';
+            } else {
+                nextBtn.style.display = 'inline-block';
+                submitBtn.style.display = 'none';
+            }
+        }
+
+        function validateStep(step) {
+            if (step === 1) {
+                // Validate Personal Info
+                const fullName = document.getElementById('Customer_FullName');
+                const fatherName = document.getElementById('Customer_FatherName');
+                const cnic = document.getElementById('Customer_Cnic');
+                
+                if (!fullName || !fullName.value.trim()) {
+                    alert('Please enter Full Name');
+                    fullName?.focus();
+                    return false;
+                }
+                if (!fatherName || !fatherName.value.trim()) {
+                    alert('Please enter Father Name');
+                    fatherName?.focus();
+                    return false;
+                }
+                if (!cnic || !cnic.value.trim()) {
+                    alert('Please enter CNIC');
+                    cnic?.focus();
+                    return false;
+                }
+            }
+            // Step 2 and 3 are optional, no validation needed
+            return true;
+        }
+
+        function changeStep(direction) {
+            const newStep = currentStep + direction;
+            
+            if (direction > 0 && !validateStep(currentStep)) {
+                return;
+            }
+            
+            if (newStep >= 1 && newStep <= totalSteps) {
+                currentStep = newStep;
+                showStep(currentStep);
+            }
+        }
+
+        // Function to generate Customer No
+        async function generateCustomerNo(projectName) {
+            const customerNoInput = document.getElementById('Customer_CustomerNo');
+            
+            if (!customerNoInput) {
+                console.error('CustomerNo input field not found!');
+                return Promise.reject('Field not found');
+            }
+            
+            if (!projectName) {
+                customerNoInput.value = '';
+                customerNoInput.placeholder = 'Select a project to generate Customer No';
+                return Promise.resolve('');
+            }
+            
+            // Show loading state
+            customerNoInput.value = 'Generating...';
+            customerNoInput.disabled = true;
+            
+            try {
+                const response = await fetch(`/Customers/GetNextCustomerNo?projectName=${encodeURIComponent(projectName)}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                if (data.customerNo) {
+                    // Update the field (this is the actual form field that gets submitted)
+                    customerNoInput.value = data.customerNo;
+                    customerNoInput.placeholder = '';
+                    console.log('CustomerNo generated:', data.customerNo);
+                    return Promise.resolve(data.customerNo);
+                } else {
+                    customerNoInput.value = '';
+                    customerNoInput.placeholder = 'Unable to generate Customer No. Please check project prefix.';
+                    return Promise.reject('No customerNo in response');
+                }
+            } catch (error) {
+                console.error('Error generating Customer No:', error);
+                customerNoInput.value = '';
+                customerNoInput.placeholder = 'Error generating Customer No';
+                return Promise.reject(error);
+            } finally {
+                // Field is not disabled, so it will submit with form
+                customerNoInput.disabled = false;
+            }
+        }
+
+        // Auto-generate Customer No based on selected project
+        (function() {
+            const projectSelect = document.getElementById('ReqProject');
+            const customerNoInput = document.getElementById('Customer_CustomerNo');
+            
+            if (projectSelect && customerNoInput) {
+                // Listen for dropdown changes
+                projectSelect.addEventListener('change', async function() {
+                    await generateCustomerNo(this.value);
+                });
+                
+                // Auto-generate on page load if project is already selected
+                const selectedProject = projectSelect.value;
+                if (selectedProject && !customerNoInput.value) {
+                    // Small delay to ensure DOM is ready
+                    setTimeout(() => {
+                        generateCustomerNo(selectedProject);
+                    }, 100);
+                }
+            }
+        })();
+
+        // Initialize wizard on page load
         (function () {
+            showStep(1);
+            
+            // Show validation summary if there are errors
+            const validationSummary = document.getElementById('validationSummary');
+            if (validationSummary) {
+                validationSummary.style.display = 'block';
+                
+                // Navigate to the tab with the first error
+                const errorText = validationSummary.textContent.toLowerCase();
+                if (errorText.includes('customer no') || errorText.includes('project')) {
+                    showStep(3); // Requested Property tab
+                } else if (errorText.includes('full name') || errorText.includes('father name') || errorText.includes('cnic')) {
+                    showStep(1); // Personal Info tab
+                } else if (errorText.includes('contact') || errorText.includes('email') || errorText.includes('address')) {
+                    showStep(2); // Contact Info tab
+                }
+            }
+
             const form = document.getElementById('customer-create-form');
             if (!form) return;
 
@@ -233,15 +604,75 @@
                 const fullName = document.getElementById('Customer_FullName');
                 const fatherName = document.getElementById('Customer_FatherName');
                 const cnic = document.getElementById('Customer_Cnic');
+                const customerNo = document.getElementById('Customer_CustomerNo');
+                const creationDate = document.getElementById('Customer_CreationDate');
+                const projectSelect = document.getElementById('ReqProject');
+
+                // CRITICAL: If CustomerNo is empty but project is selected, generate it NOW before validation
+                if (customerNo && (!customerNo.value || !customerNo.value.trim()) && projectSelect && projectSelect.value) {
+                    e.preventDefault();
+                    // Generate CustomerNo before allowing form submission
+                    generateCustomerNo(projectSelect.value).then((generatedNo) => {
+                        if (generatedNo && customerNo) {
+                            customerNo.value = generatedNo;
+                            // Now submit the form
+                            form.submit();
+                        } else {
+                            alert('Error generating Customer No. Please try selecting the project again.');
+                        }
+                    }).catch((error) => {
+                        console.error('Error generating CustomerNo:', error);
+                        alert('Error generating Customer No. Please try selecting the project again.');
+                    });
+                    return;
+                }
 
                 const missing = [];
-                if (!fullName || !fullName.value.trim()) missing.push('Full Name');
-                if (!fatherName || !fatherName.value.trim()) missing.push('Father Name');
-                if (!cnic || !cnic.value.trim()) missing.push('CNIC');
+                const missingTabs = [];
+                
+                if (!fullName || !fullName.value.trim()) {
+                    missing.push('Full Name');
+                    missingTabs.push(1);
+                }
+                if (!fatherName || !fatherName.value.trim()) {
+                    missing.push('Father Name');
+                    missingTabs.push(1);
+                }
+                if (!cnic || !cnic.value.trim()) {
+                    missing.push('CNIC');
+                    missingTabs.push(1);
+                }
+                if (!creationDate || !creationDate.value.trim()) {
+                    missing.push('Creation Date');
+                    missingTabs.push(1);
+                }
+                
+                // Check Customer No field - but note: server will generate it if project is selected
+                // So we only warn if project is also not selected
+                if ((!customerNo || !customerNo.value || !customerNo.value.trim()) && (!projectSelect || !projectSelect.value)) {
+                    missing.push('Customer No (select a project in Requested Property tab)');
+                    missingTabs.push(3);
+                }
 
                 if (missing.length > 0) {
                     e.preventDefault();
-                    alert('Please fill the following required fields before saving:\\n- ' + missing.join('\\n- '));
+                    
+                    // Show which tab has errors
+                    const tabNames = { 1: 'Personal Info', 2: 'Contact Info', 3: 'Requested Property' };
+                    const errorTabs = [...new Set(missingTabs)].map(t => tabNames[t]).join(', ');
+                    
+                    alert('Please fill the following required fields before saving:\\n\\n' + 
+                          missing.join('\\n') + 
+                          '\\n\\nPlease check the ' + errorTabs + ' tab(s).');
+                    
+                    // Navigate to the first tab with errors
+                    if (missingTabs.includes(3)) {
+                        showStep(3); // Requested Property tab
+                    } else if (missingTabs.includes(1)) {
+                        showStep(1); // Personal Info tab
+                    } else {
+                        showStep(2); // Contact Info tab
+                    }
                 }
             });
         })();

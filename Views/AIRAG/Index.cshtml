@@ -22,12 +22,19 @@
                                     AI
                                 </div>
                                 <div class="message-content bg-white p-3 rounded shadow-sm" style="max-width: 80%;">
-                                    <p class="mb-0">Hello! I'm your AI database assistant. I can help you query the Property Management System database. Try asking questions like:</p>
-                                    <ul class="mb-0 mt-2">
-                                        <li>"How many plots are available in Road 1 of Block A?"</li>
-                                        <li>"Show me all allotted plots"</li>
-                                        <li>"How many customers do we have?"</li>
-                                    </ul>
+                                    <p class="mb-2">Hello! I'm your AI database assistant. I can help you query the Property Management System database.</p>
+                                    <p class="mb-2 fw-semibold">Click on any question below to try it:</p>
+                                    <div class="example-questions mt-2">
+                                        <button class="btn btn-outline-primary btn-sm mb-2 me-2 example-question-btn" onclick="fillQuestion('Show me new customers are created this month?')">
+                                            <i class="bi bi-question-circle me-1"></i> Q1: Show me new customers are created this month?
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm mb-2 me-2 example-question-btn" onclick="fillQuestion('Show me new Payment created this month group by Subproject?')">
+                                            <i class="bi bi-question-circle me-1"></i> Q2: Show me new Payment created this month group by Subproject?
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm mb-2 me-2 example-question-btn" onclick="fillQuestion('Show me all customers with nic number 35201-3596997-3')">
+                                            <i class="bi bi-question-circle me-1"></i> Q3: Show me all customers with nic number 35201-3596997-3
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <small class="text-muted ms-5">Just now</small>
@@ -99,6 +106,10 @@
     .message-content {
         word-wrap: break-word;
         line-height: 1.6;
+        overflow-x: hidden;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
     }
 
     .message-content p {
@@ -112,27 +123,77 @@
     .query-result-table {
         margin-top: 10px;
         font-size: 0.875rem;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .query-result-table .table-responsive {
+        border-radius: 0.375rem;
+        border: 1px solid #dee2e6;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: auto;
     }
 
     .query-result-table table {
         width: 100%;
+        max-width: 100%;
         border-collapse: collapse;
+        margin-bottom: 0;
+        table-layout: auto;
     }
 
     .query-result-table th,
     .query-result-table td {
         border: 1px solid #dee2e6;
-        padding: 8px;
+        padding: 8px 12px;
         text-align: left;
+        vertical-align: middle;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-wrap: break-word;
     }
 
     .query-result-table th {
         background-color: #f8f9fa;
         font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
-    .query-result-table tr:nth-child(even) {
-        background-color: #f8f9fa;
+    .query-result-table .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .query-result-table .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .query-result-table {
+            font-size: 0.8rem;
+        }
+
+        .query-result-table th,
+        .query-result-table td {
+            padding: 6px 8px;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .query-result-table {
+            font-size: 0.75rem;
+        }
+
+        .query-result-table th,
+        .query-result-table td {
+            padding: 4px 6px;
+        }
     }
 
     .sql-query-display {
@@ -176,6 +237,15 @@
 
     .query-result-collapsible {
         margin-top: 10px;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+    
+    .query-result-collapsible .card {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
     }
 
     .user-msg .query-result-collapsible button {
@@ -215,7 +285,160 @@
     .query-result-collapsible .table {
         margin-bottom: 0;
     }
+
+    .example-questions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .example-question-btn {
+        text-align: left;
+        white-space: normal;
+        word-wrap: break-word;
+        max-width: 100%;
+        transition: all 0.2s ease;
+    }
+
+    .example-question-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+    }
+
+    .example-question-btn:active {
+        transform: translateY(0);
+    }
+
+    @@media (max-width: 768px) {
+        .example-questions {
+            flex-direction: column;
+        }
+
+        .example-question-btn {
+            width: 100%;
+            margin-right: 0 !important;
+        }
+    }
+
+    .visualization-tabs {
+        margin-top: 10px;
+    }
+
+    .visualization-tabs .nav-tabs {
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .visualization-tabs .nav-link {
+        color: #495057;
+        border: none;
+        border-bottom: 2px solid transparent;
+        padding: 0.5rem 1rem;
+    }
+
+    .visualization-tabs .nav-link:hover {
+        border-color: #dee2e6;
+    }
+
+    .visualization-tabs .nav-link.active {
+        color: #007bff;
+        background-color: transparent;
+        border-color: #007bff;
+        font-weight: 600;
+    }
+
+    .visualization-tabs .tab-content {
+        padding: 1rem 0;
+        min-height: 300px;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+        box-sizing: border-box;
+    }
+    
+    .visualization-tabs {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin: 1rem 0;
+    }
+
+    .user-msg .visualization-tabs .nav-link {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .user-msg .visualization-tabs .nav-link:hover {
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .user-msg .visualization-tabs .nav-link.active {
+        color: #ffffff;
+        border-color: #ffffff;
+    }
+
+    .user-msg .tab-content {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 0.375rem;
+        padding: 1rem;
+    }
+
+    /* Responsive adjustments for chat container */
+    @@media (max-width: 768px) {
+        .chat-container {
+            padding: 0.75rem !important;
+        }
+
+        .message-content {
+            max-width: 100% !important;
+            padding: 0.75rem !important;
+        }
+
+        .visualization-tabs .nav-link {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.85rem;
+        }
+
+        .chart-container {
+            height: 250px;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .chat-container {
+            padding: 0.5rem !important;
+        }
+
+        .message-content {
+            padding: 0.5rem !important;
+            font-size: 0.875rem;
+        }
+
+        .visualization-tabs .nav-link {
+            padding: 0.35rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .visualization-tabs .nav-link i {
+            font-size: 0.9rem;
+        }
+
+        .chart-container {
+            height: 200px;
+        }
+
+        .query-result-table .table-responsive {
+            max-height: 300px;
+        }
+    }
 </style>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <script>
     let conversationHistory = [];
@@ -295,7 +518,7 @@
                 ${!isUser ? `<div class="avatar ${avatarBg} text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px; font-size: 0.875rem; flex-shrink: 0;">
                     ${avatarText}
                 </div>` : ''}
-                <div class="message-content ${isUser ? 'user-msg' : 'assistant-msg'} p-3 rounded shadow-sm" style="max-width: 75%;">
+                <div class="message-content ${isUser ? 'user-msg' : 'assistant-msg'} p-3 rounded shadow-sm" style="max-width: min(75%, 100%); width: 100%; box-sizing: border-box;">
                     <p class="mb-0" style="color: ${isUser ? '#ffffff' : '#212529'}; font-weight: ${isUser ? '500' : '400'};">
                         ${escapeHtml(content)}
                     </p>
@@ -313,21 +536,51 @@
 
             if (queryResult.success && queryResult.rows && queryResult.rows.length > 0) {
                 const resultId = 'result-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                const tabId = 'tab-' + resultId;
+                const tableTabId = 'table-' + resultId;
+                const graphTabId = 'graph-' + resultId;
+                const chartTabId = 'chart-' + resultId;
+                
+                // Store queryResult data as JSON for chart initialization
+                const queryResultJson = JSON.stringify(queryResult);
+                
                 messageHtml += `
                     <div class="query-result-collapsible mt-3">
                         <button class="btn btn-sm btn-outline-secondary w-100 text-start d-flex align-items-center justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#${resultId}" aria-expanded="false" aria-controls="${resultId}">
                             <span><i class="bi bi-chevron-down me-2 collapse-icon"></i><strong>View Query Results</strong> (${queryResult.rows.length} row${queryResult.rows.length !== 1 ? 's' : ''})</span>
                         </button>
-                        <div class="collapse mt-2" id="${resultId}">
+                        <div class="collapse mt-2" id="${resultId}" data-query-result='${escapeHtml(queryResultJson)}'>
                             <div class="card card-body p-0">
-                                <div class="query-result-table">
-                                    <table class="table table-sm table-bordered mb-0">
+                                <div class="visualization-tabs">
+                                    <ul class="nav nav-tabs" id="${tabId}" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="${tableTabId}-tab" data-bs-toggle="tab" data-bs-target="#${tableTabId}" type="button" role="tab" aria-controls="${tableTabId}" aria-selected="true">
+                                                <i class="bi bi-table"></i> Table
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="${graphTabId}-tab" data-bs-toggle="tab" data-bs-target="#${graphTabId}" type="button" role="tab" aria-controls="${graphTabId}" aria-selected="false">
+                                                <i class="bi bi-bar-chart"></i> Graph
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="${chartTabId}-tab" data-bs-toggle="tab" data-bs-target="#${chartTabId}" type="button" role="tab" aria-controls="${chartTabId}" aria-selected="false">
+                                                <i class="bi bi-pie-chart"></i> Chart
+                                            </button>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content" id="${tabId}Content">
+                                        <!-- Table Tab -->
+                                        <div class="tab-pane fade show active" id="${tableTabId}" role="tabpanel" aria-labelledby="${tableTabId}-tab">
+                                            <div class="query-result-table p-2" style="width: 100%; max-width: 100%; box-sizing: border-box;">
+                                                <div class="table-responsive" style="max-height: 400px; overflow-y: auto; overflow-x: auto; width: 100%; max-width: 100%;">
+                                                    <table class="table table-sm table-bordered table-striped table-hover mb-0">
                 `;
                 
                 // Header
-                messageHtml += '<thead><tr>';
+                messageHtml += '<thead class="table-light sticky-top"><tr>';
                 queryResult.columns.forEach(col => {
-                    messageHtml += `<th>${escapeHtml(col)}</th>`;
+                    messageHtml += `<th style="white-space: nowrap;">${escapeHtml(col)}</th>`;
                 });
                 messageHtml += '</tr></thead>';
                 
@@ -337,14 +590,30 @@
                     messageHtml += '<tr>';
                     queryResult.columns.forEach(col => {
                         const value = row[col] !== null && row[col] !== undefined ? row[col] : '';
-                        messageHtml += `<td>${escapeHtml(String(value))}</td>`;
+                        messageHtml += `<td style="white-space: nowrap;">${escapeHtml(String(value))}</td>`;
                     });
                     messageHtml += '</tr>';
                 });
                 messageHtml += '</tbody>';
                 
                 messageHtml += `
-                                    </table>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Graph Tab -->
+                                        <div class="tab-pane fade" id="${graphTabId}" role="tabpanel" aria-labelledby="${graphTabId}-tab">
+                                            <div class="chart-container">
+                                                <canvas id="graph-${resultId}"></canvas>
+                                            </div>
+                                        </div>
+                                        <!-- Chart Tab -->
+                                        <div class="tab-pane fade" id="${chartTabId}" role="tabpanel" aria-labelledby="${chartTabId}-tab">
+                                            <div class="chart-container">
+                                                <canvas id="chart-${resultId}"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -367,7 +636,7 @@
         messageDiv.innerHTML = messageHtml;
         chatMessages.appendChild(messageDiv);
         
-        // Initialize Bootstrap collapse for the new collapsible section
+        // Initialize Bootstrap collapse and charts for the new collapsible section
         if (queryResult && queryResult.success && queryResult.rows && queryResult.rows.length > 0) {
             // Wait for Bootstrap to be available
             setTimeout(() => {
@@ -376,11 +645,20 @@
                     const toggleButton = messageDiv.querySelector('[data-bs-toggle="collapse"]');
                     
                     if (collapseElement && toggleButton) {
+                        // Store queryResult in the collapse element for later access
+                        collapseElement._queryResult = queryResult;
+                        
                         // Update icon rotation on collapse events
                         collapseElement.addEventListener('show.bs.collapse', function() {
                             const icon = toggleButton.querySelector('.collapse-icon');
                             if (icon) icon.style.transform = 'rotate(180deg)';
                             toggleButton.setAttribute('aria-expanded', 'true');
+                            
+                            // Initialize charts when expanded (with small delay to ensure DOM is ready)
+                            setTimeout(() => {
+                                const storedQueryResult = collapseElement._queryResult || queryResult;
+                                initializeCharts(storedQueryResult, messageDiv);
+                            }, 200);
                         });
                         
                         collapseElement.addEventListener('hide.bs.collapse', function() {
@@ -389,6 +667,18 @@
                             toggleButton.setAttribute('aria-expanded', 'false');
                         });
                     }
+                    
+                    // Initialize charts when tabs are shown
+                    const tabButtons = messageDiv.querySelectorAll('[data-bs-toggle="tab"]');
+                    tabButtons.forEach(button => {
+                        button.addEventListener('shown.bs.tab', function(e) {
+                            setTimeout(() => {
+                                const collapseEl = messageDiv.querySelector('.collapse');
+                                const storedQueryResult = collapseEl?._queryResult || queryResult;
+                                initializeCharts(storedQueryResult, messageDiv);
+                            }, 100);
+                        });
+                    });
                 }
             }, 100);
         }
@@ -408,7 +698,19 @@
                             AI
                         </div>
                         <div class="message-content bg-white p-3 rounded shadow-sm" style="max-width: 80%;">
-                            <p class="mb-0">Chat cleared. How can I help you today?</p>
+                            <p class="mb-2">Chat cleared. How can I help you today?</p>
+                            <p class="mb-2 fw-semibold">Click on any question below to try it:</p>
+                            <div class="example-questions mt-2">
+                                <button class="btn btn-outline-primary btn-sm mb-2 me-2 example-question-btn" onclick="fillQuestion('Show me new customers are created this month?')">
+                                    <i class="bi bi-question-circle me-1"></i> Q1: Show me new customers are created this month?
+                                </button>
+                                <button class="btn btn-outline-primary btn-sm mb-2 me-2 example-question-btn" onclick="fillQuestion('Show me new Payment created this month group by Subproject?')">
+                                    <i class="bi bi-question-circle me-1"></i> Q2: Show me new Payment created this month group by Subproject?
+                                </button>
+                                <button class="btn btn-outline-primary btn-sm mb-2 me-2 example-question-btn" onclick="fillQuestion('Show me all customers with nic number 35201-3596997-3')">
+                                    <i class="bi bi-question-circle me-1"></i> Q3: Show me all customers with nic number 35201-3596997-3
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <small class="text-muted ms-5">Just now</small>
@@ -421,5 +723,267 @@
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    function fillQuestion(question) {
+        const input = document.getElementById('chatInput');
+        if (input) {
+            input.value = question;
+            input.focus();
+            // Scroll input into view if needed
+            input.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    function isNumeric(value) {
+        if (value === null || value === undefined || value === '') return false;
+        return !isNaN(value) && !isNaN(parseFloat(value));
+    }
+
+    function detectNumericColumns(columns, rows) {
+        const numericColumns = [];
+        const categoricalColumns = [];
+        
+        columns.forEach(col => {
+            let hasNumeric = false;
+            let hasNonNumeric = false;
+            
+            rows.forEach(row => {
+                const value = row[col];
+                if (value !== null && value !== undefined && value !== '') {
+                    if (isNumeric(value)) {
+                        hasNumeric = true;
+                    } else {
+                        hasNonNumeric = true;
+                    }
+                }
+            });
+            
+            if (hasNumeric && !hasNonNumeric) {
+                numericColumns.push(col);
+            } else {
+                categoricalColumns.push(col);
+            }
+        });
+        
+        return { numericColumns, categoricalColumns };
+    }
+
+    function initializeCharts(queryResult, messageDiv) {
+        if (!queryResult || !queryResult.rows || queryResult.rows.length === 0) return;
+        if (typeof Chart === 'undefined') return; // Chart.js not loaded yet
+        
+        const { numericColumns, categoricalColumns } = detectNumericColumns(queryResult.columns, queryResult.rows);
+        
+        // Find the result ID from the collapse element
+        const collapseElement = messageDiv.querySelector('.collapse');
+        if (!collapseElement) return;
+        
+        const resultId = collapseElement.id;
+        const graphCanvas = messageDiv.querySelector(`#graph-${resultId}`);
+        const chartCanvas = messageDiv.querySelector(`#chart-${resultId}`);
+        
+        if (!graphCanvas || !chartCanvas) return; // Canvas elements not found
+        
+        // Initialize Graph (Bar/Line Chart)
+        if (graphCanvas) {
+            // Destroy existing chart if it exists
+            const existingGraphChart = Chart.getChart(graphCanvas);
+            if (existingGraphChart) {
+                existingGraphChart.destroy();
+            }
+            
+            // Determine best visualization
+            let chartType = 'bar';
+            let labels = [];
+            let datasets = [];
+            
+            if (categoricalColumns.length > 0 && numericColumns.length > 0) {
+                // Use first categorical column as labels, first numeric as values
+                const labelColumn = categoricalColumns[0];
+                const valueColumn = numericColumns[0];
+                
+                labels = queryResult.rows.map(row => String(row[labelColumn] || ''));
+                const values = queryResult.rows.map(row => {
+                    const val = row[valueColumn];
+                    return isNumeric(val) ? parseFloat(val) : 0;
+                });
+                
+                datasets = [{
+                    label: valueColumn,
+                    data: values,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }];
+            } else if (numericColumns.length >= 2) {
+                // Use first numeric column as labels, second as values
+                const labelColumn = numericColumns[0];
+                const valueColumn = numericColumns[1];
+                
+                labels = queryResult.rows.map(row => String(row[labelColumn] || ''));
+                const values = queryResult.rows.map(row => {
+                    const val = row[valueColumn];
+                    return isNumeric(val) ? parseFloat(val) : 0;
+                });
+                
+                datasets = [{
+                    label: valueColumn,
+                    data: values,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }];
+            } else if (numericColumns.length === 1 && categoricalColumns.length > 0) {
+                // Use categorical as labels, numeric as values
+                const labelColumn = categoricalColumns[0];
+                const valueColumn = numericColumns[0];
+                
+                labels = queryResult.rows.map(row => String(row[labelColumn] || ''));
+                const values = queryResult.rows.map(row => {
+                    const val = row[valueColumn];
+                    return isNumeric(val) ? parseFloat(val) : 0;
+                });
+                
+                datasets = [{
+                    label: valueColumn,
+                    data: values,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }];
+            } else {
+                // Fallback: use row index as labels, count as values
+                labels = queryResult.rows.map((_, idx) => `Row ${idx + 1}`);
+                datasets = [{
+                    label: 'Count',
+                    data: new Array(queryResult.rows.length).fill(1),
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }];
+            }
+            
+            new Chart(graphCanvas, {
+                type: chartType,
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: datasets.length > 1
+                        },
+                        title: {
+                            display: true,
+                            text: 'Data Visualization'
+                        }
+                    },
+                    scales: chartType === 'bar' ? {
+                        y: {
+                            beginAtZero: true
+                        }
+                    } : {}
+                }
+            });
+        }
+        
+        // Initialize Chart (Pie/Doughnut)
+        if (chartCanvas) {
+            // Destroy existing chart if it exists
+            const existingChart = Chart.getChart(chartCanvas);
+            if (existingChart) {
+                existingChart.destroy();
+            }
+            
+            let labels = [];
+            let values = [];
+            
+            if (categoricalColumns.length > 0 && numericColumns.length > 0) {
+                // Use categorical as labels, numeric as values
+                const labelColumn = categoricalColumns[0];
+                const valueColumn = numericColumns[0];
+                
+                labels = queryResult.rows.map(row => String(row[labelColumn] || ''));
+                values = queryResult.rows.map(row => {
+                    const val = row[valueColumn];
+                    return isNumeric(val) ? parseFloat(val) : 1;
+                });
+            } else if (categoricalColumns.length > 0) {
+                // Count occurrences of each category
+                const labelColumn = categoricalColumns[0];
+                const counts = {};
+                queryResult.rows.forEach(row => {
+                    const label = String(row[labelColumn] || 'Unknown');
+                    counts[label] = (counts[label] || 0) + 1;
+                });
+                
+                labels = Object.keys(counts);
+                values = Object.values(counts);
+            } else if (numericColumns.length > 0) {
+                // Use first numeric column as values, create labels
+                const valueColumn = numericColumns[0];
+                labels = queryResult.rows.map((_, idx) => `Item ${idx + 1}`);
+                values = queryResult.rows.map(row => {
+                    const val = row[valueColumn];
+                    return isNumeric(val) ? parseFloat(val) : 1;
+                });
+            } else {
+                // Fallback: equal distribution
+                labels = queryResult.rows.map((_, idx) => `Row ${idx + 1}`);
+                values = new Array(queryResult.rows.length).fill(1);
+            }
+            
+            // Generate colors
+            const colors = [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(153, 102, 255, 0.6)',
+                'rgba(255, 159, 64, 0.6)',
+                'rgba(199, 199, 199, 0.6)',
+                'rgba(83, 102, 255, 0.6)',
+                'rgba(255, 99, 255, 0.6)',
+                'rgba(99, 255, 132, 0.6)'
+            ];
+            
+            const backgroundColors = [];
+            const borderColors = [];
+            for (let i = 0; i < labels.length; i++) {
+                const colorIndex = i % colors.length;
+                backgroundColors.push(colors[colorIndex]);
+                borderColors.push(colors[colorIndex].replace('0.6', '1'));
+            }
+            
+            new Chart(chartCanvas, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Data Distribution'
+                        }
+                    }
+                }
+            });
+        }
     }
 </script>

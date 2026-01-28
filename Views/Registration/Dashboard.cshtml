@@ -1,0 +1,172 @@
+@{
+    ViewData["Title"] = "Registration Dashboard";
+    var statusLabels = ViewBag.StatusLabels as string ?? "[]";
+    var statusCounts = ViewBag.StatusCounts as string ?? "[]";
+    var projectLabels = ViewBag.ProjectLabels as string ?? "[]";
+    var projectCounts = ViewBag.ProjectCounts as string ?? "[]";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Registration Dashboard</h2>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small mb-1">Total Registrations</div>
+                            <div class="h3 mb-0">@ViewBag.TotalRegistrations</div>
+                        </div>
+                        <div class="fs-1 opacity-50">📋</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small mb-1">Pending</div>
+                            <div class="h3 mb-0">@ViewBag.PendingCount</div>
+                        </div>
+                        <div class="fs-1 opacity-50">⏳</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small mb-1">Approved</div>
+                            <div class="h3 mb-0">@ViewBag.ApprovedCount</div>
+                        </div>
+                        <div class="fs-1 opacity-50">✅</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small mb-1">Rejected</div>
+                            <div class="h3 mb-0">@ViewBag.RejectedCount</div>
+                        </div>
+                        <div class="fs-1 opacity-50">❌</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Registrations by Status</h5>
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Top Projects by Registrations</h5>
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="projectChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    (function() {
+        // Destroy existing charts if they exist
+        const statusChartElement = document.getElementById('statusChart');
+        const projectChartElement = document.getElementById('projectChart');
+        
+        if (window.statusChartInstance) {
+            window.statusChartInstance.destroy();
+        }
+        if (window.projectChartInstance) {
+            window.projectChartInstance.destroy();
+        }
+
+        const statusLabels = @Html.Raw(statusLabels);
+        const statusCounts = @Html.Raw(statusCounts);
+        const projectLabels = @Html.Raw(projectLabels);
+        const projectCounts = @Html.Raw(projectCounts);
+
+        // Status Chart
+        if (statusLabels && statusLabels.length > 0 && statusChartElement) {
+            const statusColors = ['#667eea', '#f093fb', '#4facfe', '#fa709a', '#fee140', '#a8edea'];
+            window.statusChartInstance = new Chart(statusChartElement, {
+                type: 'doughnut',
+                data: {
+                    labels: statusLabels,
+                    datasets: [{
+                        data: statusCounts,
+                        backgroundColor: statusColors.slice(0, statusLabels.length),
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1.5,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Project Chart
+        if (projectLabels && projectLabels.length > 0 && projectChartElement) {
+            window.projectChartInstance = new Chart(projectChartElement, {
+                type: 'bar',
+                data: {
+                    labels: projectLabels,
+                    datasets: [{
+                        label: 'Registrations',
+                        data: projectCounts,
+                        backgroundColor: '#0d6efd'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 1.5,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    })();
+</script>

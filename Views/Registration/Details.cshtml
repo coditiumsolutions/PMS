@@ -1,0 +1,83 @@
+@model PMS.Web.Models.Registration
+
+@{
+    ViewData["Title"] = "Registration Details";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Registration Details</h2>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.RegID" class="btn btn-primary">Edit</a>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <tbody>
+                        <tr>
+                            <th class="bg-light" style="width: 200px;">@Html.DisplayNameFor(model => model.RegID)</th>
+                            <td class="fw-medium">@Html.DisplayFor(model => model.RegID)</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">@Html.DisplayNameFor(model => model.FullName)</th>
+                            <td>@Html.DisplayFor(model => model.FullName)</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">@Html.DisplayNameFor(model => model.CNIC)</th>
+                            <td>@Html.DisplayFor(model => model.CNIC)</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">@Html.DisplayNameFor(model => model.Phone)</th>
+                            <td>@Html.DisplayFor(model => model.Phone)</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">@Html.DisplayNameFor(model => model.Email)</th>
+                            <td>@Html.DisplayFor(model => model.Email)</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">@Html.DisplayNameFor(model => model.ProjectID)</th>
+                            <td>@Html.DisplayFor(model => model.ProjectID)</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">@Html.DisplayNameFor(model => model.RequestedSize)</th>
+                            <td>@Html.DisplayFor(model => model.RequestedSize)</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">@Html.DisplayNameFor(model => model.Remarks)</th>
+                            <td>@Html.DisplayFor(model => model.Remarks)</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">@Html.DisplayNameFor(model => model.Status)</th>
+                            <td>
+                                @if (Model.Status?.ToLower() == "pending")
+                                {
+                                    <span class="badge bg-warning">@Html.DisplayFor(model => model.Status)</span>
+                                }
+                                else if (Model.Status?.ToLower() == "approved" || Model.Status?.ToLower() == "completed")
+                                {
+                                    <span class="badge bg-success">@Html.DisplayFor(model => model.Status)</span>
+                                }
+                                else if (Model.Status?.ToLower() == "rejected" || Model.Status?.ToLower() == "cancelled")
+                                {
+                                    <span class="badge bg-danger">@Html.DisplayFor(model => model.Status)</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@Html.DisplayFor(model => model.Status)</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">@Html.DisplayNameFor(model => model.CreatedAt)</th>
+                            <td>@(Model.CreatedAt?.ToString("MMM dd, yyyy HH:mm") ?? "N/A")</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

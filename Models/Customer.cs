@@ -73,5 +73,8 @@ public class Customer
     [Display(Name = "Created By")]
     [StringLength(100, ErrorMessage = "Created By cannot exceed 100 characters")]
     public string? CreatedBy { get; set; }
+
+    [Display(Name = "Registration ID")]
+    public int? RegistrationID { get; set; }
 }
 

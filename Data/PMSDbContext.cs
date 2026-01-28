@@ -21,6 +21,7 @@ public class PMSDbContext : DbContext
     public DbSet<PaymentPlanChild> PaymentPlanChildren { get; set; }
     public DbSet<Transfer> Transfers { get; set; }
     public DbSet<RequestedProperty> RequestedProperties { get; set; }
+    public DbSet<Registration> Registrations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -195,6 +196,29 @@ public class PMSDbContext : DbContext
             entity.Property(e => e.ReqConstruction)
                 .HasColumnName("reqconstruction")
                 .HasMaxLength(20);
+        });
+
+        // Configure Registration entity
+        modelBuilder.Entity<Registration>(entity =>
+        {
+            entity.HasKey(e => e.RegID);
+            entity.ToTable("Registration");
+            
+            // Configure RegID as identity
+            entity.Property(e => e.RegID)
+                .ValueGeneratedOnAdd();
+            
+            // Set default values
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("GETDATE()");
+            
+            entity.Property(e => e.Status)
+                .HasDefaultValue("Pending");
+            
+            // Configure indexes
+            entity.HasIndex(e => e.ProjectID);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
         });
     }
 }

@@ -37,7 +37,7 @@ public class CustomersController : Controller
     public async Task<IActionResult> CustomersDetail()
     {
         ViewBag.ActiveModule = "Customers";
-        return View(await _context.Customers.OrderBy(c => c.CustomerNo).ToListAsync());
+        return View(await _context.Customers.OrderByDescending(c => c.CreationDate).ToListAsync());
     }
 
     // GET: Customers/Dashboard
@@ -93,10 +93,91 @@ public class CustomersController : Controller
         return View("Details", customer);
     }
 
-    // GET: Customers/Create (also used as edit page when id is provided)
-    public async Task<IActionResult> Create(string? id)
+    // GET: Customers/Create (also used as edit page when id is provided, or pre-fill from registration when registrationId is provided)
+    public async Task<IActionResult> Create(string? id, int? registrationId)
     {
         ViewBag.ActiveModule = "Customers";
+
+        // Pre-fill from Registration case
+        if (registrationId.HasValue)
+        {
+            var registration = await _context.Registrations
+                .FirstOrDefaultAsync(r => r.RegID == registrationId.Value);
+
+            if (registration == null)
+            {
+                return NotFound();
+            }
+
+            // Get project name if ProjectID exists
+            string? projectName = null;
+            if (registration.ProjectID.HasValue)
+            {
+                var project = await _context.Projects
+                    .FirstOrDefaultAsync(p => p.Id == registration.ProjectID.Value);
+                projectName = project?.ProjectName;
+            }
+
+            var newModel = new CustomerCreateViewModel
+            {
+                Customer = new Customer
+                {
+                    RegistrationID = registration.RegID,
+                    FullName = registration.FullName ?? string.Empty,
+                    Cnic = registration.CNIC ?? string.Empty,
+                    Email = registration.Email,
+                    ContactNo = registration.Phone,
+                    CreationDate = DateTime.Today
+                },
+                RequestedProperty = new RequestedProperty
+                {
+                    ReqProject = projectName,
+                    ReqSize = registration.RequestedSize
+                }
+            };
+
+            // Load dropdown options
+            ViewBag.ProjectOptions = await _context.Projects
+                .OrderBy(p => p.ProjectName)
+                .ToListAsync();
+
+            ViewBag.SizeOptions = await _context.Configurations
+                .Where(c => c.ConfigKey == "Size" && c.IsActive)
+                .Select(c => c.ConfigValue)
+                .Distinct()
+                .OrderBy(v => v)
+                .ToListAsync();
+
+            ViewBag.CategoryOptions = await _context.Configurations
+                .Where(c => c.ConfigKey == "PlotCategory" && c.IsActive)
+                .Select(c => c.ConfigValue)
+                .Distinct()
+                .OrderBy(v => v)
+                .ToListAsync();
+
+            ViewBag.FromRegistration = true;
+            ViewBag.RegistrationID = registration.RegID;
+            return View(newModel);
+        }
+
+        // Load dropdown options
+        ViewBag.ProjectOptions = await _context.Projects
+            .OrderBy(p => p.ProjectName)
+            .ToListAsync();
+
+        ViewBag.SizeOptions = await _context.Configurations
+            .Where(c => c.ConfigKey == "Size" && c.IsActive)
+            .Select(c => c.ConfigValue)
+            .Distinct()
+            .OrderBy(v => v)
+            .ToListAsync();
+
+        ViewBag.CategoryOptions = await _context.Configurations
+            .Where(c => c.ConfigKey == "PlotCategory" && c.IsActive)
+            .Select(c => c.ConfigValue)
+            .Distinct()
+            .OrderBy(v => v)
+            .ToListAsync();
 
         // New customer case
         if (string.IsNullOrWhiteSpace(id))
@@ -125,6 +206,25 @@ public class CustomersController : Controller
         var existingRequested = await _context.RequestedProperties
             .FirstOrDefaultAsync(r => r.CustomerNo == id);
 
+        // Load dropdown options
+        ViewBag.ProjectOptions = await _context.Projects
+            .OrderBy(p => p.ProjectName)
+            .ToListAsync();
+
+        ViewBag.SizeOptions = await _context.Configurations
+            .Where(c => c.ConfigKey == "Size" && c.IsActive)
+            .Select(c => c.ConfigValue)
+            .Distinct()
+            .OrderBy(v => v)
+            .ToListAsync();
+
+        ViewBag.CategoryOptions = await _context.Configurations
+            .Where(c => c.ConfigKey == "PlotCategory" && c.IsActive)
+            .Select(c => c.ConfigValue)
+            .Distinct()
+            .OrderBy(v => v)
+            .ToListAsync();
+
         var model = new CustomerCreateViewModel
         {
             Customer = existingCustomer,
@@ -150,9 +250,67 @@ public class CustomersController : Controller
         // Determine if this is an insert or an update based on CustomerNo
         var isNewCustomer = string.IsNullOrWhiteSpace(customer.CustomerNo);
 
-        // Remove validation for CustomerNo if it's new (auto-generated) or empty
+        // CRITICAL: For new customers, ALWAYS try to generate CustomerNo from the selected project FIRST
+        // This ensures CustomerNo is set even if JavaScript didn't run or form field wasn't submitted properly
+        if (isNewCustomer && string.IsNullOrWhiteSpace(customer.CustomerNo))
+        {
+            if (!string.IsNullOrWhiteSpace(requestedProperty?.ReqProject))
+            {
+                var project = await _context.Projects
+                    .FirstOrDefaultAsync(p => p.ProjectName == requestedProperty.ReqProject);
+
+                if (project != null && !string.IsNullOrWhiteSpace(project.Prefix))
+                {
+                    var prefix = project.Prefix.Trim().ToUpper();
+                    
+                    // Find all existing customer numbers that start with this prefix
+                    var existingNumbers = await _context.Customers
+                        .Where(c => c.CustomerNo != null && c.CustomerNo.StartsWith(prefix))
+                        .Select(c => c.CustomerNo)
+                        .ToListAsync();
+
+                    // Extract numeric parts and find the highest number
+                    int nextNumber = 1;
+                    foreach (var existingNo in existingNumbers)
+                    {
+                        if (existingNo != null && existingNo.Length > prefix.Length)
+                        {
+                            var numericPart = existingNo.Substring(prefix.Length);
+                            if (int.TryParse(numericPart, out int num))
+                            {
+                                if (num >= nextNumber)
+                                {
+                                    nextNumber = num + 1;
+                                }
+                            }
+                        }
+                    }
+
+                    // Format as prefix + 4-digit number (e.g., ABL0001)
+                    customer.CustomerNo = $"{prefix}{nextNumber:D4}";
+                }
+            }
+        }
+
+        // CRITICAL FIX: Set RequestedProperty.CustomerNo from Customer.CustomerNo BEFORE removing from ModelState
+        // This prevents the [Required] validation error on RequestedProperty.CustomerNo
+        if (requestedProperty != null && !string.IsNullOrWhiteSpace(customer.CustomerNo))
+        {
+            requestedProperty.CustomerNo = customer.CustomerNo;
+        }
+
+        // Remove CustomerNo from ModelState validation (we'll validate manually)
         ModelState.Remove("Customer.CustomerNo");
         ModelState.Remove("model.Customer.CustomerNo");
+        ModelState.Remove("RequestedProperty.CustomerNo");
+        ModelState.Remove("model.RequestedProperty.CustomerNo");
+        
+        // Manual validation for CustomerNo (required for new customers)
+        // Only show error if we still don't have a CustomerNo after trying to generate it
+        if (isNewCustomer && string.IsNullOrWhiteSpace(customer.CustomerNo))
+        {
+            ModelState.AddModelError("Customer.CustomerNo", "Customer No is required. Please select a project in the Requested Property tab to generate it.");
+        }
 
         if (ModelState.IsValid)
         {
@@ -162,8 +320,12 @@ public class CustomersController : Controller
             {
                 if (isNewCustomer)
                 {
-                    // Generate a new CustomerNo following CUST0001, CUST0002... pattern
-                    customer.CustomerNo = await GenerateNewCustomerNoAsync();
+                    // Use the CustomerNo from the form (generated from project prefix)
+                    // If for some reason it's still empty, fallback to CUST pattern
+                    if (string.IsNullOrWhiteSpace(customer.CustomerNo))
+                    {
+                        customer.CustomerNo = await GenerateNewCustomerNoAsync();
+                    }
                     _context.Customers.Add(customer);
                 }
                 else
@@ -174,8 +336,10 @@ public class CustomersController : Controller
 
                     if (existingCustomer == null)
                     {
-                        ModelState.AddModelError(string.Empty, $"Customer {customer.CustomerNo} not found for updating.");
-                        return View(model);
+                        // CRITICAL FIX: If customer doesn't exist, treat this as a CREATE, not UPDATE
+                        // This happens when CustomerNo is pre-filled but customer doesn't exist yet
+                        isNewCustomer = true;
+                        _context.Customers.Add(customer);
                     }
                     else
                     {
@@ -229,7 +393,7 @@ public class CustomersController : Controller
                 await transaction.CommitAsync();
 
                 TempData["SuccessMessage"] = "Customer information has been saved successfully.";
-                return RedirectToAction(nameof(Create), new { id = customer.CustomerNo });
+                return RedirectToAction(nameof(CustomersDetail));
             }
             catch (DbUpdateException ex)
             {
@@ -243,15 +407,26 @@ public class CustomersController : Controller
                 ModelState.AddModelError(string.Empty, $"Unexpected error while saving customer: {ex.Message}");
             }
         }
-        else
-        {
-            // If validation failed, collect all errors to display them more clearly
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-            if (errors.Any())
-            {
-                ModelState.AddModelError(string.Empty, "Please fix the validation errors on all tabs before saving.");
-            }
-        }
+        // Note: Validation errors are already added above, no need to add duplicate errors here
+
+        // Reload dropdown options for the view
+        ViewBag.ProjectOptions = await _context.Projects
+            .OrderBy(p => p.ProjectName)
+            .ToListAsync();
+
+        ViewBag.SizeOptions = await _context.Configurations
+            .Where(c => c.ConfigKey == "Size" && c.IsActive)
+            .Select(c => c.ConfigValue)
+            .Distinct()
+            .OrderBy(v => v)
+            .ToListAsync();
+
+        ViewBag.CategoryOptions = await _context.Configurations
+            .Where(c => c.ConfigKey == "PlotCategory" && c.IsActive)
+            .Select(c => c.ConfigValue)
+            .Distinct()
+            .OrderBy(v => v)
+            .ToListAsync();
 
         return View(model);
     }
@@ -730,6 +905,54 @@ public class CustomersController : Controller
 
     // GET: Customers/Analytics/FilterOptions
     [HttpGet]
+    // GET: Customers/GetNextCustomerNo
+    [HttpGet]
+    public async Task<IActionResult> GetNextCustomerNo([FromQuery] string projectName)
+    {
+        if (string.IsNullOrWhiteSpace(projectName))
+        {
+            return Json(new { prefix = "", customerNo = "" });
+        }
+
+        var project = await _context.Projects
+            .FirstOrDefaultAsync(p => p.ProjectName == projectName);
+
+        if (project == null || string.IsNullOrWhiteSpace(project.Prefix))
+        {
+            return Json(new { prefix = "", customerNo = "" });
+        }
+
+        var prefix = project.Prefix.Trim().ToUpper();
+        
+        // Find all existing customer numbers that start with this prefix
+        var existingNumbers = await _context.Customers
+            .Where(c => c.CustomerNo != null && c.CustomerNo.StartsWith(prefix))
+            .Select(c => c.CustomerNo)
+            .ToListAsync();
+
+        // Extract numeric parts and find the highest number
+        int nextNumber = 1;
+        foreach (var existingNo in existingNumbers)
+        {
+            if (existingNo != null && existingNo.Length > prefix.Length)
+            {
+                var numericPart = existingNo.Substring(prefix.Length);
+                if (int.TryParse(numericPart, out int num))
+                {
+                    if (num >= nextNumber)
+                    {
+                        nextNumber = num + 1;
+                    }
+                }
+            }
+        }
+
+        // Format as prefix + 4-digit number (e.g., ABL0001)
+        var customerNo = $"{prefix}{nextNumber:D4}";
+
+        return Json(new { prefix = prefix, customerNo = customerNo });
+    }
+
     public async Task<IActionResult> GetFilterOptions()
     {
         var options = await _analyticsService.GetFilterOptionsAsync();
