@@ -86,11 +86,35 @@ CRITICAL SQL SERVER DATE FUNCTIONS (USE THESE - DO NOT USE EXTRACT):
 - Date difference: DATEDIFF(day, date1, date2)
 - FORBIDDEN: EXTRACT() function does NOT exist in SQL Server - NEVER use it
 
+CRITICAL: STRING DATE COLUMNS (VARCHAR):
+Some date columns are stored as VARCHAR (string) in the database, NOT as date/datetime types:
+- Payments.CreatedOn is VARCHAR(60) - stored as string
+- Payments.PaidDate is VARCHAR(60) - stored as string
+- Payments.DSDate, DDDate, ChequeDate are VARCHAR(60) - stored as string
+
+FOR STRING DATE COLUMNS, USE ONE OF THESE METHODS:
+1. TRY_CONVERT with proper format (SAFEST):
+   - TRY_CONVERT(DATETIME, CreatedOn, 120) - for 'YYYY-MM-DD HH:MM:SS' format
+   - TRY_CONVERT(DATETIME, CreatedOn, 101) - for 'MM/DD/YYYY' format
+   - TRY_CONVERT(DATETIME, CreatedOn, 103) - for 'DD/MM/YYYY' format
+   - TRY_CONVERT(DATE, CreatedOn, 120) - for date only
+
+2. CAST with ISDATE check:
+   - WHERE ISDATE(CreatedOn) = 1 AND CAST(CreatedOn AS DATETIME) >= DATEADD(day, -30, GETDATE())
+
+3. String comparison (if dates are stored in 'YYYY-MM-DD' format):
+   - WHERE CreatedOn LIKE '2025-01%' - for January 2025
+   - WHERE CreatedOn >= '2025-01-01' AND CreatedOn < '2025-02-01' - for January 2025
+
 DATE QUERY EXAMPLES FOR SQL SERVER:
-- This month: WHERE YEAR(CreationDate) = YEAR(GETDATE()) AND MONTH(CreationDate) = MONTH(GETDATE())
-- This year: WHERE YEAR(CreationDate) = YEAR(GETDATE())
-- Last 30 days: WHERE CreationDate >= DATEADD(day, -30, GETDATE())
-- Date range: WHERE CreationDate BETWEEN '2025-01-01' AND '2025-01-31'
+- For datetime columns: WHERE YEAR(CreationDate) = YEAR(GETDATE()) AND MONTH(CreationDate) = MONTH(GETDATE())
+- For string date columns (Payments.CreatedOn): WHERE YEAR(TRY_CONVERT(DATETIME, CreatedOn, 120)) = YEAR(GETDATE()) AND MONTH(TRY_CONVERT(DATETIME, CreatedOn, 120)) = MONTH(GETDATE())
+- This year (datetime): WHERE YEAR(CreationDate) = YEAR(GETDATE())
+- This year (string date): WHERE YEAR(TRY_CONVERT(DATETIME, CreatedOn, 120)) = YEAR(GETDATE())
+- Last 30 days (datetime): WHERE CreationDate >= DATEADD(day, -30, GETDATE())
+- Last 30 days (string date): WHERE TRY_CONVERT(DATETIME, CreatedOn, 120) >= DATEADD(day, -30, GETDATE())
+- Date range (datetime): WHERE CreationDate BETWEEN '2025-01-01' AND '2025-01-31'
+- Date range (string date): WHERE TRY_CONVERT(DATETIME, CreatedOn, 120) BETWEEN '2025-01-01' AND '2025-01-31'
 
 DATABASE SCHEMA (EXACT TABLE AND COLUMN NAMES - USE THESE EXACTLY):
 {dbSchema}
@@ -139,6 +163,8 @@ Example questions and queries (using EXACT table names and SQL Server date funct
 - ""How many customers do we have?"" → SELECT COUNT(*) FROM Customers
 - ""How many new customers this month?"" → SELECT COUNT(*) FROM Customers WHERE YEAR(CreationDate) = YEAR(GETDATE()) AND MONTH(CreationDate) = MONTH(GETDATE())
 - ""How many customers this year?"" → SELECT COUNT(*) FROM Customers WHERE YEAR(CreationDate) = YEAR(GETDATE())
+- ""Show me new payments created this month group by bank name?"" → SELECT BankName, COUNT(*) AS NewPaymentsCount FROM Payments WHERE YEAR(TRY_CONVERT(DATETIME, CreatedOn, 120)) = YEAR(GETDATE()) AND MONTH(TRY_CONVERT(DATETIME, CreatedOn, 120)) = MONTH(GETDATE()) GROUP BY BankName ORDER BY BankName
+- ""Show me payments this month?"" → SELECT * FROM Payments WHERE YEAR(TRY_CONVERT(DATETIME, CreatedOn, 120)) = YEAR(GETDATE()) AND MONTH(TRY_CONVERT(DATETIME, CreatedOn, 120)) = MONTH(GETDATE())
 - ""Hello"" → (respond naturally, no SQL)";
 
             // Load configuration limits
@@ -171,6 +197,9 @@ Examples:
             var queryTypeResponse = await _groqService.GenerateResponseAsync(isQueryPrompt, request.Message, conversationHistory);
             var isQuery = queryTypeResponse.Trim().ToUpper().Contains("QUERY");
 
+            // Add delay to prevent rate limiting
+            await Task.Delay(3000);
+
             var response = new ChatMessageViewModel
             {
                 Role = "assistant",
@@ -192,10 +221,14 @@ CRITICAL RULES:
    - Extract year: YEAR(date_column) - NEVER use EXTRACT(YEAR FROM date_column)
    - Extract month: MONTH(date_column) - NEVER use EXTRACT(MONTH FROM date_column)
    - Extract day: DAY(date_column) - NEVER use EXTRACT(DAY FROM date_column)
-   - This month: WHERE YEAR(CreationDate) = YEAR(GETDATE()) AND MONTH(CreationDate) = MONTH(GETDATE())
-   - This year: WHERE YEAR(CreationDate) = YEAR(GETDATE())
-   - Last N days: WHERE CreationDate >= DATEADD(day, -N, GETDATE())
+   - FOR DATETIME COLUMNS: This month: WHERE YEAR(CreationDate) = YEAR(GETDATE()) AND MONTH(CreationDate) = MONTH(GETDATE())
+   - FOR STRING DATE COLUMNS (Payments.CreatedOn, Payments.PaidDate): This month: WHERE YEAR(TRY_CONVERT(DATETIME, CreatedOn, 120)) = YEAR(GETDATE()) AND MONTH(TRY_CONVERT(DATETIME, CreatedOn, 120)) = MONTH(GETDATE())
+   - FOR DATETIME COLUMNS: This year: WHERE YEAR(CreationDate) = YEAR(GETDATE())
+   - FOR STRING DATE COLUMNS: This year: WHERE YEAR(TRY_CONVERT(DATETIME, CreatedOn, 120)) = YEAR(GETDATE())
+   - FOR DATETIME COLUMNS: Last N days: WHERE CreationDate >= DATEADD(day, -N, GETDATE())
+   - FOR STRING DATE COLUMNS: Last N days: WHERE TRY_CONVERT(DATETIME, CreatedOn, 120) >= DATEADD(day, -N, GETDATE())
    - FORBIDDEN: EXTRACT() function does NOT exist in SQL Server - NEVER use EXTRACT()
+   - CRITICAL: Payments table date columns (CreatedOn, PaidDate, DSDate, DDDate, ChequeDate) are VARCHAR - ALWAYS use TRY_CONVERT(DATETIME, column_name, 120) before using YEAR() or MONTH()
 
 User question: ""{request.Message}""
 
@@ -218,6 +251,12 @@ Return ONLY a valid SQL SELECT query using EXACT table and column names from the
                     sqlQuery = sqlQuery.Substring(0, sqlQuery.Length - 3);
                 }
                 sqlQuery = sqlQuery.Trim();
+                
+                // Fix string date column usage in Payments table
+                sqlQuery = FixStringDateColumns(sqlQuery);
+
+                // Add delay to prevent rate limiting
+                await Task.Delay(3000);
 
                 // Step 2.5: Audit the generated query against database schema
                 var auditResult = await AuditQueryAgainstSchemaAsync(sqlQuery, dbSchema, request.Message);
@@ -256,6 +295,9 @@ Return ONLY a valid SQL SELECT query using EXACT table and column names from the
                         return Json(new { success = true, message = response });
                     }
                 }
+
+                // Add delay to prevent rate limiting before interpretation step
+                await Task.Delay(3000);
 
                 // Step 3: Check if this is a COUNT query and convert it to SELECT * to get actual data
                 var originalQuery = sqlQuery;
@@ -396,6 +438,78 @@ Answer user questions naturally and helpfully. If they ask about database capabi
         }
     }
 
+    private string FixStringDateColumns(string sqlQuery)
+    {
+        if (string.IsNullOrWhiteSpace(sqlQuery))
+            return sqlQuery;
+
+        try
+        {
+            var fixedQuery = sqlQuery;
+            
+            // List of string date columns in Payments table that need conversion
+            var stringDateColumns = new[] { "CreatedOn", "PaidDate", "DSDate", "DDDate", "ChequeDate" };
+            
+            foreach (var column in stringDateColumns)
+            {
+                // Fix CONVERT(date, column) -> TRY_CONVERT(DATETIME, column, 120)
+                var convertPattern = $@"\bCONVERT\s*\(\s*date\s*,\s*({column})\s*\)";
+                fixedQuery = System.Text.RegularExpressions.Regex.Replace(
+                    fixedQuery,
+                    convertPattern,
+                    "TRY_CONVERT(DATETIME, $1, 120)",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase
+                );
+                
+                // Fix CONVERT(datetime, column) -> TRY_CONVERT(DATETIME, column, 120)
+                var convertDateTimePattern = $@"\bCONVERT\s*\(\s*datetime\s*,\s*({column})\s*\)";
+                fixedQuery = System.Text.RegularExpressions.Regex.Replace(
+                    fixedQuery,
+                    convertDateTimePattern,
+                    "TRY_CONVERT(DATETIME, $1, 120)",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase
+                );
+                
+                // Fix YEAR(column) -> YEAR(TRY_CONVERT(DATETIME, column, 120))
+                // Only if not already wrapped in TRY_CONVERT
+                var yearPattern = $@"\bYEAR\s*\(\s*(?!TRY_CONVERT\()({column})\s*\)";
+                fixedQuery = System.Text.RegularExpressions.Regex.Replace(
+                    fixedQuery,
+                    yearPattern,
+                    "YEAR(TRY_CONVERT(DATETIME, $1, 120))",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase
+                );
+                
+                // Fix MONTH(column) -> MONTH(TRY_CONVERT(DATETIME, column, 120))
+                // Only if not already wrapped in TRY_CONVERT
+                var monthPattern = $@"\bMONTH\s*\(\s*(?!TRY_CONVERT\()({column})\s*\)";
+                fixedQuery = System.Text.RegularExpressions.Regex.Replace(
+                    fixedQuery,
+                    monthPattern,
+                    "MONTH(TRY_CONVERT(DATETIME, $1, 120))",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase
+                );
+                
+                // Fix DAY(column) -> DAY(TRY_CONVERT(DATETIME, column, 120))
+                // Only if not already wrapped in TRY_CONVERT
+                var dayPattern = $@"\bDAY\s*\(\s*(?!TRY_CONVERT\()({column})\s*\)";
+                fixedQuery = System.Text.RegularExpressions.Regex.Replace(
+                    fixedQuery,
+                    dayPattern,
+                    "DAY(TRY_CONVERT(DATETIME, $1, 120))",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase
+                );
+            }
+            
+            return fixedQuery;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning($"Error fixing string date columns: {ex.Message}");
+            return sqlQuery;
+        }
+    }
+
     private string FixExtractFunction(string sqlQuery)
     {
         if (string.IsNullOrWhiteSpace(sqlQuery))
@@ -524,6 +638,18 @@ Answer user questions naturally and helpfully. If they ask about database capabi
 DATABASE TYPE: Microsoft SQL Server (MSSQL)
 CRITICAL: EXTRACT() function does NOT exist in SQL Server. Use YEAR(), MONTH(), DAY() instead.
 
+CRITICAL: STRING DATE COLUMNS (VARCHAR):
+Some date columns are stored as VARCHAR (string) in the database, NOT as date/datetime types:
+- Payments.CreatedOn is VARCHAR(60) - stored as string
+- Payments.PaidDate is VARCHAR(60) - stored as string
+- Payments.DSDate, DDDate, ChequeDate are VARCHAR(60) - stored as string
+
+FOR STRING DATE COLUMNS, YOU MUST USE TRY_CONVERT:
+- Payments.CreatedOn: Use TRY_CONVERT(DATETIME, CreatedOn, 120) before YEAR() or MONTH()
+- Payments.PaidDate: Use TRY_CONVERT(DATETIME, PaidDate, 120) before YEAR() or MONTH()
+- Example: YEAR(TRY_CONVERT(DATETIME, CreatedOn, 120)) = YEAR(GETDATE())
+- NEVER use: YEAR(CreatedOn) or MONTH(CreatedOn) directly on string date columns
+
 DATABASE SCHEMA:
 {dbSchema}
 
@@ -544,6 +670,9 @@ INSTRUCTIONS:
    - When users mention ""Phase"", the correct columns are Project or SubProject (not a Phase column)
    - Date functions: Use YEAR(date), MONTH(date), DAY(date) - NOT EXTRACT(YEAR FROM date)
    - Current date: Use GETDATE() or CURRENT_TIMESTAMP - NOT CURRENT_DATE
+   - STRING DATE COLUMNS: Payments.CreatedOn, Payments.PaidDate, etc. are VARCHAR - MUST use TRY_CONVERT(DATETIME, column_name, 120) before YEAR() or MONTH()
+   - Example correct: YEAR(TRY_CONVERT(DATETIME, CreatedOn, 120)) = YEAR(GETDATE())
+   - Example WRONG: YEAR(CreatedOn) = YEAR(GETDATE()) - This will fail because CreatedOn is VARCHAR
 
 RESPOND IN THIS EXACT JSON FORMAT (no other text):
 {{
@@ -556,6 +685,7 @@ Examples:
 - Query uses ""inventories"" table → isValid: false, error: ""Table 'inventories' does not exist. Use 'InventoryDetail' instead."", suggestedFix: ""SELECT COUNT(*) FROM InventoryDetail WHERE...""
 - Query uses ""Phase"" column → isValid: false, error: ""Column 'Phase' does not exist in InventoryDetail. Use 'Project' or 'SubProject' with LIKE operator."", suggestedFix: ""SELECT COUNT(*) FROM InventoryDetail WHERE Project LIKE '%Phase 1%' OR SubProject LIKE '%Phase 1%'""
 - Query uses EXTRACT(YEAR FROM date) → isValid: false, error: ""EXTRACT function not supported in SQL Server. Use YEAR(date) instead."", suggestedFix: ""SELECT COUNT(*) FROM Customers WHERE YEAR(CreationDate) = YEAR(GETDATE()) AND MONTH(CreationDate) = MONTH(GETDATE())""
+- Query uses YEAR(CreatedOn) on Payments table → isValid: false, error: ""CreatedOn in Payments table is VARCHAR. Use TRY_CONVERT(DATETIME, CreatedOn, 120) before YEAR()."", suggestedFix: ""SELECT BankName, COUNT(*) FROM Payments WHERE YEAR(TRY_CONVERT(DATETIME, CreatedOn, 120)) = YEAR(GETDATE()) AND MONTH(TRY_CONVERT(DATETIME, CreatedOn, 120)) = MONTH(GETDATE()) GROUP BY BankName""
 - Query is correct → isValid: true, error: """", suggestedFix: """"";
 
         try
