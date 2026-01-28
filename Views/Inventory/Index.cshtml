@@ -47,10 +47,11 @@
     {
         <div class="card shadow-sm">
             <div class="card-body p-0">
-                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-                    <table class="table table-bordered table-striped table-hover mb-0" id="plotsTable">
-                        <thead class="table-dark sticky-top">
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto; overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch;">
+                    <table class="table table-bordered table-hover mb-0" id="plotsTable" style="width: 100%; table-layout: auto; min-width: 700px;">
+                        <thead class="sticky-top" style="background-color: #071a2e; color: white;">
                             <tr>
+                                <th scope="col" class="ps-2 text-center" style="width: 110px; min-width: 110px;">Actions</th>
                                 <th scope="col" class="ps-3">@Html.DisplayNameFor(model => model.Project)</th>
                                 <th scope="col">@Html.DisplayNameFor(model => model.SubProject)</th>
                                 <th scope="col">@Html.DisplayNameFor(model => model.Sector)</th>
@@ -61,13 +62,22 @@
                                 <th scope="col">@Html.DisplayNameFor(model => model.UnitType)</th>
                                 <th scope="col">@Html.DisplayNameFor(model => model.AllotmentStatus)</th>
                                 <th scope="col">@Html.DisplayNameFor(model => model.CustomerNo)</th>
-                                <th scope="col" class="pe-3 text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model)
                             {
                                 <tr>
+                                    <td class="ps-2 text-center" style="width: 110px; min-width: 110px;">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a asp-action="Details" asp-route-id="@item.UID" class="btn btn-sm btn-info" title="View Details" style="padding: 0.1rem 0.2rem;">
+                                                <i class="bi bi-eye" style="font-size: 0.7rem;"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@item.UID" class="btn btn-sm btn-warning" title="Edit" style="padding: 0.1rem 0.2rem;">
+                                                <i class="bi bi-pencil" style="font-size: 0.7rem;"></i>
+                                            </a>
+                                        </div>
+                                    </td>
                                     <td class="ps-3">@Html.DisplayFor(modelItem => item.Project)</td>
                                     <td>@Html.DisplayFor(modelItem => item.SubProject)</td>
                                     <td>@Html.DisplayFor(modelItem => item.Sector)</td>
@@ -91,12 +101,6 @@
                                         }
                                     </td>
                                     <td>@Html.DisplayFor(modelItem => item.CustomerNo)</td>
-                                    <td class="pe-3 text-center">
-                                        <div class="btn-group" role="group">
-                                            <a asp-action="Details" asp-route-id="@item.UID" class="btn btn-sm btn-info">Details</a>
-                                            <a asp-action="Edit" asp-route-id="@item.UID" class="btn btn-sm btn-warning">Edit</a>
-                                        </div>
-                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -187,25 +191,140 @@
 @section Styles {
     <style>
         .container-fluid {
-            font-size: 0.875rem;
+            overflow-x: hidden;
+            max-width: 100%;
         }
-        .container-fluid h2 {
-            font-size: 1.5rem;
+
+        #plotsTable {
+            font-size: 0.85rem;
+            width: 100%;
+            table-layout: auto;
         }
-        .table {
-            font-size: 0.875rem;
+
+        #plotsTable thead th {
+            user-select: none;
+            position: relative;
+            white-space: nowrap;
+            background-color: #071a2e !important;
+            color: white !important;
+            border-color: #071a2e !important;
+            padding: 0.5rem 0.4rem;
+            font-size: 0.8rem;
         }
-        .table th {
-            font-size: 0.875rem;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+
+        #plotsTable tbody tr {
+            transition: background-color 0.15s ease;
         }
-        .form-label {
-            font-size: 0.875rem;
+
+        #plotsTable tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
         }
-        .btn {
-            font-size: 0.875rem;
+
+        #plotsTable tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        #plotsTable tbody tr:hover {
+            background-color: #e9ecef !important;
+        }
+
+        #plotsTable tbody td {
+            vertical-align: middle;
+            padding: 0.4rem 0.3rem;
+            white-space: nowrap;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.8rem;
+        }
+
+        #plotsTable tbody td:first-child {
+            white-space: normal;
+            max-width: 110px;
+            overflow: visible;
+            padding: 0.3rem 0.2rem;
+        }
+
+        #plotsTable .btn-group {
+            display: inline-flex;
+            gap: 1px;
+        }
+
+        #plotsTable .btn-group .btn {
+            padding: 0.1rem 0.2rem;
+            border-radius: 0.2rem;
+            min-width: 24px;
+        }
+
+        #plotsTable .btn-group .btn i {
+            font-size: 0.7rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto !important;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive::-webkit-scrollbar {
+            height: 12px;
+            width: 12px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        @@media (max-width: 1200px) {
+            #plotsTable {
+                font-size: 0.8rem;
+            }
+
+            #plotsTable tbody td {
+                padding: 0.35rem 0.25rem;
+                max-width: 120px;
+            }
+
+            #plotsTable thead th {
+                padding: 0.45rem 0.35rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            #plotsTable {
+                font-size: 0.75rem;
+                min-width: 650px;
+            }
+
+            #plotsTable tbody td {
+                padding: 0.3rem 0.2rem;
+                max-width: 100px;
+            }
+
+            #plotsTable thead th {
+                padding: 0.4rem 0.25rem;
+                font-size: 0.7rem;
+            }
+
+            #plotsTable .btn-group .btn {
+                padding: 0.08rem 0.15rem;
+                min-width: 20px;
+            }
+
+            #plotsTable .btn-group .btn i {
+                font-size: 0.65rem;
+            }
         }
     </style>
 }

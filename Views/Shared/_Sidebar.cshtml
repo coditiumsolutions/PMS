@@ -4,18 +4,18 @@
     {
         <h3 class="sidebar-heading">Customers</h3>
         <ul class="sidebar-nav">
-            <li><a asp-controller="Customers" asp-action="Dashboard">Dashboard</a></li>
-            <li><a asp-controller="Customers" asp-action="Create">New Customer</a></li>
-            <li><a asp-controller="Customers" asp-action="CustomersDetail">Customers</a></li>
-            <li><a asp-controller="Customers" asp-action="Summary">Summary</a></li>
+            <li><a asp-controller="Customers" asp-action="Dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+            <li><a asp-controller="Customers" asp-action="Create"><i class="bi bi-person-plus me-2"></i>New Customer</a></li>
+            <li><a asp-controller="Customers" asp-action="CustomersDetail"><i class="bi bi-people me-2"></i>Customers</a></li>
+            <li><a asp-controller="Customers" asp-action="Summary"><i class="bi bi-graph-up me-2"></i>Summary</a></li>
             <li class="nav-item-dropdown">
                 <a href="#" class="nav-parent-link" data-bs-toggle="collapse" data-bs-target="#othersSubmenu" aria-expanded="false" aria-controls="othersSubmenu">
-                    <span>Others</span>
+                    <span><i class="bi bi-three-dots-vertical me-2"></i>Others</span>
                     <span class="dropdown-icon">▼</span>
                 </a>
                 <ul class="nav-submenu collapse" id="othersSubmenu">
-                    <li><a asp-controller="Customers" asp-action="CustomersOperation">Operations</a></li>
-                    <li><a asp-controller="Customers" asp-action="History">History</a></li>
+                    <li><a asp-controller="Customers" asp-action="CustomersOperation"><i class="bi bi-gear me-2"></i>Operations</a></li>
+                    <li><a asp-controller="Customers" asp-action="History"><i class="bi bi-clock-history me-2"></i>History</a></li>
                 </ul>
             </li>
         </ul>
@@ -24,111 +24,111 @@
     {
         <h3 class="sidebar-heading">Inventory</h3>
         <ul class="sidebar-nav">
-            <li><a asp-controller="Inventory" asp-action="Index">Dashboard</a></li>
-            <li><a asp-controller="Inventory" asp-action="Summary">Summary</a></li>
-            <li><a asp-controller="Inventory" asp-action="Reserved">Reserved Inventory</a></li>
-            <li><a asp-controller="Inventory" asp-action="History">History</a></li>
-            <li><a asp-controller="Inventory" asp-action="BulkUpload">Bulk Import</a></li>
+            <li><a asp-controller="Inventory" asp-action="Index"><i class="bi bi-box-seam me-2"></i>Dashboard</a></li>
+            <li><a asp-controller="Inventory" asp-action="Summary"><i class="bi bi-graph-up me-2"></i>Summary</a></li>
+            <li><a asp-controller="Inventory" asp-action="Reserved"><i class="bi bi-bookmark-check me-2"></i>Reserved Inventory</a></li>
+            <li><a asp-controller="Inventory" asp-action="History"><i class="bi bi-clock-history me-2"></i>History</a></li>
+            <li><a asp-controller="Inventory" asp-action="BulkUpload"><i class="bi bi-upload me-2"></i>Bulk Import</a></li>
         </ul>
     }
     else if (ViewBag.ActiveModule == "Payments")
     {
         <h3 class="sidebar-heading">Payments</h3>
         <ul class="sidebar-nav">
-            <li><a asp-controller="Payments" asp-action="Dashboard">Dashboard</a></li>
+            <li><a asp-controller="Payments" asp-action="Dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
             
             <li class="sidebar-section-heading">
                 <span class="sidebar-section-title">Challans</span>
             </li>
-            <li><a asp-controller="Challans" asp-action="Customers">New Challan</a></li>
-            <li><a asp-controller="Payments" asp-action="AllChallans">All Challans</a></li>
-            <li><a asp-controller="Payments" asp-action="PendingChall">Pending Chall</a></li>
-            <li><a asp-controller="Payments" asp-action="UnVerifiedChall">Un-Verified Chall</a></li>
+            <li><a asp-controller="Challans" asp-action="Customers"><i class="bi bi-journal-plus me-2"></i>New Challan</a></li>
+            <li><a asp-controller="Payments" asp-action="AllChallans"><i class="bi bi-journal-text me-2"></i>All Challans</a></li>
+            <li><a asp-controller="Payments" asp-action="PendingChall"><i class="bi bi-hourglass-split me-2"></i>Pending Chall</a></li>
+            <li><a asp-controller="Payments" asp-action="UnVerifiedChall"><i class="bi bi-exclamation-circle me-2"></i>Un-Verified Chall</a></li>
             
             <li class="sidebar-section-heading">
                 <span class="sidebar-section-title">Payments</span>
             </li>
-            <li><a asp-controller="Payments" asp-action="AllPayments">All Payments</a></li>
-            <li><a asp-controller="Payments" asp-action="History">History</a></li>
+            <li><a asp-controller="Payments" asp-action="AllPayments"><i class="bi bi-credit-card me-2"></i>All Payments</a></li>
+            <li><a asp-controller="Payments" asp-action="History"><i class="bi bi-clock-history me-2"></i>History</a></li>
         </ul>
     }
     else if (ViewBag.ActiveModule == "Schedules")
     {
         <h3 class="sidebar-heading">Schedules</h3>
         <ul class="sidebar-nav">
-            <li><a asp-controller="Schedules" asp-action="Dashboard">Dashboard</a></li>
+            <li><a asp-controller="Schedules" asp-action="Dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
             <li class="sidebar-section-heading">
                 <span class="sidebar-section-title">Plans</span>
             </li>
-            <li><a asp-controller="Schedules" asp-action="AllPlans">All Plans</a></li>
+            <li><a asp-controller="Schedules" asp-action="AllPlans"><i class="bi bi-list-ul me-2"></i>All Plans</a></li>
 
             <li class="sidebar-section-heading">
                 <span class="sidebar-section-title">Child Plans</span>
             </li>
-            <li><a asp-controller="Schedules" asp-action="AllPayments">All Payments</a></li>
-            <li><a asp-controller="Schedules" asp-action="Summary">Summary</a></li>
+            <li><a asp-controller="Schedules" asp-action="AllPayments"><i class="bi bi-credit-card me-2"></i>All Payments</a></li>
+            <li><a asp-controller="Schedules" asp-action="Summary"><i class="bi bi-graph-up me-2"></i>Summary</a></li>
         </ul>
     }
     else if (ViewBag.ActiveModule == "Transfers")
     {
         <h3 class="sidebar-heading">Transfers</h3>
         <ul class="sidebar-nav">
-            <li><a asp-controller="Transfers" asp-action="Dashboard">Dashboard</a></li>
-            <li><a asp-controller="Transfers" asp-action="Customers">New Transfer</a></li>
-            <li><a asp-controller="Transfers" asp-action="AllTransfers">All Transfers</a></li>
-            <li><a asp-controller="Transfers" asp-action="Payments">Payments</a></li>
-            <li><a asp-controller="Transfers" asp-action="TransferFees">Transfer Fees</a></li>
-            <li><a asp-controller="Transfers" asp-action="Summary">Summary</a></li>
-            <li><a asp-controller="Transfers" asp-action="History">History</a></li>
+            <li><a asp-controller="Transfers" asp-action="Dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+            <li><a asp-controller="Transfers" asp-action="Customers"><i class="bi bi-person-arrows me-2"></i>New Transfer</a></li>
+            <li><a asp-controller="Transfers" asp-action="AllTransfers"><i class="bi bi-arrow-left-right me-2"></i>All Transfers</a></li>
+            <li><a asp-controller="Transfers" asp-action="Payments"><i class="bi bi-credit-card me-2"></i>Payments</a></li>
+            <li><a asp-controller="Transfers" asp-action="TransferFees"><i class="bi bi-cash-coin me-2"></i>Transfer Fees</a></li>
+            <li><a asp-controller="Transfers" asp-action="Summary"><i class="bi bi-graph-up me-2"></i>Summary</a></li>
+            <li><a asp-controller="Transfers" asp-action="History"><i class="bi bi-clock-history me-2"></i>History</a></li>
         </ul>
     }
     else if (ViewBag.ActiveModule == "Sales")
     {
         <h3 class="sidebar-heading">Sales</h3>
         <ul class="sidebar-nav">
-            <li><a asp-controller="Sales" asp-action="Index">Dashboard</a></li>
-            <li><a asp-controller="Sales" asp-action="QueriesReport">Queries</a></li>
+            <li><a asp-controller="Sales" asp-action="Index"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+            <li><a asp-controller="Sales" asp-action="QueriesReport"><i class="bi bi-question-circle me-2"></i>Queries</a></li>
         </ul>
     }
     else if (ViewBag.ActiveModule == "Setup")
     {
         <h3 class="sidebar-heading">Setup</h3>
         <ul class="sidebar-nav">
-            <li><a href="/Setup/Configurations">Configurations</a></li>
-            <li><a asp-controller="Setup" asp-action="Proj">Project</a></li>
-            <li><a asp-controller="Setup" asp-action="Roles">Roles</a></li>
-            <li><a asp-controller="Setup" asp-action="Users">Users</a></li>
+            <li><a href="/Setup/Configurations"><i class="bi bi-sliders me-2"></i>Configurations</a></li>
+            <li><a asp-controller="Setup" asp-action="Proj"><i class="bi bi-building me-2"></i>Project</a></li>
+            <li><a asp-controller="Setup" asp-action="Roles"><i class="bi bi-diagram-3 me-2"></i>Roles</a></li>
+            <li><a asp-controller="Setup" asp-action="Users"><i class="bi bi-people me-2"></i>Users</a></li>
         </ul>
     }
     else if (ViewBag.ActiveModule == "Registration")
     {
         <h3 class="sidebar-heading">Registration</h3>
         <ul class="sidebar-nav">
-            <li><a asp-controller="Registration" asp-action="Dashboard">Dashboard</a></li>
-            <li><a asp-controller="Registration" asp-action="Create">New Registration</a></li>
-            <li><a asp-controller="Registration" asp-action="Index">All Registrations</a></li>
-            <li><a asp-controller="Registration" asp-action="Summary">Summary</a></li>
+            <li><a asp-controller="Registration" asp-action="Dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+            <li><a asp-controller="Registration" asp-action="Create"><i class="bi bi-person-plus me-2"></i>New Registration</a></li>
+            <li><a asp-controller="Registration" asp-action="Index"><i class="bi bi-card-checklist me-2"></i>All Registrations</a></li>
+            <li><a asp-controller="Registration" asp-action="Summary"><i class="bi bi-graph-up me-2"></i>Summary</a></li>
         </ul>
     }
     else if (ViewBag.ActiveModule == "AIRAG")
     {
         <h3 class="sidebar-heading">AI RAG</h3>
         <ul class="sidebar-nav">
-            <li><a asp-controller="AIRAG" asp-action="Index">Database Assistant</a></li>
+            <li><a asp-controller="AIRAG" asp-action="Index"><i class="bi bi-robot me-2"></i>Database Assistant</a></li>
         </ul>
     }
     else
     {
         <ul class="sidebar-nav">
-            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
-            <li><a asp-controller="Customers" asp-action="Index">Customers</a></li>
-            <li><a asp-controller="Inventory" asp-action="Index">Inventory</a></li>
-            <li><a asp-controller="Payments" asp-action="Index">Payments</a></li>
-            <li><a asp-controller="Schedules" asp-action="Index">Schedules</a></li>
-            <li><a asp-controller="Transfers" asp-action="Index">Transfers</a></li>
-            <li><a asp-controller="Sales" asp-action="Index">Sales</a></li>
-            <li><a asp-controller="Setup" asp-action="Index">Setup</a></li>
-            <li><a asp-controller="AIRAG" asp-action="Index">AI RAG</a></li>
+            <li><a asp-controller="Home" asp-action="Index"><i class="bi bi-house-door me-2"></i>Home</a></li>
+            <li><a asp-controller="Customers" asp-action="Index"><i class="bi bi-people me-2"></i>Customers</a></li>
+            <li><a asp-controller="Inventory" asp-action="Index"><i class="bi bi-box-seam me-2"></i>Inventory</a></li>
+            <li><a asp-controller="Payments" asp-action="Index"><i class="bi bi-credit-card me-2"></i>Payments</a></li>
+            <li><a asp-controller="Schedules" asp-action="Index"><i class="bi bi-calendar-event me-2"></i>Schedules</a></li>
+            <li><a asp-controller="Transfers" asp-action="Index"><i class="bi bi-arrow-left-right me-2"></i>Transfers</a></li>
+            <li><a asp-controller="Sales" asp-action="Index"><i class="bi bi-bar-chart-line me-2"></i>Sales</a></li>
+            <li><a asp-controller="Setup" asp-action="Index"><i class="bi bi-gear me-2"></i>Setup</a></li>
+            <li><a asp-controller="AIRAG" asp-action="Index"><i class="bi bi-robot me-2"></i>AI RAG</a></li>
         </ul>
     }
 </aside>

@@ -25,16 +25,16 @@
     {
         <div class="card shadow-sm">
             <div class="card-body p-0">
-                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-                    <table class="table table-bordered table-striped table-hover mb-0" id="plans-table">
-                        <thead class="table-dark sticky-top">
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto; overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch;">
+                    <table class="table table-bordered table-hover mb-0" id="plans-table" style="width: 100%; table-layout: auto; min-width: 650px;">
+                        <thead class="sticky-top" style="background-color: #071a2e; color: white;">
                             <tr>
-                                <th style="width: 4%; text-align: center;">Select</th>
+                                <th style="width: 4%; min-width: 60px; text-align: center;">Select</th>
                                 <th class="ps-3">Plan No</th>
                                 <th>P Detail</th>
                                 <th>P Total</th>
                                 <th>Pay Type</th>
-                                <th>Size</th>
+                                <th class="pe-3">Size</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -53,7 +53,7 @@
                                     <td>@Html.DisplayFor(modelItem => item.plandetail)</td>
                                     <td>@Html.DisplayFor(modelItem => item.totalamount)</td>
                                     <td>@Html.DisplayFor(modelItem => item.paymenttype)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.sizedetail)</td>
+                                    <td class="pe-3">@Html.DisplayFor(modelItem => item.sizedetail)</td>
                                 </tr>
                             }
                         </tbody>
@@ -128,4 +128,121 @@
             toggleScheduleButton();
         })();
     </script>
+}
+
+@section Styles {
+    <style>
+        .container-fluid {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        #plans-table {
+            font-size: 0.85rem;
+            width: 100%;
+            table-layout: auto;
+        }
+
+        #plans-table thead th {
+            user-select: none;
+            position: relative;
+            white-space: nowrap;
+            background-color: #071a2e !important;
+            color: white !important;
+            border-color: #071a2e !important;
+            padding: 0.5rem 0.4rem;
+            font-size: 0.8rem;
+        }
+
+        #plans-table tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        #plans-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        #plans-table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        #plans-table tbody tr:hover {
+            background-color: #e9ecef !important;
+        }
+
+        #plans-table tbody td {
+            vertical-align: middle;
+            padding: 0.4rem 0.3rem;
+            white-space: nowrap;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.8rem;
+        }
+
+        #plans-table tbody td:first-child {
+            white-space: normal;
+            max-width: 80px;
+            overflow: visible;
+            padding: 0.3rem 0.2rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto !important;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive::-webkit-scrollbar {
+            height: 12px;
+            width: 12px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        @@media (max-width: 1200px) {
+            #plans-table {
+                font-size: 0.8rem;
+            }
+
+            #plans-table tbody td {
+                padding: 0.35rem 0.25rem;
+                max-width: 140px;
+            }
+
+            #plans-table thead th {
+                padding: 0.45rem 0.35rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            #plans-table {
+                font-size: 0.75rem;
+                min-width: 650px;
+            }
+
+            #plans-table tbody td {
+                padding: 0.3rem 0.2rem;
+                max-width: 110px;
+            }
+
+            #plans-table thead th {
+                padding: 0.4rem 0.25rem;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
 }

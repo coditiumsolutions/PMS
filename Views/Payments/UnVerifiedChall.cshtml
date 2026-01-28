@@ -31,9 +31,9 @@
 
         <div class="card shadow-sm">
             <div class="card-body p-0">
-                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-                    <table class="table table-bordered table-striped table-hover mb-0" id="unVerifiedChallansTable">
-                        <thead class="table-dark sticky-top">
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto; overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch;">
+                    <table class="table table-bordered table-hover mb-0" id="unVerifiedChallansTable" style="width: 100%; table-layout: auto; min-width: 800px;">
+                        <thead class="sticky-top" style="background-color: #071a2e; color: white;">
                             <tr>
                                 <th scope="col" class="ps-3">@Html.DisplayNameFor(model => model.uid)</th>
                                 <th scope="col">@Html.DisplayNameFor(model => model.customerno)</th>
@@ -46,7 +46,7 @@
                                 <th scope="col">@Html.DisplayNameFor(model => model.currency)</th>
                                 <th scope="col">@Html.DisplayNameFor(model => model.createdby)</th>
                                 <th scope="col">@Html.DisplayNameFor(model => model.verifiedby)</th>
-                                <th scope="col">@Html.DisplayNameFor(model => model.creationdate)</th>
+                                <th scope="col" class="pe-3">@Html.DisplayNameFor(model => model.creationdate)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -66,7 +66,7 @@
                                     <td>@Html.DisplayFor(modelItem => item.currency)</td>
                                     <td>@Html.DisplayFor(modelItem => item.createdby)</td>
                                     <td>@Html.DisplayFor(modelItem => item.verifiedby)</td>
-                                    <td>@(item.creationdate?.ToString("yyyy-MM-dd") ?? "N/A")</td>
+                                    <td class="pe-3">@(item.creationdate?.ToString("yyyy-MM-dd") ?? "N/A")</td>
                                 </tr>
                             }
                         </tbody>
@@ -80,22 +80,116 @@
 @section Styles {
     <style>
         .container-fluid {
-            font-size: 0.875rem;
+            overflow-x: hidden;
+            max-width: 100%;
         }
-        .container-fluid h2 {
-            font-size: 1.5rem;
+
+        #unVerifiedChallansTable {
+            font-size: 0.85rem;
+            width: 100%;
+            table-layout: auto;
         }
-        .table {
-            font-size: 0.875rem;
+
+        #unVerifiedChallansTable thead th {
+            user-select: none;
+            position: relative;
+            white-space: nowrap;
+            background-color: #071a2e !important;
+            color: white !important;
+            border-color: #071a2e !important;
+            padding: 0.5rem 0.4rem;
+            font-size: 0.8rem;
         }
-        .table th {
-            font-size: 0.875rem;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+
+        #unVerifiedChallansTable tbody tr {
+            transition: background-color 0.15s ease;
         }
-        .btn {
-            font-size: 0.875rem;
+
+        #unVerifiedChallansTable tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        #unVerifiedChallansTable tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        #unVerifiedChallansTable tbody tr:hover {
+            background-color: #e9ecef !important;
+        }
+
+        #unVerifiedChallansTable tbody td {
+            vertical-align: middle;
+            padding: 0.4rem 0.3rem;
+            white-space: nowrap;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.8rem;
+        }
+
+        #unVerifiedChallansTable tbody td:first-child {
+            white-space: normal;
+            max-width: 120px;
+            overflow: visible;
+            padding: 0.3rem 0.2rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto !important;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-responsive::-webkit-scrollbar {
+            height: 12px;
+            width: 12px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        @@media (max-width: 1200px) {
+            #unVerifiedChallansTable {
+                font-size: 0.8rem;
+            }
+
+            #unVerifiedChallansTable tbody td {
+                padding: 0.35rem 0.25rem;
+                max-width: 120px;
+            }
+
+            #unVerifiedChallansTable thead th {
+                padding: 0.45rem 0.35rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            #unVerifiedChallansTable {
+                font-size: 0.75rem;
+                min-width: 800px;
+            }
+
+            #unVerifiedChallansTable tbody td {
+                padding: 0.3rem 0.2rem;
+                max-width: 100px;
+            }
+
+            #unVerifiedChallansTable thead th {
+                padding: 0.4rem 0.25rem;
+                font-size: 0.7rem;
+            }
         }
     </style>
 }

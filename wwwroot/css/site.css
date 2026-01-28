@@ -128,7 +128,7 @@ body {
 }
 
 .sidebar-nav a::before {
-    content: "◆";
+    content: none;
     position: absolute;
     left: 12px;
     top: 50%;
@@ -188,7 +188,7 @@ body {
 }
 
 .nav-parent-link::before {
-    content: "◆";
+    content: none;
     position: absolute;
     left: 12px;
     top: 50%;
@@ -242,7 +242,7 @@ body {
 }
 
 .nav-submenu a::before {
-    content: "▸";
+    content: none;
     position: absolute;
     left: 32px;
     top: 50%;
