@@ -2,7 +2,7 @@
     Modern, responsive, icons-based dashboard grid for Property Management System.
     Uses Bootstrap 5 + Bootstrap Icons. Load bootstrap-icons.min.css in the consuming view or layout.
     Modules: Customers, Payments, Challans, Property, Transfer, Merger, Refund, Waiver,
-             Billing Management, AI Reports, Warehouse.
+             Billing Management, AI Reports, Warehouse, Setup.
 *@
 @{
     var modules = new[]
@@ -17,7 +17,8 @@
         new { Name = "Waiver", Icon = "bi-hand-thumbs-up-fill", Description = "Waiver approvals and fee exemptions", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-orange" },
         new { Name = "Billing Management", Icon = "bi-receipt", Description = "Invoices, dues, and payment schedules", Link = Url.Action("Index", "Schedules"), Accent = "pms-accent-blue" },
         new { Name = "AI Reports", Icon = "bi-cpu-fill", Description = "Analytics, forecasts, and smart insights", Link = Url.Action("Index", "Sales"), Accent = "pms-accent-teal" },
-        new { Name = "Warehouse", Icon = "bi-box-seam-fill", Description = "Inventory and warehouse management", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-green" }
+        new { Name = "Warehouse", Icon = "bi-box-seam-fill", Description = "Inventory and warehouse management", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-green" },
+        new { Name = "Setup", Icon = "bi-gear-fill", Description = "Configurations, projects, roles, and users", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-orange" }
     };
 }
 <div class="pms-module-grid-container bg-light rounded-3 p-4">

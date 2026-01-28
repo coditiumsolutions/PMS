@@ -4,9 +4,10 @@
     {
         <h3 class="sidebar-heading">Customers</h3>
         <ul class="sidebar-nav">
-            <li><a asp-controller="Customers" asp-action="Index">Home</a></li>
             <li><a asp-controller="Customers" asp-action="Dashboard">Dashboard</a></li>
+            <li><a asp-controller="Customers" asp-action="Create">New Customer</a></li>
             <li><a asp-controller="Customers" asp-action="CustomersDetail">Customers</a></li>
+            <li><a asp-controller="Customers" asp-action="Summary">Summary</a></li>
             <li class="nav-item-dropdown">
                 <a href="#" class="nav-parent-link" data-bs-toggle="collapse" data-bs-target="#othersSubmenu" aria-expanded="false" aria-controls="othersSubmenu">
                     <span>Others</span>
@@ -14,7 +15,6 @@
                 </a>
                 <ul class="nav-submenu collapse" id="othersSubmenu">
                     <li><a asp-controller="Customers" asp-action="CustomersOperation">Operations</a></li>
-                    <li><a asp-controller="Customers" asp-action="Summary">Summary</a></li>
                     <li><a asp-controller="Customers" asp-action="History">History</a></li>
                 </ul>
             </li>

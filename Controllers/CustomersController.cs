@@ -44,62 +44,13 @@ public class CustomersController : Controller
     public async Task<IActionResult> Dashboard()
     {
         ViewBag.ActiveModule = "Customers";
-        
-        var customers = await _context.Customers.ToListAsync();
-        
-        // Total customers
-        ViewBag.TotalCustomers = customers.Count;
-        
-        // Gender distribution
-        ViewBag.MaleCustomers = customers.Count(c => c.Gender?.ToLower() == "male");
-        ViewBag.FemaleCustomers = customers.Count(c => c.Gender?.ToLower() == "female");
-        ViewBag.OtherGenderCustomers = customers.Count(c => string.IsNullOrEmpty(c.Gender) || 
-            (c.Gender?.ToLower() != "male" && c.Gender?.ToLower() != "female"));
-        
-        // Project-wise customers (grouping by CreatedBy or a project identifier)
-        // For now, we'll group by CreatedBy as a proxy for project assignment
-        // This can be enhanced later when a proper Project relationship is added
-        var customersByProject = customers
-            .Where(c => !string.IsNullOrEmpty(c.CreatedBy))
-            .GroupBy(c => c.CreatedBy ?? "Unassigned")
-            .Select(g => new KeyValuePair<string, int>(g.Key, g.Count()))
-            .OrderByDescending(x => x.Value)
-            .ToList();
-        
-        ViewBag.CustomersByProject = customersByProject;
-        
-        // Customers by city
-        var customersByCity = customers
-            .Where(c => !string.IsNullOrEmpty(c.PresCity))
-            .GroupBy(c => c.PresCity ?? "Unknown")
-            .Select(g => new KeyValuePair<string, int>(g.Key, g.Count()))
-            .OrderByDescending(x => x.Value)
-            .Take(10)
-            .ToList();
-        
-        ViewBag.CustomersByCity = customersByCity;
-        
-        // Recent customers (last 30 days)
-        var thirtyDaysAgo = DateTime.Today.AddDays(-30);
-        ViewBag.RecentCustomers = customers.Count(c => c.CreationDate >= thirtyDaysAgo);
-        
-        // Customers created this month
-        var thisMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-        ViewBag.ThisMonthCustomers = customers.Count(c => c.CreationDate >= thisMonth);
-        
-        // Monthly registration trend (last 6 months)
-        var monthlyData = new List<KeyValuePair<string, int>>();
-        for (int i = 5; i >= 0; i--)
-        {
-            var monthStart = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).AddMonths(-i);
-            var monthEnd = monthStart.AddMonths(1);
-            var monthName = monthStart.ToString("MMM yyyy");
-            var count = customers.Count(c => c.CreationDate >= monthStart && c.CreationDate < monthEnd);
-            monthlyData.Add(new KeyValuePair<string, int>(monthName, count));
-        }
-        ViewBag.MonthlyTrend = monthlyData;
-        
-        return View();
+
+        var analytics = await _analyticsService.GetAnalyticsAsync();
+        var filterOptions = await _analyticsService.GetFilterOptionsAsync();
+
+        ViewBag.FilterOptions = filterOptions;
+
+        return View("Analytics", analytics);
     }
 
     // GET: Customers/Details/CUST001
