@@ -7,7 +7,10 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>All Plans</h2>
-        <a asp-action="CreatePlan" class="btn btn-primary">Create Plan</a>
+        <div class="d-flex gap-2">
+            <button type="button" id="schedule-view-btn" class="btn btn-success d-none" disabled>Schedule View</button>
+            <a asp-action="CreatePlan" class="btn btn-primary">Create Plan</a>
+        </div>
     </div>
 
     @if (Model == null || !Model.Any())
@@ -23,35 +26,34 @@
         <div class="card shadow-sm">
             <div class="card-body p-0">
                 <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-                    <table class="table table-bordered table-striped table-hover mb-0">
+                    <table class="table table-bordered table-striped table-hover mb-0" id="plans-table">
                         <thead class="table-dark sticky-top">
                             <tr>
+                                <th style="width: 4%; text-align: center;">Select</th>
                                 <th class="ps-3">Plan No</th>
-                                <th>Plan Detail</th>
-                                <th>Total Amount</th>
-                                <th>Payment Type</th>
-                                <th>Size Detail</th>
-                                <th>Creation Date</th>
-                                <th>Created By</th>
-                                <th>Actions</th>
+                                <th>P Detail</th>
+                                <th>P Total</th>
+                                <th>Pay Type</th>
+                                <th>Size</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model)
                             {
-                                <tr>
+                                <tr class="plan-row"
+                                    data-edit-url="@Url.Action("EditPlan", "Schedules", new { id = item.uid })"
+                                    data-planno="@item.planno">
+                                    <td class="text-center align-middle">
+                                        @if (!string.IsNullOrWhiteSpace(item.planno))
+                                        {
+                                            <input type="checkbox" class="form-check-input plan-select-checkbox" />
+                                        }
+                                    </td>
                                     <td class="ps-3 fw-medium">@Html.DisplayFor(modelItem => item.planno)</td>
                                     <td>@Html.DisplayFor(modelItem => item.plandetail)</td>
                                     <td>@Html.DisplayFor(modelItem => item.totalamount)</td>
                                     <td>@Html.DisplayFor(modelItem => item.paymenttype)</td>
                                     <td>@Html.DisplayFor(modelItem => item.sizedetail)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.creationdate)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.createdby)</td>
-                                    <td>
-                                        <a asp-action="PlanDetails" asp-route-id="@item.uid">Details</a> |
-                                        <a asp-action="EditPlan" asp-route-id="@item.uid">Edit</a> |
-                                        <a asp-action="DeletePlan" asp-route-id="@item.uid">Delete</a>
-                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -61,3 +63,69 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const rows = document.querySelectorAll('#plans-table .plan-row');
+            const checkboxes = document.querySelectorAll('#plans-table .plan-select-checkbox');
+            let selectedPlanno = null;
+
+            // Double-click to open edit view
+            rows.forEach(row => {
+                row.addEventListener('dblclick', function () {
+                    const url = this.getAttribute('data-edit-url');
+                    if (url) {
+                        window.location.href = url;
+                    }
+                });
+            });
+
+            // Single-select checkbox behavior
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', function () {
+                    if (this.checked) {
+                        // Uncheck all others
+                        checkboxes.forEach(other => {
+                            if (other !== this) {
+                                other.checked = false;
+                            }
+                        });
+
+                        const row = this.closest('.plan-row');
+                        selectedPlanno = row ? row.getAttribute('data-planno') : null;
+                    } else {
+                        selectedPlanno = null;
+                    }
+
+                    toggleScheduleButton();
+                });
+            });
+
+            const scheduleBtn = document.getElementById('schedule-view-btn');
+
+            function toggleScheduleButton() {
+                if (!scheduleBtn) return;
+                if (selectedPlanno && selectedPlanno.trim() !== '') {
+                    scheduleBtn.classList.remove('d-none');
+                    scheduleBtn.disabled = false;
+                } else {
+                    scheduleBtn.classList.add('d-none');
+                    scheduleBtn.disabled = true;
+                }
+            }
+
+            if (scheduleBtn) {
+                scheduleBtn.addEventListener('click', function () {
+                    if (!selectedPlanno) return;
+                    const baseUrl = '@Url.Action("PlanSchedule", "Schedules")';
+                    const target = baseUrl + '?planno=' + encodeURIComponent(selectedPlanno);
+                    window.location.href = target;
+                });
+            }
+
+            // Initialize button state
+            toggleScheduleButton();
+        })();
+    </script>
+}

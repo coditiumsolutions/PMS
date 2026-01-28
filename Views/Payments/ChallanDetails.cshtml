@@ -1,0 +1,134 @@
+@model PMS.Web.Models.Challan
+
+@{
+    ViewData["Title"] = "Challan Details";
+}
+
+<div class="container-fluid mt-3">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Challan Details (@Model.uid)</h4>
+            <div>
+                <button type="button" id="editButton" class="btn btn-primary btn-sm">Edit</button>
+                <button type="submit" form="challanForm" id="saveButton" class="btn btn-success btn-sm d-none">Save</button>
+                <button type="button" id="cancelButton" class="btn btn-outline-secondary btn-sm d-none">Cancel</button>
+            </div>
+        </div>
+
+        <form asp-action="UpdateChallanStatus" method="post" id="challanForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.uid" />
+
+            <div class="card-body p-0">
+                <table class="table table-sm table-bordered mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="w-25">Customer No</th>
+                            <td class="w-25">@Model.customerno</td>
+                            <th class="w-25">Deposit Slip No</th>
+                            <td class="w-25">@Model.depsoiteslipno</td>
+                        </tr>
+                        <tr>
+                            <th>Bank Name</th>
+                            <td>@Model.bankname</td>
+                            <th>Bank Verified</th>
+                            <td>
+                                @{
+                                    var currentStatus = (Model.bankverified ?? string.Empty).Trim();
+                                    string displayStatus = string.IsNullOrEmpty(currentStatus) ? "N/A" : currentStatus;
+                                    string[] statuses = new[] { "Inprocess", "Pending", "Verified" };
+                                }
+                                <span id="bankStatusDisplay">@displayStatus</span>
+                                <select id="bankStatusEdit" name="bankverified" class="form-select form-select-sm d-none">
+                                    @foreach (var status in statuses)
+                                    {
+                                        var selected = string.Equals(currentStatus, status, StringComparison.OrdinalIgnoreCase);
+                                        <option value="@status" selected="@(selected ? "selected" : null)">
+                                            @status
+                                        </option>
+                                    }
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Deposit Date</th>
+                            <td>
+                                @(Model.depositdate?.ToString("yyyy-MM-dd") ?? "N/A")
+                            </td>
+                            <th>Bank Verified Date</th>
+                            <td>
+                                @(Model.bankverifieddate?.ToString("yyyy-MM-dd") ?? "N/A")
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Deposit Type</th>
+                            <td>@Model.deposittype</td>
+                            <th>Currency</th>
+                            <td>@Model.currency</td>
+                        </tr>
+                        <tr>
+                            <th>Created By</th>
+                            <td>@Model.createdby</td>
+                            <th>Verified By</th>
+                            <td>@Model.verifiedby</td>
+                        </tr>
+                        <tr>
+                            <th>Creation Date</th>
+                            <td>
+                                @(Model.creationdate?.ToString("yyyy-MM-dd") ?? "N/A")
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+
+        <div class="card-footer d-flex justify-content-between">
+            <a asp-action="AllChallans" class="btn btn-secondary btn-sm">Back to All Challans</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const editButton = document.getElementById('editButton');
+            const saveButton = document.getElementById('saveButton');
+            const cancelButton = document.getElementById('cancelButton');
+            const displaySpan = document.getElementById('bankStatusDisplay');
+            const dropdown = document.getElementById('bankStatusEdit');
+
+            if (!editButton || !saveButton || !cancelButton || !displaySpan || !dropdown) {
+                return;
+            }
+
+            let originalValue = dropdown.value;
+
+            editButton.addEventListener('click', function () {
+                originalValue = dropdown.value;
+                displaySpan.classList.add('d-none');
+                dropdown.classList.remove('d-none');
+                editButton.classList.add('d-none');
+                saveButton.classList.remove('d-none');
+                cancelButton.classList.remove('d-none');
+            });
+
+            cancelButton.addEventListener('click', function () {
+                dropdown.value = originalValue;
+                displaySpan.textContent = originalValue || 'N/A';
+                displaySpan.classList.remove('d-none');
+                dropdown.classList.add('d-none');
+                editButton.classList.remove('d-none');
+                saveButton.classList.add('d-none');
+                cancelButton.classList.add('d-none');
+            });
+
+            dropdown.addEventListener('change', function () {
+                displaySpan.textContent = dropdown.value;
+            });
+        })();
+    </script>
+}
+

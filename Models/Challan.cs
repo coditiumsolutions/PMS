@@ -38,6 +38,10 @@ public class Challan
     [StringLength(50)]
     public string? deposittype { get; set; }
 
+    // SQL column is INT, so map to nullable int to avoid cast issues
+    [Display(Name = "Amount Paid")]
+    public int? amountpaid { get; set; }
+
     [Display(Name = "Currency")]
     [StringLength(10)]
     public string? currency { get; set; }

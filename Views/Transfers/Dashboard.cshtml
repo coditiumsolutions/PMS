@@ -1,5 +1,89 @@
 @{
     ViewData["Title"] = "Transfers Dashboard";
+    var typeLabels = ViewBag.TypeLabels as string ?? "[]";
+    var typeCounts = ViewBag.TypeCounts as string ?? "[]";
+    var monthLabels = ViewBag.MonthLabels as string ?? "[]";
+    var monthCounts = ViewBag.MonthCounts as string ?? "[]";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Transfers Dashboard</h2>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Transfers by Type</h5>
+                    <canvas id="transfersByTypeChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Monthly Transfers</h5>
+                    <canvas id="monthlyTransfersChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const typeLabels = @Html.Raw(typeLabels);
+    const typeCounts = @Html.Raw(typeCounts);
+    const monthLabels = @Html.Raw(monthLabels);
+    const monthCounts = @Html.Raw(monthCounts);
+
+    if (typeLabels.length > 0) {
+        new Chart(document.getElementById('transfersByTypeChart'), {
+            type: 'bar',
+            data: {
+                labels: typeLabels,
+                datasets: [{
+                    label: 'Transfers',
+                    data: typeCounts,
+                    backgroundColor: '#0d6efd'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    if (monthLabels.length > 0) {
+        new Chart(document.getElementById('monthlyTransfersChart'), {
+            type: 'line',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: 'Transfers',
+                    data: monthCounts,
+                    borderColor: '#198754',
+                    backgroundColor: 'rgba(25, 135, 84, 0.15)',
+                    fill: true,
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+</script>
+
+@{
+    ViewData["Title"] = "Transfers Dashboard";
 }
 
 <h2>Transfers Dashboard</h2>

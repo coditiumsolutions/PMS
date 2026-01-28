@@ -1,0 +1,135 @@
+@model PMS.Web.Models.Challan
+
+@{
+    ViewData["Title"] = "New Challan";
+    var bankNames = ViewBag.BankNames as IEnumerable<string> ?? Enumerable.Empty<string>();
+    var bankVerifiedStatuses = ViewBag.BankVerifiedStatuses as IEnumerable<string> ?? Enumerable.Empty<string>();
+    var depositTypes = ViewBag.DepositTypes as IEnumerable<string> ?? new[] { "Cash", "DD", "Cheque" };
+    var currencies = ViewBag.Currencies as IEnumerable<string> ?? new[] { "Rs", "Dollar" };
+}
+
+<div class="container-fluid mt-3">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">New Challan</h4>
+            <a asp-action="AllChallans" class="btn btn-secondary btn-sm">Back to All Challans</a>
+        </div>
+        <form asp-action="CreateChallan" method="post">
+            @Html.AntiForgeryToken()
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="alert alert-danger alert-dismissible fade show mb-2" role="alert">
+                    <strong>Unable to save.</strong>
+                    <div asp-validation-summary="ModelOnly" class="mb-0 mt-1"></div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="customerno" class="form-label">Customer No</label>
+                        <input asp-for="customerno" class="form-control form-control-sm" readonly />
+                        <span asp-validation-for="customerno" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="depsoiteslipno" class="form-label">Deposit Slip No</label>
+                        <input asp-for="depsoiteslipno" class="form-control form-control-sm" />
+                        <span asp-validation-for="depsoiteslipno" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="bankname" class="form-label">Bank Name</label>
+                        <select asp-for="bankname" class="form-select form-select-sm">
+                            <option value="">-- Select Bank --</option>
+                            @foreach (var bank in bankNames)
+                            {
+                                <option value="@bank">@bank</option>
+                            }
+                        </select>
+                        <span asp-validation-for="bankname" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="bankverified" class="form-label">Bank Verified</label>
+                        <select asp-for="bankverified" class="form-select form-select-sm">
+                            <option value="">-- Select Status --</option>
+                            @foreach (var status in bankVerifiedStatuses)
+                            {
+                                <option value="@status">@status</option>
+                            }
+                        </select>
+                        <span asp-validation-for="bankverified" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="depositdate" class="form-label">Deposit Date</label>
+                        <input asp-for="depositdate" type="date" class="form-control form-control-sm" />
+                        <span asp-validation-for="depositdate" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="bankverifieddate" class="form-label">Bank Verified Date</label>
+                        <input asp-for="bankverifieddate" type="date" class="form-control form-control-sm" />
+                        <span asp-validation-for="bankverifieddate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="deposittype" class="form-label">Deposit Type</label>
+                        <select asp-for="deposittype" class="form-select form-select-sm">
+                            <option value="">-- Select Type --</option>
+                            @foreach (var dt in depositTypes)
+                            {
+                                <option value="@dt">@dt</option>
+                            }
+                        </select>
+                        <span asp-validation-for="deposittype" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="amountpaid" class="form-label">Amount Paid</label>
+                        <input asp-for="amountpaid" class="form-control form-control-sm" type="number" step="1" />
+                        <span asp-validation-for="amountpaid" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="currency" class="form-label">Currency</label>
+                        <select asp-for="currency" class="form-select form-select-sm">
+                            @foreach (var cur in currencies)
+                            {
+                                <option value="@cur">@cur</option>
+                            }
+                        </select>
+                        <span asp-validation-for="currency" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="createdby" class="form-label">Created By</label>
+                        <input asp-for="createdby" class="form-control form-control-sm" />
+                        <span asp-validation-for="createdby" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="creationdate" class="form-label">Creation Date</label>
+                        <input asp-for="creationdate" type="date" class="form-control form-control-sm" />
+                        <span asp-validation-for="creationdate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary btn-sm">Save Challan</button>
+                <a asp-action="AllChallans" class="btn btn-outline-secondary btn-sm">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

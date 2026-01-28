@@ -4,79 +4,115 @@
     ViewData["Title"] = "Create Child Payment";
 }
 
-<h2>Create Child Payment</h2>
-
-<form asp-action="CreateChild" method="post">
-    <div class="form-group">
-        <label asp-for="planno" class="control-label"></label>
-        <input asp-for="planno" class="form-control" />
-        <span asp-validation-for="planno" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="paymentdesc" class="control-label"></label>
-        <input asp-for="paymentdesc" class="form-control" />
-        <span asp-validation-for="paymentdesc" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="installmentno" class="control-label"></label>
-        <input asp-for="installmentno" class="form-control" />
-        <span asp-validation-for="installmentno" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="duedate" class="control-label"></label>
-        <input asp-for="duedate" class="form-control" />
-        <span asp-validation-for="duedate" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="dueamount" class="control-label"></label>
-        <input asp-for="dueamount" class="form-control" />
-        <span asp-validation-for="dueamount" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="surchargepolicy" class="control-label"></label>
-        <input asp-for="surchargepolicy" class="form-control" />
-        <span asp-validation-for="surchargepolicy" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="surchargerate" class="control-label"></label>
-        <input asp-for="surchargerate" class="form-control" />
-        <span asp-validation-for="surchargerate" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="discount" class="control-label"></label>
-        <input asp-for="discount" class="form-control" />
-        <span asp-validation-for="discount" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="comments" class="control-label"></label>
-        <textarea asp-for="comments" class="form-control"></textarea>
-        <span asp-validation-for="comments" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="createdby" class="control-label"></label>
-        <input asp-for="createdby" class="form-control" />
-        <span asp-validation-for="createdby" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="creationdate" class="control-label"></label>
-        <input asp-for="creationdate" class="form-control" />
-        <span asp-validation-for="creationdate" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="depsoiteslipno" class="control-label"></label>
-        <input asp-for="depsoiteslipno" class="form-control" />
-        <span asp-validation-for="depsoiteslipno" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="bankname" class="control-label"></label>
-        <input asp-for="bankname" class="form-control" />
-        <span asp-validation-for="bankname" class="text-danger"></span>
-    </div>
-    <div class="form-group mt-3">
-        <button type="submit" class="btn btn-primary">Create</button>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Create Child Payment</h2>
         <a asp-action="AllPayments" class="btn btn-secondary">Back</a>
     </div>
-</form>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="CreateChild" method="post">
+                <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="planno" class="form-label fw-semibold"></label>
+                            <input asp-for="planno" class="form-control" readonly />
+                            <span asp-validation-for="planno" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="paymentdesc" class="form-label fw-semibold"></label>
+                            <select asp-for="paymentdesc" class="form-select">
+                                <option value="">-- Select Payment Description --</option>
+                                @if (ViewBag.PaymentDescriptions is IEnumerable<string> paymentDescs)
+                                {
+                                    foreach (var desc in paymentDescs)
+                                    {
+                                        <option value="@desc">@desc</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="paymentdesc" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="installmentno" class="form-label fw-semibold"></label>
+                            <input asp-for="installmentno" class="form-control" />
+                            <span asp-validation-for="installmentno" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="duedate" class="form-label fw-semibold"></label>
+                            <input asp-for="duedate" class="form-control" type="date" />
+                            <span asp-validation-for="duedate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="dueamount" class="form-label fw-semibold"></label>
+                            <input asp-for="dueamount" class="form-control" />
+                            <span asp-validation-for="dueamount" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="surchargepolicy" class="form-label fw-semibold"></label>
+                            <select asp-for="surchargepolicy" class="form-select">
+                                <option value="">-- Select Surcharge Policy --</option>
+                                @if (ViewBag.SurchargePolicies is IEnumerable<string> policies)
+                                {
+                                    foreach (var p in policies)
+                                    {
+                                        <option value="@p">@p</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="surchargepolicy" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="surchargerate" class="form-label fw-semibold"></label>
+                            <input asp-for="surchargerate" class="form-control" />
+                            <span asp-validation-for="surchargerate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="discount" class="form-label fw-semibold"></label>
+                            <input asp-for="discount" class="form-control" />
+                            <span asp-validation-for="discount" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="createdby" class="form-label fw-semibold"></label>
+                            <input asp-for="createdby" class="form-control" readonly />
+                            <span asp-validation-for="createdby" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="creationdate" class="form-label fw-semibold"></label>
+                            <input asp-for="creationdate" class="form-control" readonly />
+                            <span asp-validation-for="creationdate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="comments" class="form-label fw-semibold"></label>
+                            <textarea asp-for="comments" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="comments" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Create</button>
+                    <a asp-action="AllPayments" class="btn btn-secondary">Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

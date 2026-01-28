@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PMS.Web.Data;
 using PMS.Web.Models;
+using PMS.Web.ViewModels;
 using System.Text.Json;
 
 namespace PMS.Web.Controllers;
@@ -91,6 +92,85 @@ public class SchedulesController : Controller
             .OrderByDescending(p => p.uid)
             .ToListAsync();
         return View(payments);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddChildInline(PaymentPlanChildInlineCreateViewModel model)
+    {
+        if (!Request.Headers.ContainsKey("X-Requested-With"))
+        {
+            return BadRequest();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+            return BadRequest(new { errors });
+        }
+
+        var child = new PaymentPlanChild
+        {
+            planno = model.Planno,
+            paymentdesc = model.PaymentDesc,
+            installmentno = model.InstallmentNo,
+            duedate = model.DueDate,
+            dueamount = model.DueAmount
+        };
+
+        _context.PaymentPlanChildren.Add(child);
+        await _context.SaveChangesAsync();
+
+        var children = await _context.PaymentPlanChildren.AsNoTracking()
+            .Where(c => c.planno == model.Planno)
+            .OrderBy(c => c.installmentno)
+            .ToListAsync();
+
+        return PartialView("_ChildPaymentsTable", children);
+    }
+
+    /// <summary>
+    /// Shows a selected payment plan together with its child payment schedule.
+    /// </summary>
+    public async Task<IActionResult> PlanSchedule(string planno)
+    {
+        ViewBag.ActiveModule = "Schedules";
+
+        if (string.IsNullOrWhiteSpace(planno))
+        {
+            return RedirectToAction(nameof(AllPlans));
+        }
+
+        var plan = await _context.PaymentPlans.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.planno == planno);
+
+        if (plan == null)
+        {
+            return NotFound();
+        }
+
+        var children = await _context.PaymentPlanChildren.AsNoTracking()
+            .Where(c => c.planno == planno)
+            .OrderBy(c => c.installmentno)
+            .ToListAsync();
+
+        var viewModel = new PaymentPlanScheduleViewModel
+        {
+            Plan = plan,
+            Children = children
+        };
+
+        // Populate payment description options for inline child form
+        ViewBag.PaymentDescriptions = await _context.Configurations
+            .AsNoTracking()
+            .Where(c => c.ConfigKey == "PaymentDesc")
+            .Select(c => c.ConfigValue)
+            .ToListAsync();
+
+        return View(viewModel);
     }
 
     public async Task<IActionResult> PlanDetails(int? id)
@@ -230,25 +310,62 @@ public class SchedulesController : Controller
         return View(child);
     }
 
-    public IActionResult CreateChild()
+    public IActionResult CreateChild(string? planno)
     {
         ViewBag.ActiveModule = "Schedules";
-        return View();
+        var model = new PaymentPlanChild();
+        if (!string.IsNullOrWhiteSpace(planno))
+        {
+            model.planno = planno;
+        }
+        // Set default creation date to today
+        model.creationdate = DateTime.Today.ToString("yyyy-MM-dd");
+        // Populate dropdowns
+        ViewBag.PaymentDescriptions = _context.Configurations
+            .AsNoTracking()
+            .Where(c => c.ConfigKey == "PaymentDesc")
+            .Select(c => c.ConfigValue)
+            .ToList();
+
+        ViewBag.SurchargePolicies = new List<string> { "Active", "Not Active" };
+        return View(model);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CreateChild([Bind("planno,paymentdesc,installmentno,duedate,dueamount,surchargepolicy,surchargerate,discount,comments,createdby,creationdate,depsoiteslipno,bankname")] PaymentPlanChild paymentPlanChild)
+    public async Task<IActionResult> CreateChild([Bind("planno,paymentdesc,installmentno,duedate,dueamount,surchargepolicy,surchargerate,discount,comments,createdby,creationdate")] PaymentPlanChild paymentPlanChild)
     {
         ViewBag.ActiveModule = "Schedules";
-        if (ModelState.IsValid)
+        // Repopulate dropdowns for redisplay
+        ViewBag.PaymentDescriptions = await _context.Configurations
+            .AsNoTracking()
+            .Where(c => c.ConfigKey == "PaymentDesc")
+            .Select(c => c.ConfigValue)
+            .ToListAsync();
+        ViewBag.SurchargePolicies = new List<string> { "Active", "Not Active" };
+        
+        if (!ModelState.IsValid)
+        {
+            return View(paymentPlanChild);
+        }
+
+        try
         {
             _context.Add(paymentPlanChild);
             await _context.SaveChangesAsync();
+            if (!string.IsNullOrWhiteSpace(paymentPlanChild.planno))
+            {
+                return RedirectToAction(nameof(PlanSchedule), new { planno = paymentPlanChild.planno });
+            }
+
             return RedirectToAction(nameof(AllPayments));
         }
-
-        return View(paymentPlanChild);
+        catch (DbUpdateException ex)
+        {
+            var message = ex.InnerException?.Message ?? ex.Message;
+            ModelState.AddModelError(string.Empty, $"Database error while saving child payment: {message}");
+            return View(paymentPlanChild);
+        }
     }
 
     public async Task<IActionResult> EditChild(int? id)
@@ -270,7 +387,7 @@ public class SchedulesController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditChild(int id, [Bind("uid,planno,paymentdesc,installmentno,duedate,dueamount,surchargepolicy,surchargerate,discount,comments,createdby,creationdate,depsoiteslipno,bankname")] PaymentPlanChild paymentPlanChild)
+    public async Task<IActionResult> EditChild(int id, [Bind("uid,planno,paymentdesc,installmentno,duedate,dueamount,surchargepolicy,surchargerate,discount,comments,createdby,creationdate")] PaymentPlanChild paymentPlanChild)
     {
         ViewBag.ActiveModule = "Schedules";
         if (id != paymentPlanChild.uid)

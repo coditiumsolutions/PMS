@@ -1,0 +1,44 @@
+@model IEnumerable<PMS.Web.Models.PaymentPlanChild>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Child Payments Schedule</h5>
+    </div>
+    <div class="card-body p-0">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="p-3">
+                <div class="alert alert-info mb-0">
+                    No child payments found for this plan.
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Payment Description</th>
+                            <th>Due Amount</th>
+                            <th>Due Date</th>
+                            <th>Installment No</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var child in Model)
+                        {
+                            <tr>
+                                <td>@child.paymentdesc</td>
+                                <td>@child.dueamount</td>
+                                <td>@child.duedate</td>
+                                <td>@child.installmentno</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+

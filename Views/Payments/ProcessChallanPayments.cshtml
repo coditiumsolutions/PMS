@@ -1,0 +1,200 @@
+@model PMS.Web.ViewModels.ChallanPaymentsViewModel
+
+@{
+    ViewData["Title"] = "Process Payments";
+    var bankNames = ViewBag.BankNames as IEnumerable<string> ?? Enumerable.Empty<string>();
+    var paymentDescriptions = ViewBag.PaymentDescriptions as IEnumerable<string> ?? Enumerable.Empty<string>();
+}
+
+<div class="container-fluid mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Process Payments</h2>
+        <a asp-action="AllChallans" class="btn btn-secondary btn-sm">Back to All Challans</a>
+    </div>
+
+    <!-- Parent Challan Details -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-header">
+            <strong>Challan Details</strong>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-sm table-bordered mb-0">
+                <tbody>
+                    <tr>
+                        <th class="w-25">Customer No</th>
+                        <td class="w-25">@Model.Challan.customerno</td>
+                        <th class="w-25">DS No</th>
+                        <td class="w-25">@Model.Challan.depsoiteslipno</td>
+                    </tr>
+                    <tr>
+                        <th>Bank</th>
+                        <td>@Model.Challan.bankname</td>
+                        <th>Bank Verified</th>
+                        <td>@Model.Challan.bankverified</td>
+                    </tr>
+                    <tr>
+                        <th>Deposit Date</th>
+                        <td>
+                            @(Model.Challan.depositdate?.ToString("yyyy-MM-dd") ?? "N/A")
+                        </td>
+                        <th>Verification Date</th>
+                        <td>
+                            @(Model.Challan.bankverifieddate?.ToString("yyyy-MM-dd") ?? "N/A")
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Deposit Type</th>
+                        <td>@Model.Challan.deposittype</td>
+                        <th>Verified By</th>
+                        <td>@Model.Challan.verifiedby</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Inline Add Payment Form -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-header">
+            <strong>Add Payment</strong>
+        </div>
+        <div class="card-body p-0">
+            <form id="addPaymentForm" asp-action="AddPaymentInline" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="challanId" value="@Model.Challan.uid" />
+
+                <table class="table table-sm table-bordered mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="w-25">
+                                <label asp-for="NewPayment.PaidAmount" class="form-label mb-0">Paid Amount</label>
+                            </th>
+                            <td class="w-25">
+                                <input asp-for="NewPayment.PaidAmount" class="form-control form-control-sm" />
+                            </td>
+                            <th class="w-25">
+                                <label asp-for="NewPayment.PaidDate" class="form-label mb-0">Paid Date</label>
+                            </th>
+                            <td class="w-25">
+                                <input asp-for="NewPayment.PaidDate" type="date" class="form-control form-control-sm" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <label asp-for="NewPayment.Method" class="form-label mb-0">Method</label>
+                            </th>
+                            <td>
+                                <select asp-for="NewPayment.Method" class="form-select form-select-sm">
+                                    <option value="">-- Select Method --</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="DD">DD</option>
+                                    <option value="Cheque">Cheque</option>
+                                </select>
+                            </td>
+                            <th>
+                                <label asp-for="NewPayment.BankName" class="form-label mb-0">Bank Name</label>
+                            </th>
+                            <td>
+                                <select asp-for="NewPayment.BankName" class="form-select form-select-sm">
+                                    <option value="">-- Select Bank --</option>
+                                    @foreach (var bank in bankNames)
+                                    {
+                                        <option value="@bank">@bank</option>
+                                    }
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <label asp-for="NewPayment.InstallNo" class="form-label mb-0">Install No</label>
+                            </th>
+                            <td>
+                                <input asp-for="NewPayment.InstallNo" class="form-control form-control-sm" />
+                            </td>
+                            <th>
+                                <label asp-for="NewPayment.PaymentDescription" class="form-label mb-0">Description</label>
+                            </th>
+                            <td>
+                                <select asp-for="NewPayment.PaymentDescription" class="form-select form-select-sm">
+                                    <option value="">-- Select Description --</option>
+                                    @foreach (var desc in paymentDescriptions)
+                                    {
+                                        <option value="@desc">@desc</option>
+                                    }
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-start">
+                                <button type="submit" class="btn btn-primary btn-sm">Save Payment</button>
+                                <span id="addPaymentError" class="text-danger ms-2" style="display:none;"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+
+    <!-- Child Payments Grid -->
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <strong>Payments for @Model.Challan.customerno</strong>
+        </div>
+        <div class="card-body p-0" id="paymentsTableContainer">
+            @await Html.PartialAsync("_ChallanPaymentsTable", Model.Payments)
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const form = document.getElementById('addPaymentForm');
+            const errorSpan = document.getElementById('addPaymentError');
+            const tableContainer = document.getElementById('paymentsTableContainer');
+
+            if (!form || !tableContainer) {
+                return;
+            }
+
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                errorSpan.style.display = 'none';
+                errorSpan.textContent = '';
+
+                const formData = new FormData(form);
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const contentType = response.headers.get('Content-Type') || '';
+                        if (contentType.includes('application/json')) {
+                            const errorData = await response.json();
+                            errorSpan.textContent = (errorData.errors && errorData.errors.join('; ')) || 'Error saving payment.';
+                        } else {
+                            errorSpan.textContent = 'Error saving payment.';
+                        }
+                        errorSpan.style.display = 'inline';
+                        return;
+                    }
+
+                    const html = await response.text();
+                    tableContainer.innerHTML = html;
+                    form.reset();
+                } catch (err) {
+                    errorSpan.textContent = 'Unexpected error while saving payment.';
+                    errorSpan.style.display = 'inline';
+                }
+            });
+        })();
+    </script>
+}
+

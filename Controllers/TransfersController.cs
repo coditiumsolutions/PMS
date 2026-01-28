@@ -14,15 +14,17 @@ public class TransfersController : Controller
     {
         _context = context;
     }
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         ViewBag.ActiveModule = "Transfers";
-        return View();
+        await LoadDashboardData();
+        return View("Dashboard");
     }
 
-    public IActionResult Dashboard()
+    public async Task<IActionResult> Dashboard()
     {
         ViewBag.ActiveModule = "Transfers";
+        await LoadDashboardData();
         return View();
     }
 
@@ -235,6 +237,36 @@ public class TransfersController : Controller
     private bool TransferExists(int id)
     {
         return _context.Transfers.Any(e => e.uId == id);
+    }
+
+    private async Task LoadDashboardData()
+    {
+        var transfers = await _context.Transfers.AsNoTracking().ToListAsync();
+
+        var typeGroups = transfers
+            .GroupBy(t => string.IsNullOrWhiteSpace(t.TransferType) ? "Unknown" : t.TransferType.Trim())
+            .OrderByDescending(g => g.Count())
+            .Select(g => new { Type = g.Key, Count = g.Count() })
+            .ToList();
+
+        var monthlyCounts = transfers
+            .Select(t =>
+            {
+                var dateText = t.CreationDate;
+                return DateTime.TryParse(dateText, out var dt)
+                    ? dt.ToString("yyyy-MM")
+                    : null;
+            })
+            .Where(m => m != null)
+            .GroupBy(m => m!)
+            .OrderBy(g => g.Key)
+            .Select(g => new { Month = g.Key, Count = g.Count() })
+            .ToList();
+
+        ViewBag.TypeLabels = System.Text.Json.JsonSerializer.Serialize(typeGroups.Select(t => t.Type));
+        ViewBag.TypeCounts = System.Text.Json.JsonSerializer.Serialize(typeGroups.Select(t => t.Count));
+        ViewBag.MonthLabels = System.Text.Json.JsonSerializer.Serialize(monthlyCounts.Select(m => m.Month));
+        ViewBag.MonthCounts = System.Text.Json.JsonSerializer.Serialize(monthlyCounts.Select(m => m.Count));
     }
 }
 

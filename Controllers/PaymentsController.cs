@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using PMS.Web.Data;
 using PMS.Web.Models;
+using PMS.Web.ViewModels;
 
 namespace PMS.Web.Controllers;
 
@@ -197,6 +199,282 @@ public class PaymentsController : Controller
             .OrderByDescending(c => c.uid)
             .ToList();
         return View(unVerifiedChallans);
+    }
+
+    // GET: Payments/ChallanDetails/5
+    public async Task<IActionResult> ChallanDetails(int id)
+    {
+        ViewBag.ActiveModule = "Payments";
+
+        var challan = await _context.Challans
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.uid == id);
+
+        if (challan == null)
+        {
+            return NotFound();
+        }
+
+        return View(challan);
+    }
+
+    // GET: Payments/CreateChallan
+    public async Task<IActionResult> CreateChallan(string? customerno = null)
+    {
+        ViewBag.ActiveModule = "Payments";
+
+        var challan = new Challan
+        {
+            customerno = customerno,
+            creationdate = DateTime.Today,
+            currency = "Rs"
+        };
+
+        // Dropdown sources
+        ViewBag.BankNames = await _context.Configurations
+            .AsNoTracking()
+            .Where(c => c.ConfigKey == "Bank")
+            .Select(c => c.ConfigValue)
+            .ToListAsync();
+
+        ViewBag.BankVerifiedStatuses = await _context.Configurations
+            .AsNoTracking()
+            .Where(c => c.ConfigKey == "Bank")
+            .Select(c => c.ConfigValue)
+            .ToListAsync();
+
+        ViewBag.DepositTypes = new List<string> { "Cash", "DD", "Cheque" };
+        ViewBag.Currencies = new List<string> { "Rs", "Dollar" };
+
+        return View(challan);
+    }
+
+    // POST: Payments/CreateChallan
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateChallan(Challan challan)
+    {
+        ViewBag.ActiveModule = "Payments";
+
+        // Local helper to repopulate dropdowns whenever we need to redisplay the form
+        async Task PopulateDropdowns()
+        {
+            ViewBag.BankNames = await _context.Configurations
+                .AsNoTracking()
+                .Where(c => c.ConfigKey == "Bank")
+                .Select(c => c.ConfigValue)
+                .ToListAsync();
+
+            ViewBag.BankVerifiedStatuses = await _context.Configurations
+                .AsNoTracking()
+                .Where(c => c.ConfigKey == "Bank")
+                .Select(c => c.ConfigValue)
+                .ToListAsync();
+
+            ViewBag.DepositTypes = new List<string> { "Cash", "DD", "Cheque" };
+            ViewBag.Currencies = new List<string> { "Rs", "Dollar" };
+        }
+
+        // Basic model validation
+        if (!ModelState.IsValid)
+        {
+            await PopulateDropdowns();
+            return View(challan);
+        }
+
+        // Server-side check for existing challan with same customer and bank
+        if (!string.IsNullOrWhiteSpace(challan.customerno) &&
+            !string.IsNullOrWhiteSpace(challan.bankname))
+        {
+            var duplicateExists = await _context.Challans
+                .AsNoTracking()
+                .AnyAsync(c =>
+                    c.customerno == challan.customerno &&
+                    c.bankname == challan.bankname);
+
+            if (duplicateExists)
+            {
+                ModelState.AddModelError(string.Empty,
+                    "A challan already exists for this customer and bank. Please use a different bank or update the existing challan.");
+
+                await PopulateDropdowns();
+                return View(challan);
+            }
+        }
+
+        if (!challan.creationdate.HasValue)
+        {
+            challan.creationdate = DateTime.Today;
+        }
+
+        _context.Challans.Add(challan);
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            TempData["ChallanMessage"] = "Challan saved successfully.";
+            TempData["ChallanMessageType"] = "success";
+            return RedirectToAction(nameof(AllChallans));
+        }
+        catch (DbUpdateException ex)
+        {
+            var sqlEx = ex.InnerException as SqlException;
+            if (sqlEx != null && (sqlEx.Number == 2627 || sqlEx.Number == 2601) &&
+                sqlEx.Message.Contains("UQ_Deposit_Bank"))
+            {
+                ModelState.AddModelError(string.Empty,
+                    "A challan with this customer and bank already exists. Please check existing challans or choose a different bank.");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty,
+                    "The record could not be saved due to a database error. Please try again or contact support.");
+            }
+
+            await PopulateDropdowns();
+            return View(challan);
+        }
+        catch (Exception)
+        {
+            ModelState.AddModelError(string.Empty,
+                "An unexpected error occurred while saving. Please try again.");
+
+            await PopulateDropdowns();
+            return View(challan);
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateChallanStatus(int id, string bankverified)
+    {
+        ViewBag.ActiveModule = "Payments";
+
+        var challan = await _context.Challans.FirstOrDefaultAsync(c => c.uid == id);
+        if (challan == null)
+        {
+            return NotFound();
+        }
+
+        challan.bankverified = bankverified;
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(ChallanDetails), new { id });
+    }
+
+    // GET: Payments/ProcessChallanPayments/5
+    public async Task<IActionResult> ProcessChallanPayments(int id)
+    {
+        ViewBag.ActiveModule = "Payments";
+
+        var challan = await _context.Challans
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.uid == id);
+
+        if (challan == null)
+        {
+            return NotFound();
+        }
+
+        var payments = await _context.Payments
+            .AsNoTracking()
+            .Where(p => p.customerno == challan.customerno)
+            .OrderByDescending(p => p.uId)
+            .ToListAsync();
+
+        var viewModel = new ChallanPaymentsViewModel
+        {
+            Challan = challan,
+            Payments = payments,
+            NewPayment = new Payment
+            {
+                customerno = challan.customerno,
+                BankName = challan.bankname ?? string.Empty,
+                DSNo = challan.depsoiteslipno,
+                DSDate = challan.depositdate?.ToString("yyyy-MM-dd")
+            }
+        };
+
+        // Populate dropdown sources
+        ViewBag.BankNames = await _context.Configurations
+            .AsNoTracking()
+            .Where(c => c.ConfigKey == "Bank")
+            .Select(c => c.ConfigValue)
+            .ToListAsync();
+
+        ViewBag.PaymentDescriptions = await _context.Configurations
+            .AsNoTracking()
+            .Where(c => c.ConfigKey == "PaymentDesc")
+            .Select(c => c.ConfigValue)
+            .ToListAsync();
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddPaymentInline(int challanId, [Bind(Prefix = "NewPayment")] Payment input)
+    {
+        if (!Request.Headers.ContainsKey("X-Requested-With"))
+        {
+            return BadRequest();
+        }
+
+        var challan = await _context.Challans
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.uid == challanId);
+
+        if (challan == null)
+        {
+            return NotFound();
+        }
+
+        if (string.IsNullOrWhiteSpace(input.PaidAmount))
+        {
+            return BadRequest(new { errors = new[] { "Paid Amount is required." } });
+        }
+
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+
+            return BadRequest(new { errors });
+        }
+
+        var payment = new Payment
+        {
+            customerno = challan.customerno ?? string.Empty,
+            PaidAmount = input.PaidAmount,
+            PaidDate = input.PaidDate,
+            Method = input.Method,
+            BankName = string.IsNullOrWhiteSpace(input.BankName)
+                ? (challan.bankname ?? string.Empty)
+                : input.BankName,
+            CreatedBy = input.CreatedBy,
+            DSNo = challan.depsoiteslipno,
+            DSDate = challan.depositdate?.ToString("yyyy-MM-dd"),
+            DDNo = input.DDNo,
+            DDDate = input.DDDate,
+            ChequeNo = input.ChequeNo,
+            ChequeDate = input.ChequeDate,
+            InstallNo = input.InstallNo,
+            PaymentDescription = input.PaymentDescription,
+            CreatedOn = DateTime.Now.ToString("yyyy-MM-dd")
+        };
+
+        _context.Payments.Add(payment);
+        await _context.SaveChangesAsync();
+
+        var payments = await _context.Payments
+            .AsNoTracking()
+            .Where(p => p.customerno == challan.customerno)
+            .OrderByDescending(p => p.uId)
+            .ToListAsync();
+
+        return PartialView("_ChallanPaymentsTable", payments);
     }
 }
 

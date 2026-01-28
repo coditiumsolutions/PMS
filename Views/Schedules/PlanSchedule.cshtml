@@ -1,0 +1,166 @@
+@model PMS.Web.ViewModels.PaymentPlanScheduleViewModel
+
+@{
+    ViewData["Title"] = "Plan Schedule";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Plan Schedule</h2>
+        <div class="d-flex gap-2">
+            <button type="button" id="show-inline-child-form" class="btn btn-success">
+                Add Child Payment
+            </button>
+            <a asp-action="AllPlans" class="btn btn-secondary">Back to All Plans</a>
+        </div>
+    </div>
+
+    <!-- Plan summary -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Plan Summary</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Plan No</dt>
+                        <dd class="col-sm-8">@Model.Plan.planno</dd>
+
+                        <dt class="col-sm-4">P Total</dt>
+                        <dd class="col-sm-8">@Model.Plan.totalamount</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Size</dt>
+                        <dd class="col-sm-8">@Model.Plan.sizedetail</dd>
+
+                        <dt class="col-sm-4">Created By</dt>
+                        <dd class="col-sm-8">@Model.Plan.createdby</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inline child payment form -->
+    <div id="inline-child-form-wrapper" class="card mb-3 shadow-sm d-none">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Add Child Payment</h5>
+        </div>
+        <div class="card-body">
+            <form id="inline-child-form" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Planno" value="@Model.Plan.planno" />
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-semibold" for="PaymentDesc">Payment Description</label>
+                        <select class="form-select" id="PaymentDesc" name="PaymentDesc">
+                            <option value="">-- Select Payment Description --</option>
+                            @if (ViewBag.PaymentDescriptions is IEnumerable<string> paymentDescs)
+                            {
+                                foreach (var desc in paymentDescs)
+                                {
+                                    <option value="@desc">@desc</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-semibold" for="InstallmentNo">Installment No</label>
+                        <input class="form-control" id="InstallmentNo" name="InstallmentNo" />
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-semibold" for="DueDate">Due Date</label>
+                        <input class="form-control" id="DueDate" name="DueDate" type="date" />
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-semibold" for="DueAmount">Due Amount</label>
+                        <input class="form-control" id="DueAmount" name="DueAmount" />
+                    </div>
+                </div>
+                <div id="inline-child-errors" class="text-danger small mb-2"></div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                    <button type="button" id="cancel-inline-child-form" class="btn btn-outline-secondary btn-sm">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Child payment schedule -->
+    <div id="child-payments-container">
+        @Html.Partial("_ChildPaymentsTable", Model.Children)
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const showBtn = document.getElementById('show-inline-child-form');
+            const wrapper = document.getElementById('inline-child-form-wrapper');
+            const form = document.getElementById('inline-child-form');
+            const cancelBtn = document.getElementById('cancel-inline-child-form');
+            const errorsDiv = document.getElementById('inline-child-errors');
+            const container = document.getElementById('child-payments-container');
+
+            if (!showBtn || !wrapper || !form || !cancelBtn || !container) {
+                return;
+            }
+
+            function showForm() {
+                wrapper.classList.remove('d-none');
+                errorsDiv.textContent = '';
+            }
+
+            function hideForm() {
+                wrapper.classList.add('d-none');
+                errorsDiv.textContent = '';
+                form.reset();
+            }
+
+            showBtn.addEventListener('click', function () {
+                showForm();
+            });
+
+            cancelBtn.addEventListener('click', function () {
+                hideForm();
+            });
+
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                errorsDiv.textContent = '';
+
+                const formData = new FormData(form);
+
+                try {
+                    const response = await fetch('@Url.Action("AddChildInline", "Schedules")', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const html = await response.text();
+                        container.innerHTML = html;
+                        hideForm();
+                    } else if (response.status === 400) {
+                        const data = await response.json();
+                        if (data && Array.isArray(data.errors)) {
+                            errorsDiv.textContent = data.errors.join(' ');
+                        } else {
+                            errorsDiv.textContent = 'Please correct the highlighted errors.';
+                        }
+                    } else {
+                        errorsDiv.textContent = 'An unexpected error occurred while saving the child payment.';
+                    }
+                } catch {
+                    errorsDiv.textContent = 'Unable to save child payment. Please try again.';
+                }
+            });
+        })();
+    </script>
+}
