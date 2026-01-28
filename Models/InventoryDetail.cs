@@ -10,32 +10,26 @@ public class InventoryDetail
     [Display(Name = "UID")]
     public int UID { get; set; }
 
-    [Required]
     [Display(Name = "Project")]
     [StringLength(100)]
     public string? Project { get; set; }
 
-    [Required]
     [Display(Name = "Sub Project")]
     [StringLength(100)]
     public string? SubProject { get; set; }
 
-    [Required]
     [Display(Name = "Sector")]
     [StringLength(50)]
     public string? Sector { get; set; }
 
-    [Required]
     [Display(Name = "Block")]
     [StringLength(50)]
     public string? Block { get; set; }
 
-    [Required]
     [Display(Name = "Street")]
     [StringLength(50)]
     public string? Street { get; set; }
 
-    [Required]
     [Display(Name = "Plot No")]
     [StringLength(50)]
     public string? PlotNo { get; set; }

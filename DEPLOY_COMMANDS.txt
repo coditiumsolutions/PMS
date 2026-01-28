@@ -1,0 +1,68 @@
+================================================================================
+QUICK DEPLOYMENT COMMANDS FOR PMS APPLICATION
+================================================================================
+
+AUTOMATED DEPLOYMENT (Recommended):
+-----------------------------------
+cd D:\PMS_Coditium
+powershell -ExecutionPolicy Bypass -File "deploy-to-iis.ps1"
+
+
+MANUAL DEPLOYMENT COMMANDS:
+---------------------------
+
+1. Build Project:
+   cd D:\PMS_Coditium
+   dotnet build --configuration Release
+
+2. Publish Project:
+   dotnet publish --configuration Release --output "D:\PMSDeploy" --self-contained false
+
+3. Stop IIS (if updating):
+   Import-Module WebAdministration
+   Stop-WebAppPool -Name "PMSAppPool"
+   Stop-Website -Name "PMS"
+
+4. Create Application Pool:
+   Import-Module WebAdministration
+   Remove-WebAppPool -Name "PMSAppPool" -ErrorAction SilentlyContinue
+   New-WebAppPool -Name "PMSAppPool"
+   Set-ItemProperty -Path "IIS:\AppPools\PMSAppPool" -Name managedRuntimeVersion -Value ""
+   Set-ItemProperty -Path "IIS:\AppPools\PMSAppPool" -Name processModel.identityType -Value "ApplicationPoolIdentity"
+   Set-ItemProperty -Path "IIS:\AppPools\PMSAppPool" -Name startMode -Value "AlwaysRunning"
+
+5. Create Website:
+   Remove-Website -Name "PMS" -ErrorAction SilentlyContinue
+   New-Website -Name "PMS" -PhysicalPath "D:\PMSDeploy" -ApplicationPool "PMSAppPool" -IPAddress "172.20.228.2" -Port 84 -Force
+
+6. Start Application:
+   Start-WebAppPool -Name "PMSAppPool"
+   Start-Website -Name "PMS"
+
+
+QUICK UPDATE (After Code Changes):
+-----------------------------------
+Import-Module WebAdministration
+Stop-WebAppPool -Name "PMSAppPool"
+Stop-Website -Name "PMS"
+cd D:\PMS_Coditium
+dotnet publish --configuration Release --output "D:\PMSDeploy" --self-contained false
+Start-WebAppPool -Name "PMSAppPool"
+Start-Website -Name "PMS"
+
+
+VERIFY DEPLOYMENT:
+------------------
+Application URL: http://172.20.228.2:84
+Check Status: Get-WebAppPoolState -Name "PMSAppPool"
+Check Website: Get-WebsiteState -Name "PMS"
+
+
+TROUBLESHOOTING:
+----------------
+Restart App Pool: Restart-WebAppPool -Name "PMSAppPool"
+Restart Website: Restart-Website -Name "PMS"
+View Bindings: Get-WebBinding -Name "PMS"
+View Logs: Get-EventLog -LogName Application -Source "IIS*" -Newest 50
+
+================================================================================

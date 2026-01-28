@@ -83,6 +83,13 @@ public class InventoryController : Controller
         inventoryDetail.ConstStatus ??= "Vacant";
         inventoryDetail.AllotmentStatus ??= "Available";
 
+        if (string.IsNullOrWhiteSpace(inventoryDetail.Project)) ModelState.AddModelError("Project", "Project is required.");
+        if (string.IsNullOrWhiteSpace(inventoryDetail.SubProject)) ModelState.AddModelError("SubProject", "Sub Project is required.");
+        if (string.IsNullOrWhiteSpace(inventoryDetail.Sector)) ModelState.AddModelError("Sector", "Sector is required.");
+        if (string.IsNullOrWhiteSpace(inventoryDetail.Block)) ModelState.AddModelError("Block", "Block is required.");
+        if (string.IsNullOrWhiteSpace(inventoryDetail.Street)) ModelState.AddModelError("Street", "Street is required.");
+        if (string.IsNullOrWhiteSpace(inventoryDetail.PlotNo)) ModelState.AddModelError("PlotNo", "Plot No is required.");
+
         if (ModelState.IsValid)
         {
             _context.Add(inventoryDetail);
@@ -142,9 +149,9 @@ public class InventoryController : Controller
     public IActionResult DownloadSampleTemplate()
     {
         var builder = new StringBuilder();
-        builder.AppendLine("Project,SubProject,Sector,Block,Street,PlotNo,Category,UnitSize,UnitType");
-        builder.AppendLine("Northspire,Northspire East,Sector 1,A-1,Main Boulevard,Plot-101,Residential,5 Marla,Plot");
-        builder.AppendLine("Northspire,Northspire West,Sector 3,B-3,Sunset Avenue,Plot-202,Commercial,8 Marla,Apartment");
+        builder.AppendLine("Project,SubProject,Sector,Block,Street,PlotNo,Category,UnitSize,UnitType,FloorNo,UnitNo");
+        builder.AppendLine("Northspire,Northspire East,Sector 1,A-1,Main Boulevard,Plot-101,Residential,5 Marla,Plot,,");
+        builder.AppendLine("Northspire,Northspire West,Sector 3,B-3,Sunset Avenue,Plot-202,Commercial,8 Marla,Apartment,2,201");
         var bytes = Encoding.UTF8.GetBytes(builder.ToString());
         return File(bytes, "text/csv", "InventoryTemplate.csv");
     }
@@ -500,6 +507,13 @@ public class InventoryController : Controller
         {
             return NotFound();
         }
+
+        if (string.IsNullOrWhiteSpace(inventoryDetail.Project)) ModelState.AddModelError("Project", "Project is required.");
+        if (string.IsNullOrWhiteSpace(inventoryDetail.SubProject)) ModelState.AddModelError("SubProject", "Sub Project is required.");
+        if (string.IsNullOrWhiteSpace(inventoryDetail.Sector)) ModelState.AddModelError("Sector", "Sector is required.");
+        if (string.IsNullOrWhiteSpace(inventoryDetail.Block)) ModelState.AddModelError("Block", "Block is required.");
+        if (string.IsNullOrWhiteSpace(inventoryDetail.Street)) ModelState.AddModelError("Street", "Street is required.");
+        if (string.IsNullOrWhiteSpace(inventoryDetail.PlotNo)) ModelState.AddModelError("PlotNo", "Plot No is required.");
 
         if (ModelState.IsValid)
         {
