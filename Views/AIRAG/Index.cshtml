@@ -868,9 +868,6 @@
         if (!collapseElement) return;
         
         const resultId = collapseElement.id;
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/8d743264-53ef-4c21-b9f1-07472dc473cf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AIRAG:848',message:'resultId found',data:{resultId:resultId,hasId:!!resultId,idType:typeof resultId},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
         
         // Find tab panes first, then find canvas elements inside them
         // This avoids ID conflicts (tab pane and canvas both have similar IDs)
@@ -880,10 +877,6 @@
         // Find canvas elements inside the tab panes
         const graphCanvas = graphTabPane ? graphTabPane.querySelector('canvas') : null;
         const chartCanvas = chartTabPane ? chartTabPane.querySelector('canvas') : null;
-        
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/8d743264-53ef-4c21-b9f1-07472dc473cf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AIRAG:851',message:'canvas elements found',data:{graphCanvas:graphCanvas?{tagName:graphCanvas.tagName,nodeName:graphCanvas.nodeName,constructor:graphCanvas.constructor.name,hasGetContext:typeof graphCanvas.getContext,id:graphCanvas.id,isCanvas:graphCanvas instanceof HTMLCanvasElement}:null,chartCanvas:chartCanvas?{tagName:chartCanvas.tagName,nodeName:chartCanvas.nodeName,constructor:chartCanvas.constructor.name,hasGetContext:typeof chartCanvas.getContext,id:chartCanvas.id,isCanvas:chartCanvas instanceof HTMLCanvasElement}:null,graphTabPane:graphTabPane?{id:graphTabPane.id}:null,chartTabPane:chartTabPane?{id:chartTabPane.id}:null},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         
         if (!graphCanvas || !chartCanvas) return; // Canvas elements not found
         
@@ -895,16 +888,10 @@
         
         // Helper function to ensure canvas is ready for Chart.js
         const ensureCanvasReady = async (canvas, tabPane) => {
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/8d743264-53ef-4c21-b9f1-07472dc473cf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AIRAG:865',message:'ensureCanvasReady entry',data:{canvas:canvas?{tagName:canvas.tagName,nodeName:canvas.nodeName,constructor:canvas.constructor.name,hasGetContext:typeof canvas.getContext,id:canvas.id,type:typeof canvas,isCanvas:canvas instanceof HTMLCanvasElement}:null,tabPane:tabPane?{id:tabPane.id,className:tabPane.className}:null},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
             if (!canvas) return false;
             
             // Verify it's actually a canvas element
             if (!(canvas instanceof HTMLCanvasElement)) {
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/8d743264-53ef-4c21-b9f1-07472dc473cf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AIRAG:870',message:'canvas is not HTMLCanvasElement',data:{canvas:canvas?{tagName:canvas.tagName,constructor:canvas.constructor.name}:null},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
                 return false;
             }
             
@@ -950,9 +937,6 @@
             
             // Try to get context - this is what Chart.js needs
             // If we can't get context, Chart.js won't be able to either
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/8d743264-53ef-4c21-b9f1-07472dc473cf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AIRAG:898',message:'before getContext call',data:{canvas:canvas?{tagName:canvas.tagName,nodeName:canvas.nodeName,constructor:canvas.constructor.name,hasGetContext:typeof canvas.getContext,id:canvas.id,isCanvas:canvas instanceof HTMLCanvasElement}:null},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
             try {
                 const ctx = canvas.getContext('2d');
                 if (!ctx) {
