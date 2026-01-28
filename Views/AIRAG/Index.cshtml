@@ -1,0 +1,290 @@
+@{
+    ViewData["Title"] = "AI RAG - Database Assistant";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>AI Database Assistant</h2>
+                <button class="btn btn-secondary" onclick="clearChat()">
+                    <i class="bi bi-trash"></i> Clear Chat
+                </button>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <!-- Chat Messages Container -->
+                    <div id="chatMessages" class="chat-container mb-3" style="height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 1rem; background-color: #f8f9fa;">
+                        <div class="chat-message assistant-message mb-3">
+                            <div class="d-flex align-items-start">
+                                <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                    AI
+                                </div>
+                                <div class="message-content bg-white p-3 rounded shadow-sm" style="max-width: 80%;">
+                                    <p class="mb-0">Hello! I'm your AI database assistant. I can help you query the Property Management System database. Try asking questions like:</p>
+                                    <ul class="mb-0 mt-2">
+                                        <li>"How many plots are available in Road 1 of Block A?"</li>
+                                        <li>"Show me all allotted plots"</li>
+                                        <li>"How many customers do we have?"</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <small class="text-muted ms-5">Just now</small>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="input-group">
+                        <input type="text" id="chatInput" class="form-control" placeholder="Ask a question about the database..." onkeypress="handleKeyPress(event)">
+                        <button class="btn btn-primary" onclick="sendMessage()" id="sendButton">
+                            <i class="bi bi-send"></i> Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .chat-container {
+        scroll-behavior: smooth;
+    }
+
+    .chat-message {
+        animation: fadeIn 0.3s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .user-message .message-content {
+        background-color: #007bff !important;
+        color: white;
+        margin-left: auto;
+    }
+
+    .assistant-message .message-content {
+        background-color: white;
+    }
+
+    .query-result-table {
+        margin-top: 10px;
+        font-size: 0.875rem;
+    }
+
+    .query-result-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .query-result-table th,
+    .query-result-table td {
+        border: 1px solid #dee2e6;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .query-result-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .query-result-table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .sql-query-display {
+        background-color: #f1f3f5;
+        border-left: 3px solid #007bff;
+        padding: 8px;
+        margin-top: 8px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.8rem;
+        border-radius: 4px;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<script>
+    let conversationHistory = [];
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+
+        // Disable input and button
+        input.disabled = true;
+        const sendButton = document.getElementById('sendButton');
+        sendButton.disabled = true;
+        sendButton.innerHTML = '<span class="loading-spinner"></span> Sending...';
+
+        // Add user message to chat
+        addMessageToChat('user', message);
+        input.value = '';
+
+        try {
+            const response = await fetch('/AIRAG/Chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    conversationHistory: conversationHistory
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                addMessageToChat('assistant', data.message.content, data.message.queryResult);
+                // Update conversation history
+                conversationHistory.push({
+                    role: 'user',
+                    content: message
+                });
+                conversationHistory.push({
+                    role: 'assistant',
+                    content: data.message.content
+                });
+            } else {
+                addMessageToChat('assistant', `Error: ${data.error || 'Unknown error occurred'}`);
+            }
+        } catch (error) {
+            addMessageToChat('assistant', `Error: ${error.message}`);
+        } finally {
+            // Re-enable input and button
+            input.disabled = false;
+            sendButton.disabled = false;
+            sendButton.innerHTML = '<i class="bi bi-send"></i> Send';
+            input.focus();
+        }
+    }
+
+    function addMessageToChat(role, content, queryResult = null) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${role}-message mb-3`;
+
+        const avatarBg = role === 'user' ? 'bg-primary' : 'bg-success';
+        const avatarText = role === 'user' ? 'You' : 'AI';
+
+        let messageHtml = `
+            <div class="d-flex align-items-start">
+                <div class="avatar ${avatarBg} text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                    ${avatarText}
+                </div>
+                <div class="message-content ${role === 'user' ? 'bg-primary text-white' : 'bg-white'} p-3 rounded shadow-sm" style="max-width: 80%; ${role === 'user' ? 'margin-left: auto;' : ''}">
+                    <p class="mb-0">${escapeHtml(content)}</p>
+        `;
+
+        if (queryResult) {
+            if (queryResult.generatedQuery) {
+                messageHtml += `
+                    <div class="sql-query-display mt-2">
+                        <strong>Generated SQL:</strong><br>
+                        <code>${escapeHtml(queryResult.generatedQuery)}</code>
+                    </div>
+                `;
+            }
+
+            if (queryResult.success && queryResult.rows && queryResult.rows.length > 0) {
+                messageHtml += '<div class="query-result-table mt-3">';
+                messageHtml += '<table class="table table-sm table-bordered">';
+                
+                // Header
+                messageHtml += '<thead><tr>';
+                queryResult.columns.forEach(col => {
+                    messageHtml += `<th>${escapeHtml(col)}</th>`;
+                });
+                messageHtml += '</tr></thead>';
+                
+                // Rows
+                messageHtml += '<tbody>';
+                queryResult.rows.forEach(row => {
+                    messageHtml += '<tr>';
+                    queryResult.columns.forEach(col => {
+                        const value = row[col] !== null && row[col] !== undefined ? row[col] : '';
+                        messageHtml += `<td>${escapeHtml(String(value))}</td>`;
+                    });
+                    messageHtml += '</tr>';
+                });
+                messageHtml += '</tbody>';
+                
+                messageHtml += '</table></div>';
+            } else if (queryResult.error) {
+                messageHtml += `<div class="alert alert-danger mt-2 mb-0">${escapeHtml(queryResult.error)}</div>`;
+            }
+        }
+
+        messageHtml += `
+                </div>
+            </div>
+            <small class="text-muted ms-5">${new Date().toLocaleTimeString()}</small>
+        `;
+
+        messageDiv.innerHTML = messageHtml;
+        chatMessages.appendChild(messageDiv);
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function clearChat() {
+        if (confirm('Are you sure you want to clear the chat history?')) {
+            conversationHistory = [];
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = `
+                <div class="chat-message assistant-message mb-3">
+                    <div class="d-flex align-items-start">
+                        <div class="avatar bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                            AI
+                        </div>
+                        <div class="message-content bg-white p-3 rounded shadow-sm" style="max-width: 80%;">
+                            <p class="mb-0">Chat cleared. How can I help you today?</p>
+                        </div>
+                    </div>
+                    <small class="text-muted ms-5">Just now</small>
+                </div>
+            `;
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+</script>

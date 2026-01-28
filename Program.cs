@@ -18,6 +18,10 @@ builder.Services.AddScoped<AuditLogService>();
 // Register CustomerAnalyticsService
 builder.Services.AddScoped<CustomerAnalyticsService>();
 
+// Register AI RAG Services
+builder.Services.AddHttpClient<GroqAIService>();
+builder.Services.AddScoped<SQLQueryService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

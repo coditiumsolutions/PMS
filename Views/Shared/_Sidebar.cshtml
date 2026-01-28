@@ -100,6 +100,13 @@
             <li><a asp-controller="Setup" asp-action="Users">Users</a></li>
         </ul>
     }
+    else if (ViewBag.ActiveModule == "AIRAG")
+    {
+        <h3 class="sidebar-heading">AI RAG</h3>
+        <ul class="sidebar-nav">
+            <li><a asp-controller="AIRAG" asp-action="Index">Database Assistant</a></li>
+        </ul>
+    }
     else
     {
         <ul class="sidebar-nav">
@@ -111,6 +118,7 @@
             <li><a asp-controller="Transfers" asp-action="Index">Transfers</a></li>
             <li><a asp-controller="Sales" asp-action="Index">Sales</a></li>
             <li><a asp-controller="Setup" asp-action="Index">Setup</a></li>
+            <li><a asp-controller="AIRAG" asp-action="Index">AI RAG</a></li>
         </ul>
     }
 </aside>
