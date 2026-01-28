@@ -15,7 +15,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <!-- Chat Messages Container -->
-                    <div id="chatMessages" class="chat-container mb-3" style="height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 1rem; background-color: #f8f9fa;">
+                    <div id="chatMessages" class="chat-container mb-3" style="height: 500px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 1.25rem; background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);">
                         <div class="chat-message assistant-message mb-3">
                             <div class="d-flex align-items-start">
                                 <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">
@@ -67,14 +67,46 @@
         }
     }
 
+    .user-message {
+        flex-direction: row-reverse;
+    }
+
     .user-message .message-content {
-        background-color: #007bff !important;
-        color: white;
+        background: linear-gradient(135deg, #0056b3 0%, #007bff 100%);
+        color: #ffffff !important;
         margin-left: auto;
+        margin-right: 0;
+        border: 1px solid #0056b3;
+    }
+
+    .user-message .message-content * {
+        color: #ffffff !important;
+    }
+
+    .user-message .message-content p,
+    .user-message .message-content strong,
+    .user-message .message-content span,
+    .user-message .message-content div {
+        color: #ffffff !important;
     }
 
     .assistant-message .message-content {
-        background-color: white;
+        background-color: #ffffff;
+        color: #212529;
+        border: 1px solid #e9ecef;
+    }
+
+    .message-content {
+        word-wrap: break-word;
+        line-height: 1.6;
+    }
+
+    .message-content p {
+        margin-bottom: 0.5rem;
+    }
+
+    .message-content p:last-child {
+        margin-bottom: 0;
     }
 
     .query-result-table {
@@ -113,6 +145,20 @@
         border-radius: 4px;
     }
 
+    .user-msg .sql-query-display {
+        background-color: rgba(255, 255, 255, 0.15);
+        border-left-color: #ffffff;
+        color: #ffffff !important;
+    }
+
+    .user-msg .sql-query-display code {
+        color: #ffffff !important;
+    }
+
+    .user-msg .sql-query-display strong {
+        color: #ffffff !important;
+    }
+
     .loading-spinner {
         display: inline-block;
         width: 16px;
@@ -126,6 +172,48 @@
     @@keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
+    }
+
+    .query-result-collapsible {
+        margin-top: 10px;
+    }
+
+    .user-msg .query-result-collapsible button {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: #ffffff !important;
+    }
+
+    .user-msg .query-result-collapsible button:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        color: #ffffff !important;
+    }
+
+    .user-msg .query-result-collapsible button strong {
+        color: #ffffff !important;
+    }
+
+    .query-result-collapsible button {
+        font-size: 0.875rem;
+    }
+
+    .query-result-collapsible .collapse-icon {
+        transition: transform 0.3s ease;
+        display: inline-block;
+    }
+
+    .query-result-collapsible button[aria-expanded="true"] .collapse-icon {
+        transform: rotate(180deg);
+    }
+
+    .query-result-collapsible .card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+    }
+
+    .query-result-collapsible .table {
+        margin-bottom: 0;
     }
 </style>
 
@@ -200,14 +288,17 @@
 
         const avatarBg = role === 'user' ? 'bg-primary' : 'bg-success';
         const avatarText = role === 'user' ? 'You' : 'AI';
+        const isUser = role === 'user';
 
         let messageHtml = `
-            <div class="d-flex align-items-start">
-                <div class="avatar ${avatarBg} text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.875rem;">
+            <div class="d-flex align-items-start ${isUser ? 'justify-content-end' : ''}">
+                ${!isUser ? `<div class="avatar ${avatarBg} text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px; font-size: 0.875rem; flex-shrink: 0;">
                     ${avatarText}
-                </div>
-                <div class="message-content ${role === 'user' ? 'bg-primary text-white' : 'bg-white'} p-3 rounded shadow-sm" style="max-width: 80%; ${role === 'user' ? 'margin-left: auto;' : ''}">
-                    <p class="mb-0">${escapeHtml(content)}</p>
+                </div>` : ''}
+                <div class="message-content ${isUser ? 'user-msg' : 'assistant-msg'} p-3 rounded shadow-sm" style="max-width: 75%;">
+                    <p class="mb-0" style="color: ${isUser ? '#ffffff' : '#212529'}; font-weight: ${isUser ? '500' : '400'};">
+                        ${escapeHtml(content)}
+                    </p>
         `;
 
         if (queryResult) {
@@ -221,8 +312,17 @@
             }
 
             if (queryResult.success && queryResult.rows && queryResult.rows.length > 0) {
-                messageHtml += '<div class="query-result-table mt-3">';
-                messageHtml += '<table class="table table-sm table-bordered">';
+                const resultId = 'result-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                messageHtml += `
+                    <div class="query-result-collapsible mt-3">
+                        <button class="btn btn-sm btn-outline-secondary w-100 text-start d-flex align-items-center justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#${resultId}" aria-expanded="false" aria-controls="${resultId}">
+                            <span><i class="bi bi-chevron-down me-2 collapse-icon"></i><strong>View Query Results</strong> (${queryResult.rows.length} row${queryResult.rows.length !== 1 ? 's' : ''})</span>
+                        </button>
+                        <div class="collapse mt-2" id="${resultId}">
+                            <div class="card card-body p-0">
+                                <div class="query-result-table">
+                                    <table class="table table-sm table-bordered mb-0">
+                `;
                 
                 // Header
                 messageHtml += '<thead><tr>';
@@ -243,7 +343,13 @@
                 });
                 messageHtml += '</tbody>';
                 
-                messageHtml += '</table></div>';
+                messageHtml += `
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
             } else if (queryResult.error) {
                 messageHtml += `<div class="alert alert-danger mt-2 mb-0">${escapeHtml(queryResult.error)}</div>`;
             }
@@ -251,12 +357,41 @@
 
         messageHtml += `
                 </div>
+                ${isUser ? `<div class="avatar ${avatarBg} text-white rounded-circle d-flex align-items-center justify-content-center ms-2" style="width: 36px; height: 36px; font-size: 0.875rem; flex-shrink: 0;">
+                    ${avatarText}
+                </div>` : ''}
             </div>
-            <small class="text-muted ms-5">${new Date().toLocaleTimeString()}</small>
+            <small class="text-muted ${isUser ? 'text-end me-5' : 'ms-5'}" style="display: block; margin-top: 4px;">${new Date().toLocaleTimeString()}</small>
         `;
 
         messageDiv.innerHTML = messageHtml;
         chatMessages.appendChild(messageDiv);
+        
+        // Initialize Bootstrap collapse for the new collapsible section
+        if (queryResult && queryResult.success && queryResult.rows && queryResult.rows.length > 0) {
+            // Wait for Bootstrap to be available
+            setTimeout(() => {
+                if (typeof bootstrap !== 'undefined') {
+                    const collapseElement = messageDiv.querySelector('.collapse');
+                    const toggleButton = messageDiv.querySelector('[data-bs-toggle="collapse"]');
+                    
+                    if (collapseElement && toggleButton) {
+                        // Update icon rotation on collapse events
+                        collapseElement.addEventListener('show.bs.collapse', function() {
+                            const icon = toggleButton.querySelector('.collapse-icon');
+                            if (icon) icon.style.transform = 'rotate(180deg)';
+                            toggleButton.setAttribute('aria-expanded', 'true');
+                        });
+                        
+                        collapseElement.addEventListener('hide.bs.collapse', function() {
+                            const icon = toggleButton.querySelector('.collapse-icon');
+                            if (icon) icon.style.transform = 'rotate(0deg)';
+                            toggleButton.setAttribute('aria-expanded', 'false');
+                        });
+                    }
+                }
+            }, 100);
+        }
         
         // Scroll to bottom
         chatMessages.scrollTop = chatMessages.scrollHeight;

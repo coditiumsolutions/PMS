@@ -227,20 +227,31 @@ Return ONLY a valid SQL SELECT query using EXACT table and column names from the
                     };
 
                     // Step 4: Use AI to interpret and summarize the results in natural language
+                    var columnsJson = JsonSerializer.Serialize(queryResult.Columns);
+                    var rowsJson = JsonSerializer.Serialize(queryResult.Rows);
+                    
                     var interpretationPrompt = $@"You are a helpful AI assistant for a Property Management System. 
 A user asked a question, you generated and executed a SQL query, and here are the results.
-Summarize these results in 1-2 natural, friendly lines that directly answer the user's question.
+Provide a natural, friendly response that directly answers the user's question using the actual data from the results.
 
 USER'S QUESTION: ""{request.Message}""
-SQL QUERY EXECUTED: ""{sqlQuery}""
-QUERY RESULTS: 
-{JsonSerializer.Serialize(queryResult.Rows)}
+QUERY COLUMNS: {columnsJson}
+QUERY RESULTS (as JSON array): {rowsJson}
 
 INSTRUCTIONS:
-1. Provide a direct, concise answer to the user's question based on the results.
-2. Keep it to 1-2 lines.
-3. Be friendly and professional.
-4. Do NOT mention technical details like table names or SQL unless specifically asked.";
+1. Read the query results and extract the actual values from the data.
+2. Provide a direct answer using the actual values from the results.
+3. Format it naturally, like: ""We have 1 customer with NIC number: 42401-2381527-5"" or ""Found 5 available plots in Sector A"".
+4. Include specific values from the results in your response.
+5. Keep it concise (1-2 sentences).
+6. Be friendly and professional.
+7. Do NOT mention technical details like table names, SQL, or column names unless specifically asked.
+8. If the result is a count, mention the count and any relevant details from the query.
+
+Example responses:
+- For COUNT query with value 1: ""We have 1 customer with NIC number: 42401-2381527-5""
+- For COUNT query with value 5: ""There are 5 available plots in Sector A""
+- For data rows: ""Found 3 customers matching your criteria: [list key details]""";
 
                     response.Content = await _groqService.GenerateResponseAsync(interpretationPrompt, "", conversationHistory);
                 }
