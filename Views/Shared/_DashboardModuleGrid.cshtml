@@ -1,0 +1,42 @@
+@*
+    Modern, responsive, icons-based dashboard grid for Property Management System.
+    Uses Bootstrap 5 + Bootstrap Icons. Load bootstrap-icons.min.css in the consuming view or layout.
+    Modules: Customers, Payments, Challans, Property, Transfer, Merger, Refund, Waiver,
+             Billing Management, AI Reports, Warehouse.
+*@
+@{
+    var modules = new[]
+    {
+        new { Name = "Customers", Icon = "bi-people-fill", Description = "Manage customer records, profiles, and history", Link = Url.Action("Index", "Customers"), Accent = "pms-accent-blue" },
+        new { Name = "Payments", Icon = "bi-credit-card-fill", Description = "Process payments, view history, and manage collections", Link = Url.Action("Index", "Payments"), Accent = "pms-accent-teal" },
+        new { Name = "Challans", Icon = "bi-file-earmark-text-fill", Description = "Create and manage deposit challans and verification", Link = Url.Action("AllChallans", "Payments"), Accent = "pms-accent-green" },
+        new { Name = "Property", Icon = "bi-building", Description = "Property inventory, plots, allotment, and availability", Link = Url.Action("Index", "Plots"), Accent = "pms-accent-blue" },
+        new { Name = "Transfer", Icon = "bi-arrow-left-right", Description = "Property transfers, buyer-seller workflows, and NOCs", Link = Url.Action("Index", "Transfers"), Accent = "pms-accent-orange" },
+        new { Name = "Merger", Icon = "bi-diagram-3-fill", Description = "Plot merger and split operations", Link = Url.Action("Index", "Transfers"), Accent = "pms-accent-teal" },
+        new { Name = "Refund", Icon = "bi-currency-exchange", Description = "Refund requests and processing", Link = Url.Action("Index", "Payments"), Accent = "pms-accent-green" },
+        new { Name = "Waiver", Icon = "bi-hand-thumbs-up-fill", Description = "Waiver approvals and fee exemptions", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-orange" },
+        new { Name = "Billing Management", Icon = "bi-receipt", Description = "Invoices, dues, and payment schedules", Link = Url.Action("Index", "Schedules"), Accent = "pms-accent-blue" },
+        new { Name = "AI Reports", Icon = "bi-cpu-fill", Description = "Analytics, forecasts, and smart insights", Link = Url.Action("Index", "Sales"), Accent = "pms-accent-teal" },
+        new { Name = "Warehouse", Icon = "bi-box-seam-fill", Description = "Inventory and warehouse management", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-green" }
+    };
+}
+<div class="pms-module-grid-container bg-light rounded-3 p-4">
+    <div class="row g-3 g-md-4">
+        @foreach (var m in modules)
+        {
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                <a href="@(m.Link ?? "#")" class="pms-module-tile-link text-decoration-none">
+                    <div class="pms-module-tile card border-0 shadow-sm h-100 @m.Accent" title="@m.Description">
+                        <div class="card-body text-center d-flex flex-column justify-content-center py-4 px-3">
+                            <div class="pms-module-icon mb-3">
+                                <i class="bi @m.Icon" aria-hidden="true"></i>
+                            </div>
+                            <h5 class="pms-module-name mb-0">@m.Name</h5>
+                            <p class="pms-module-desc small text-muted mt-1 mb-0 d-none d-md-block">@m.Description</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>

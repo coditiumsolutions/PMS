@@ -45,20 +45,21 @@
                     <tr>
                         <th>Deposit Type</th>
                         <td>@Model.Challan.deposittype</td>
-                        <th>Verified By</th>
-                        <td>@Model.Challan.verifiedby</td>
+                        <th>Amount Paid</th>
+                        <td>@(Model.Challan.amountpaid.HasValue ? Model.Challan.amountpaid.Value.ToString("N0") : "N/A")</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Inline Add Payment Form -->
-    <div class="card shadow-sm mb-3">
-        <div class="card-header">
+    <!-- Add Payment: button shows form; form hides after save -->
+    <div class="card shadow-sm mb-3" id="addPaymentCard">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <strong>Add Payment</strong>
+            <button type="button" id="showAddPaymentBtn" class="btn btn-primary btn-sm d-none">Add Payment</button>
         </div>
-        <div class="card-body p-0">
+        <div id="addPaymentFormSection" class="card-body p-0">
             <form id="addPaymentForm" asp-action="AddPaymentInline" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="challanId" value="@Model.Challan.uid" />
@@ -153,6 +154,22 @@
             const form = document.getElementById('addPaymentForm');
             const errorSpan = document.getElementById('addPaymentError');
             const tableContainer = document.getElementById('paymentsTableContainer');
+            const formSection = document.getElementById('addPaymentFormSection');
+            const showBtn = document.getElementById('showAddPaymentBtn');
+
+            function hideAddPaymentForm() {
+                if (formSection) formSection.classList.add('d-none');
+                if (showBtn) showBtn.classList.remove('d-none');
+            }
+
+            function showAddPaymentForm() {
+                if (formSection) formSection.classList.remove('d-none');
+                if (showBtn) showBtn.classList.add('d-none');
+            }
+
+            if (showBtn) {
+                showBtn.addEventListener('click', showAddPaymentForm);
+            }
 
             if (!form || !tableContainer) {
                 return;
@@ -189,6 +206,7 @@
                     const html = await response.text();
                     tableContainer.innerHTML = html;
                     form.reset();
+                    hideAddPaymentForm();
                 } catch (err) {
                     errorSpan.textContent = 'Unexpected error while saving payment.';
                     errorSpan.style.display = 'inline';

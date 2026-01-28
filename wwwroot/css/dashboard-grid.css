@@ -1,0 +1,127 @@
+/**
+ * PMS Dashboard Module Grid
+ * Modern, responsive, icons-based tiles for Property Management System.
+ * Use with Bootstrap 5 + Bootstrap Icons.
+ */
+
+/* Grid container: light background, spacing */
+.pms-module-grid-container {
+    min-height: 200px;
+}
+
+/* Tile link: no underline, full card clickable */
+.pms-module-tile-link {
+    display: block;
+    color: inherit;
+}
+
+.pms-module-tile-link:hover {
+    color: inherit;
+}
+
+/* Card: rounded, shadow, hover scale + highlight */
+.pms-module-tile {
+    border-radius: 0.75rem !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+    background: #fff;
+}
+
+.pms-module-tile:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Icon: large, professional */
+.pms-module-icon {
+    font-size: 3rem;
+    line-height: 1;
+    opacity: 0.95;
+}
+
+.pms-module-tile:hover .pms-module-icon {
+    opacity: 1;
+}
+
+/* Module name */
+.pms-module-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* Description: visible on hover on desktop (already in markup for larger screens) */
+.pms-module-desc {
+    font-size: 0.8rem;
+    line-height: 1.35;
+    max-height: 2.7em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* Accent variants: left border + light tint + colorful icon */
+.pms-module-tile.pms-accent-blue {
+    border-left: 4px solid #0d6efd;
+}
+
+.pms-module-tile.pms-accent-blue .pms-module-icon {
+    color: #0d6efd;
+}
+
+.pms-module-tile.pms-accent-blue:hover {
+    background-color: rgba(13, 110, 253, 0.06);
+}
+
+.pms-module-tile.pms-accent-teal {
+    border-left: 4px solid #20c997;
+}
+
+.pms-module-tile.pms-accent-teal .pms-module-icon {
+    color: #20c997;
+}
+
+.pms-module-tile.pms-accent-teal:hover {
+    background-color: rgba(32, 201, 151, 0.06);
+}
+
+.pms-module-tile.pms-accent-green {
+    border-left: 4px solid #198754;
+}
+
+.pms-module-tile.pms-accent-green .pms-module-icon {
+    color: #198754;
+}
+
+.pms-module-tile.pms-accent-green:hover {
+    background-color: rgba(25, 135, 84, 0.06);
+}
+
+.pms-module-tile.pms-accent-orange {
+    border-left: 4px solid #fd7e14;
+}
+
+.pms-module-tile.pms-accent-orange .pms-module-icon {
+    color: #fd7e14;
+}
+
+.pms-module-tile.pms-accent-orange:hover {
+    background-color: rgba(253, 126, 20, 0.06);
+}
+
+/* Responsive: smaller icon on mobile */
+@media (max-width: 575.98px) {
+    .pms-module-icon {
+        font-size: 2.25rem;
+    }
+
+    .pms-module-name {
+        font-size: 1rem;
+    }
+
+    .pms-module-tile .card-body {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+}
