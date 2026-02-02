@@ -5,11 +5,11 @@ $ErrorActionPreference = "Stop"
 
 # Configuration
 $ProjectPath = "D:\PMS_Coditium"
-$DeployPath = "D:\PMSDeploy"
+$DeployPath = "D:\PMSDeploy1"
 $AppPoolName = "PMSAppPool"
 $SiteName = "PMS"
 $BindingIP = "172.20.228.2"
-$BindingPort = "84"
+$BindingPort = "86"
 
 Write-Host "=== PMS IIS Deployment ===" -ForegroundColor Cyan
 

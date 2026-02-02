@@ -76,31 +76,7 @@
         </div>
     </div>
 
-    <!-- 1. Demographic Analysis -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Gender Distribution</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="genderChart" height="250"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Top Cities</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="cityChart" height="250"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. Registration Analysis -->
+    <!-- Registration Analysis -->
     <div class="row g-3 mb-4">
         <div class="col-md-6">
             <div class="card shadow-sm">
@@ -280,87 +256,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
         // Chart data from server
-        const genderData = {
-            labels: @Html.Raw(Json.Serialize(Model.DemographicAnalysis.GenderDistribution.Select(g => g.Gender))),
-            data: @Html.Raw(Json.Serialize(Model.DemographicAnalysis.GenderDistribution.Select(g => g.Count)))
-        };
-
-        const cityData = {
-            labels: @Html.Raw(Json.Serialize(Model.DemographicAnalysis.CityDistribution.Take(10).Select(c => c.City))),
-            data: @Html.Raw(Json.Serialize(Model.DemographicAnalysis.CityDistribution.Take(10).Select(c => c.Count)))
-        };
-
         const dailyRegistrationsData = {
             labels: @Html.Raw(Json.Serialize(Model.RegistrationAnalysis.DailyRegistrations.Select(d => d.DateLabel))),
             data: @Html.Raw(Json.Serialize(Model.RegistrationAnalysis.DailyRegistrations.Select(d => d.Count)))
         };
 
         // Initialize Charts
-        let genderChart, cityChart, dailyRegistrationsChart;
+        let dailyRegistrationsChart;
 
         function initCharts() {
-            // Gender Chart
-            const genderCtx = document.getElementById('genderChart');
-            if (genderCtx) {
-                genderChart = new Chart(genderCtx, {
-                    type: 'pie',
-                    data: {
-                        labels: genderData.labels,
-                        datasets: [{
-                            data: genderData.data,
-                            backgroundColor: [
-                                'rgba(54, 162, 235, 0.8)',
-                                'rgba(255, 99, 132, 0.8)',
-                                'rgba(255, 206, 86, 0.8)',
-                                'rgba(75, 192, 192, 0.8)'
-                            ],
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }
-                });
-            }
-
-            // City Chart
-            const cityCtx = document.getElementById('cityChart');
-            if (cityCtx) {
-                cityChart = new Chart(cityCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: cityData.labels,
-                        datasets: [{
-                            label: 'Customers',
-                            data: cityData.data,
-                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-            }
-
             // Daily Registrations Chart
             const dailyCtx = document.getElementById('dailyRegistrationsChart');
             if (dailyCtx) {
@@ -454,19 +358,6 @@
             document.querySelector('.card:has(h3.text-primary)').querySelector('h3').textContent = data.kPIs.totalCustomers;
             document.querySelector('.card:has(h3.text-success)').querySelector('h3').textContent = data.kPIs.newThisMonth;
             // ... update other KPIs as needed
-
-            // Update charts
-            if (genderChart) {
-                genderChart.data.labels = data.demographicAnalysis.genderDistribution.map(g => g.gender);
-                genderChart.data.datasets[0].data = data.demographicAnalysis.genderDistribution.map(g => g.count);
-                genderChart.update();
-            }
-
-            if (cityChart) {
-                cityChart.data.labels = data.demographicAnalysis.cityDistribution.slice(0, 10).map(c => c.city);
-                cityChart.data.datasets[0].data = data.demographicAnalysis.cityDistribution.slice(0, 10).map(c => c.count);
-                cityChart.update();
-            }
 
             // Update other charts similarly...
             // For simplicity, you might want to reload the page instead
