@@ -80,6 +80,48 @@
                                     <th class="bg-light">@Html.DisplayNameFor(model => model.CreatedBy)</th>
                                     <td>@Html.DisplayFor(model => model.CreatedBy)</td>
                                 </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.PlanNo)</th>
+                                    <td>@Html.DisplayFor(model => model.PlanNo)</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">Dealer</th>
+                                    <td>@(Model.Dealer?.DealerName ?? "—")</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.CustomerImage)</th>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(Model.CustomerImage))
+                                        {
+                                            <img src="@Model.CustomerImage" alt="Customer" class="img-thumbnail" style="max-height: 120px;" />
+                                            <br /><small class="text-muted">@Model.CustomerImage</small>
+                                        }
+                                        else
+                                        { <text>—</text> }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">@Html.DisplayNameFor(model => model.CustomerAttachment)</th>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(Model.CustomerAttachment))
+                                        {
+                                            try
+                                            {
+                                                var paths = System.Text.Json.JsonSerializer.Deserialize<List<string>>(Model.CustomerAttachment);
+                                                if (paths != null && paths.Count > 0)
+                                                {
+                                                    foreach (var p in paths)
+                                                    {
+                                                        <a href="@p" target="_blank" class="d-block">@System.IO.Path.GetFileName(p)</a>
+                                                    }
+                                                }
+                                                else { <text>—</text> }
+                                            }
+                                            catch { @Model.CustomerAttachment }
+                                        }
+                                        else { <text>—</text> }
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

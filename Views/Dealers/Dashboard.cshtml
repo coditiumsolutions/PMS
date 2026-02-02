@@ -1,0 +1,240 @@
+@model PMS.Web.ViewModels.DealerPerformanceViewModel
+@{
+    ViewData["Title"] = "Dealer Performance Dashboard";
+    var k = Model.KPIs;
+    var stats = Model.DealerStats;
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-graph-up-arrow me-2"></i>Dealer Performance Dashboard</h2>
+        <a asp-action="Index" class="btn btn-outline-primary"><i class="bi bi-people me-1"></i> All Dealers</a>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-primary h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Dealers</h6>
+                            <h3 class="mb-0 text-primary">@k.TotalDealers</h3>
+                            <small class="text-muted">@k.ActiveDealers active</small>
+                        </div>
+                        <div class="text-primary" style="font-size: 2rem;"><i class="bi bi-shop"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-success h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Customers Acquired</h6>
+                            <h3 class="mb-0 text-success">@k.TotalCustomersAcquired</h3>
+                            <small class="text-muted">by @k.DealersWithCustomers dealer(s)</small>
+                        </div>
+                        <div class="text-success" style="font-size: 2rem;"><i class="bi bi-people-fill"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-info h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Revenue</h6>
+                            <h3 class="mb-0 text-info">@k.TotalRevenueFromDealers.ToString("N0")</h3>
+                            <small class="text-muted">from dealer customers</small>
+                        </div>
+                        <div class="text-info" style="font-size: 2rem;"><i class="bi bi-currency-dollar"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm border-warning h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Avg Revenue / Dealer</h6>
+                            <h3 class="mb-0 text-warning">@k.AverageRevenuePerDealer.ToString("N0")</h3>
+                            <small class="text-muted">with customers</small>
+                        </div>
+                        <div class="text-warning" style="font-size: 2rem;"><i class="bi bi-bar-chart-fill"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Revenue by Dealer</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" height="280"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Customers Acquired by Dealer</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="customersChart" height="280"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dealer Performance Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Dealer Performance Report</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Dealer</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-end">Customers</th>
+                            <th class="text-end">Payments</th>
+                            <th class="text-end">Revenue</th>
+                            <th>Payment Plans Used</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var d in stats)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@d.DealerName</strong>
+                                    @if (!string.IsNullOrEmpty(d.DealerCode))
+                                    {
+                                        <br /><small class="text-muted">@d.DealerCode</small>
+                                    }
+                                    @if (!string.IsNullOrEmpty(d.CompanyName))
+                                    {
+                                        <br /><small class="text-muted">@d.CompanyName</small>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    @if (d.IsActive)
+                                    { <span class="badge bg-success">Active</span> }
+                                    else
+                                    { <span class="badge bg-secondary">Inactive</span> }
+                                </td>
+                                <td class="text-end">@d.CustomersAcquired</td>
+                                <td class="text-end">@d.PaymentCount</td>
+                                <td class="text-end fw-semibold">@d.TotalRevenue.ToString("N0")</td>
+                                <td>
+                                    @if (d.PlanUsage.Any())
+                                    {
+                                        <ul class="list-unstyled mb-0 small">
+                                            @foreach (var plan in d.PlanUsage.Take(5))
+                                            {
+                                                <li><span class="text-primary">@plan.PlanNo</span>: @plan.CustomerCount customer(s), @plan.Revenue.ToString("N0") revenue</li>
+                                            }
+                                            @if (d.PlanUsage.Count > 5)
+                                            {
+                                                <li class="text-muted">+@(d.PlanUsage.Count - 5) more plan(s)</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <a asp-action="Details" asp-route-id="@d.DealerID" class="btn btn-sm btn-outline-info">Details</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @if (!stats.Any())
+    {
+        <div class="alert alert-info mt-3">No dealers found. <a asp-action="Create">Add a dealer</a> to start tracking performance.</div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dealerNames = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(stats.Select(d => d.DealerName).ToArray()));
+            const revenues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(stats.Select(d => (double)d.TotalRevenue).ToArray()));
+            const customers = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(stats.Select(d => d.CustomersAcquired).ToArray()));
+
+            if (document.getElementById('revenueChart') && dealerNames.length > 0) {
+                new Chart(document.getElementById('revenueChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: dealerNames,
+                        datasets: [{
+                            label: 'Revenue',
+                            data: revenues,
+                            backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                            borderColor: 'rgb(13, 110, 253)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        scales: {
+                            x: { beginAtZero: true }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('customersChart') && dealerNames.length > 0) {
+                new Chart(document.getElementById('customersChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: dealerNames,
+                        datasets: [{
+                            label: 'Customers',
+                            data: customers,
+                            backgroundColor: 'rgba(25, 135, 84, 0.7)',
+                            borderColor: 'rgb(25, 135, 84)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        scales: {
+                            x: { beginAtZero: true }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

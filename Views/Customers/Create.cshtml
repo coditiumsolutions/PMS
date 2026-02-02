@@ -7,7 +7,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-10 col-xl-8">
-            <form asp-action="Create" id="customer-create-form">
+            <form asp-action="Create" id="customer-create-form" enctype="multipart/form-data">
                 @if (!ViewData.ModelState.IsValid)
                 {
                     <div asp-validation-summary="All" class="alert alert-danger" role="alert" id="validationSummary">
@@ -107,6 +107,28 @@
                                                     <option value="Female">Female</option>
                                                 </select>
                                                 <span asp-validation-for="Customer.Gender" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label asp-for="Customer.PlanNo" class="form-label fw-semibold"></label>
+                                                <select asp-for="Customer.PlanNo" class="form-select">
+                                                    <option value="">Select Plan</option>
+                                                    @foreach (var plan in (ViewBag.PlanOptions as IEnumerable<string>) ?? Array.Empty<string>())
+                                                    {
+                                                        <option value="@plan">@plan</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label asp-for="Customer.DealerID" class="form-label fw-semibold"></label>
+                                                <select asp-for="Customer.DealerID" class="form-select">
+                                                    <option value="">Select Dealer</option>
+                                                    @foreach (var d in (ViewBag.DealerOptions as IEnumerable<PMS.Web.Models.Dealer>) ?? Array.Empty<PMS.Web.Models.Dealer>())
+                                                    {
+                                                        <option value="@d.DealerID">@d.DealerName</option>
+                                                    }
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -249,13 +271,32 @@
                                                 }
                                                 <select asp-for="RequestedProperty.ReqCategory" class="form-select">
                                                     <option value="">Select Category</option>
-                                                    @foreach (var category in categoryOptions)
-                                                    {
-                                                        <option value="@category">@category</option>
-                                                    }
+                                                @foreach (var category in categoryOptions)
+                                                {
+                                                    <option value="@category">@category</option>
+                                                }
                                                 </select>
                                                 <span asp-validation-for="RequestedProperty.ReqCategory" class="text-danger"></span>
                                             </div>
+                                        </div>
+                                        <hr class="my-3" />
+                                        <h6 class="text-muted mb-2">Documents</h6>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Customer Image</label>
+                                                <input type="file" name="customerImage" class="form-control" accept="image/*" />
+                                                @if (!string.IsNullOrEmpty(Model.Customer.CustomerImage))
+                                                {
+                                                    <small class="text-muted">Current: @Model.Customer.CustomerImage</small>
+                                                }
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Attachments (multiple)</label>
+                                                <input type="file" name="attachmentFiles" class="form-control" multiple />
+                                                <small class="text-muted">Multiple files allowed</small>
+                                            </div>
+                                        </div>
+                                        <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label asp-for="RequestedProperty.ReqConstruction" class="form-label fw-semibold"></label>
                                                 <input asp-for="RequestedProperty.ReqConstruction" class="form-control" />

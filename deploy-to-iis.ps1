@@ -145,7 +145,26 @@ try {
 Write-Host "`n[7/7] Starting Application Pool and Website..." -ForegroundColor Yellow
 Start-WebAppPool -Name $AppPoolName
 Start-Sleep -Seconds 2
-Start-Website -Name $SiteName
+try {
+    $siteState = (Get-WebsiteState -Name $SiteName -ErrorAction SilentlyContinue).Value
+    if ($siteState -eq "Started") {
+        Write-Host "   Website already running." -ForegroundColor Gray
+    } else {
+        Start-Website -Name $SiteName
+        Write-Host "   Website started." -ForegroundColor Green
+    }
+} catch {
+    if ($_.Exception.HResult -eq -2147024713) {  # 0x800700B7 = file already exists (binding/site conflict)
+        $siteState = (Get-WebsiteState -Name $SiteName -ErrorAction SilentlyContinue).Value
+        if ($siteState -eq "Started") {
+            Write-Host "   Website is running (start completed despite conflict)." -ForegroundColor Green
+        } else {
+            Write-Host "   Warning: Start-Website failed (0x800700B7). Try starting manually: Start-Website -Name '$SiteName'" -ForegroundColor Yellow
+        }
+    } else {
+        throw
+    }
+}
 Write-Host "   Application started successfully." -ForegroundColor Green
 
 Write-Host "`n=== Deployment Complete ===" -ForegroundColor Cyan

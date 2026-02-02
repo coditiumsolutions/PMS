@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PMS.Web.Data;
@@ -12,25 +13,39 @@ public class CustomersController : Controller
     private readonly PMSDbContext _context;
     private readonly AuditLogService _auditLogService;
     private readonly CustomerAnalyticsService _analyticsService;
+    private readonly IWebHostEnvironment _env;
 
-    public CustomersController(PMSDbContext context, AuditLogService auditLogService, CustomerAnalyticsService analyticsService)
+    public CustomersController(PMSDbContext context, AuditLogService auditLogService, CustomerAnalyticsService analyticsService, IWebHostEnvironment env)
     {
         _context = context;
         _auditLogService = auditLogService;
         _analyticsService = analyticsService;
+        _env = env;
     }
 
     // GET: Customers
     public async Task<IActionResult> Index()
     {
         ViewBag.ActiveModule = "Customers";
-        
-        var analytics = await _analyticsService.GetAnalyticsAsync();
-        var filterOptions = await _analyticsService.GetFilterOptionsAsync();
-        
-        ViewBag.FilterOptions = filterOptions;
-        
-        return View("Analytics", analytics);
+        try
+        {
+            var analytics = await _analyticsService.GetAnalyticsAsync();
+            var filterOptions = await _analyticsService.GetFilterOptionsAsync();
+            ViewBag.FilterOptions = filterOptions;
+            return View("Analytics", analytics);
+        }
+        catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Number == 207 || ex.Number == 208)
+        {
+            // Invalid column name / Invalid object name - migration may not be applied
+            ViewBag.MigrationError = "Database schema may be out of date. Please run: dotnet ef database update";
+            return View("MigrationRequired");
+        }
+        catch (Exception)
+        {
+            if (_env.IsDevelopment())
+                throw;
+            return View("Error", new ErrorViewModel { RequestId = HttpContext.TraceIdentifier });
+        }
     }
 
     // GET: Customers/CustomersDetail
@@ -63,6 +78,7 @@ public class CustomersController : Controller
         }
 
         var customer = await _context.Customers
+            .Include(c => c.Dealer)
             .FirstOrDefaultAsync(m => m.CustomerNo == id);
         if (customer == null)
         {
@@ -84,6 +100,7 @@ public class CustomersController : Controller
         }
 
         var customer = await _context.Customers
+            .Include(c => c.Dealer)
             .FirstOrDefaultAsync(m => m.CustomerNo == id);
         if (customer == null)
         {
@@ -136,8 +153,8 @@ public class CustomersController : Controller
                 }
             };
 
-            // Load dropdown options
-            ViewBag.ProjectOptions = await _context.Projects
+        // Load dropdown options
+        ViewBag.ProjectOptions = await _context.Projects
                 .OrderBy(p => p.ProjectName)
                 .ToListAsync();
 
@@ -154,6 +171,9 @@ public class CustomersController : Controller
                 .Distinct()
                 .OrderBy(v => v)
                 .ToListAsync();
+
+            ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
+            ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
 
             ViewBag.FromRegistration = true;
             ViewBag.RegistrationID = registration.RegID;
@@ -178,6 +198,9 @@ public class CustomersController : Controller
             .Distinct()
             .OrderBy(v => v)
             .ToListAsync();
+
+        ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
 
         // New customer case
         if (string.IsNullOrWhiteSpace(id))
@@ -225,6 +248,9 @@ public class CustomersController : Controller
             .OrderBy(v => v)
             .ToListAsync();
 
+        ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
+
         var model = new CustomerCreateViewModel
         {
             Customer = existingCustomer,
@@ -240,7 +266,7 @@ public class CustomersController : Controller
     // POST: Customers/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(CustomerCreateViewModel model)
+    public async Task<IActionResult> Create(CustomerCreateViewModel model, IFormFile? customerImage, IFormFile[]? attachmentFiles)
     {
         ViewBag.ActiveModule = "Customers";
 
@@ -326,6 +352,16 @@ public class CustomersController : Controller
                     {
                         customer.CustomerNo = await GenerateNewCustomerNoAsync();
                     }
+                }
+
+                // Save uploaded files and set CustomerImage / CustomerAttachment (requires CustomerNo)
+                if (!string.IsNullOrWhiteSpace(customer.CustomerNo))
+                {
+                    SaveCustomerFiles(customer.CustomerNo, customerImage, attachmentFiles, customer);
+                }
+
+                if (isNewCustomer)
+                {
                     _context.Customers.Add(customer);
                 }
                 else
@@ -337,7 +373,6 @@ public class CustomersController : Controller
                     if (existingCustomer == null)
                     {
                         // CRITICAL FIX: If customer doesn't exist, treat this as a CREATE, not UPDATE
-                        // This happens when CustomerNo is pre-filled but customer doesn't exist yet
                         isNewCustomer = true;
                         _context.Customers.Add(customer);
                     }
@@ -358,6 +393,10 @@ public class CustomersController : Controller
                         existingCustomer.PremCountry = customer.PremCountry;
                         existingCustomer.CreationDate = customer.CreationDate;
                         existingCustomer.CreatedBy = customer.CreatedBy;
+                        existingCustomer.PlanNo = customer.PlanNo;
+                        existingCustomer.DealerID = customer.DealerID;
+                        existingCustomer.CustomerImage = customer.CustomerImage ?? existingCustomer.CustomerImage;
+                        existingCustomer.CustomerAttachment = customer.CustomerAttachment ?? existingCustomer.CustomerAttachment;
                     }
                 }
 
@@ -428,6 +467,9 @@ public class CustomersController : Controller
             .OrderBy(v => v)
             .ToListAsync();
 
+        ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
+
         return View(model);
     }
 
@@ -445,13 +487,15 @@ public class CustomersController : Controller
         {
             return NotFound();
         }
+        ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
         return View(customer);
     }
 
     // POST: Customers/Edit/CUST001
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(string id, [Bind("CustomerNo,FullName,FatherName,Cnic,ContactNo,Email,Gender,PresAddress,PremAddress,PresCity,PremCity,PresCountry,PremCountry,CreationDate,CreatedBy")] Customer customer)
+    public async Task<IActionResult> Edit(string id, [Bind("CustomerNo,Uid,FullName,FatherName,Cnic,ContactNo,Email,Gender,PresAddress,PremAddress,PresCity,PremCity,PresCountry,PremCountry,CreationDate,CreatedBy,PlanNo,CustomerImage,CustomerAttachment,DealerID")] Customer customer, IFormFile? customerImage, IFormFile[]? attachmentFiles)
     {
         ViewBag.ActiveModule = "Customers";
         if (id != customer.CustomerNo)
@@ -498,11 +542,17 @@ public class CustomersController : Controller
                 existingCustomer.PremCountry = customer.PremCountry;
                 existingCustomer.CreationDate = customer.CreationDate;
                 existingCustomer.CreatedBy = customer.CreatedBy;
-                
+                existingCustomer.PlanNo = customer.PlanNo;
+                existingCustomer.DealerID = customer.DealerID;
+                existingCustomer.CustomerImage = customer.CustomerImage ?? existingCustomer.CustomerImage;
+                existingCustomer.CustomerAttachment = customer.CustomerAttachment ?? existingCustomer.CustomerAttachment;
+
+                if (customer.CustomerNo != null)
+                    SaveCustomerFiles(customer.CustomerNo, customerImage, attachmentFiles, existingCustomer);
+
                 // Log the update action (within same transaction)
                 _auditLogService.LogCustomerUpdate(oldCustomer, existingCustomer, User?.Identity?.Name);
                 
-                // Save both changes in the same transaction
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
@@ -525,6 +575,8 @@ public class CustomersController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
+        ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
         return View(customer);
     }
 
@@ -533,7 +585,7 @@ public class CustomersController : Controller
     {
         ViewBag.ActiveModule = "Customers";
         ViewBag.UseCustomersEdit = true;
-        ViewBag.ReturnUrl = returnUrl; // Store return URL for navigation
+        ViewBag.ReturnUrl = returnUrl;
         if (id == null)
         {
             return NotFound();
@@ -544,13 +596,15 @@ public class CustomersController : Controller
         {
             return NotFound();
         }
+        ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
         return View("Edit", customer);
     }
 
     // POST: Customers/CustomersEdit/CUST001
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CustomersEdit(string id, [Bind("CustomerNo,FullName,FatherName,Cnic,ContactNo,Email,Gender,PresAddress,PremAddress,PresCity,PremCity,PresCountry,PremCountry,CreationDate,CreatedBy")] Customer customer, string? returnUrl = null)
+    public async Task<IActionResult> CustomersEdit(string id, [Bind("CustomerNo,Uid,FullName,FatherName,Cnic,ContactNo,Email,Gender,PresAddress,PremAddress,PresCity,PremCity,PresCountry,PremCountry,CreationDate,CreatedBy,PlanNo,CustomerImage,CustomerAttachment,DealerID")] Customer customer, IFormFile? customerImage, IFormFile[]? attachmentFiles, string? returnUrl = null)
     {
         ViewBag.ActiveModule = "Customers";
         if (id != customer.CustomerNo)
@@ -582,7 +636,7 @@ public class CustomersController : Controller
                     return NotFound();
                 }
 
-                // Update only the allowed properties (exclude Uid which is identity)
+                // Update only the allowed properties
                 existingCustomer.FullName = customer.FullName;
                 existingCustomer.FatherName = customer.FatherName;
                 existingCustomer.Cnic = customer.Cnic;
@@ -597,11 +651,16 @@ public class CustomersController : Controller
                 existingCustomer.PremCountry = customer.PremCountry;
                 existingCustomer.CreationDate = customer.CreationDate;
                 existingCustomer.CreatedBy = customer.CreatedBy;
-                
-                // Log the update action (within same transaction)
+                existingCustomer.PlanNo = customer.PlanNo;
+                existingCustomer.DealerID = customer.DealerID;
+                existingCustomer.CustomerImage = customer.CustomerImage ?? existingCustomer.CustomerImage;
+                existingCustomer.CustomerAttachment = customer.CustomerAttachment ?? existingCustomer.CustomerAttachment;
+
+                if (customer.CustomerNo != null)
+                    SaveCustomerFiles(customer.CustomerNo, customerImage, attachmentFiles, existingCustomer);
+
                 _auditLogService.LogCustomerUpdate(oldCustomer, existingCustomer, User?.Identity?.Name);
                 
-                // Save both changes in the same transaction
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
@@ -622,14 +681,15 @@ public class CustomersController : Controller
                 await transaction.RollbackAsync();
                 throw;
             }
-            // Redirect based on returnUrl
             if (!string.IsNullOrEmpty(returnUrl) && returnUrl == "CustomersOperation")
             {
                 return RedirectToAction(nameof(CustomersOperation));
             }
             return RedirectToAction(nameof(CustomersDetail));
         }
-        ViewBag.ReturnUrl = returnUrl; // Preserve returnUrl on validation error
+        ViewBag.ReturnUrl = returnUrl;
+        ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
         return View("Edit", customer);
     }
 
@@ -989,5 +1049,48 @@ public class CustomersController : Controller
 
         var nextNumber = maxNumber + 1;
         return $"{prefix}{nextNumber:D4}";
+    }
+
+    private void SaveCustomerFiles(string customerNo, IFormFile? customerImage, IFormFile[]? attachmentFiles, Customer customer)
+    {
+        var uploadsDir = Path.Combine(_env.WebRootPath ?? "wwwroot", "uploads", "customers", customerNo);
+        Directory.CreateDirectory(uploadsDir);
+        var baseUrl = $"/uploads/customers/{customerNo}";
+
+        if (customerImage != null && customerImage.Length > 0)
+        {
+            var ext = Path.GetExtension(customerImage.FileName);
+            if (string.IsNullOrEmpty(ext)) ext = ".jpg";
+            var imagePath = Path.Combine(uploadsDir, "image" + ext);
+            using (var stream = new FileStream(imagePath, FileMode.Create))
+                customerImage.CopyTo(stream);
+            customer.CustomerImage = baseUrl + "/image" + ext;
+        }
+
+        var attachmentPaths = new List<string>();
+        if (!string.IsNullOrWhiteSpace(customer.CustomerAttachment))
+        {
+            try
+            {
+                var existing = System.Text.Json.JsonSerializer.Deserialize<List<string>>(customer.CustomerAttachment);
+                if (existing != null) attachmentPaths.AddRange(existing);
+            }
+            catch { /* ignore */ }
+        }
+        if (attachmentFiles != null && attachmentFiles.Length > 0)
+        {
+            for (int i = 0; i < attachmentFiles.Length; i++)
+            {
+                var f = attachmentFiles[i];
+                if (f == null || f.Length == 0) continue;
+                var ext = Path.GetExtension(f.FileName) ?? "";
+                var fileName = $"att_{i}_{DateTime.UtcNow:yyyyMMddHHmmss}{ext}";
+                var filePath = Path.Combine(uploadsDir, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                    f.CopyTo(stream);
+                attachmentPaths.Add(baseUrl + "/" + fileName);
+            }
+            customer.CustomerAttachment = System.Text.Json.JsonSerializer.Serialize(attachmentPaths);
+        }
     }
 }

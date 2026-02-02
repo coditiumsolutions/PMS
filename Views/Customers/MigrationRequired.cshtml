@@ -1,0 +1,16 @@
+@{
+    ViewData["Title"] = "Database Update Required";
+    ViewBag.ActiveModule = "Customers";
+    var message = ViewBag.MigrationError as string ?? "Database schema may be out of date. Please run: dotnet ef database update";
+}
+
+<div class="container-fluid">
+    <div class="alert alert-warning shadow-sm" role="alert">
+        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Database schema update required</h4>
+        <p class="mb-0">@message</p>
+        <hr />
+        <p class="mb-0">
+            <a asp-action="Index" asp-controller="Home" class="btn btn-primary">Back to Home</a>
+        </p>
+    </div>
+</div>

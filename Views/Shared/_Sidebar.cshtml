@@ -117,11 +117,21 @@
             <li><a asp-controller="AIRAG" asp-action="Index"><i class="bi bi-robot me-2"></i>Database Assistant</a></li>
         </ul>
     }
+    else if (ViewBag.ActiveModule == "Dealers")
+    {
+        <h3 class="sidebar-heading">Dealers</h3>
+        <ul class="sidebar-nav">
+            <li><a asp-controller="Dealers" asp-action="Dashboard"><i class="bi bi-speedometer2 me-2"></i>Performance Dashboard</a></li>
+            <li><a asp-controller="Dealers" asp-action="Index"><i class="bi bi-people me-2"></i>All Dealers</a></li>
+            <li><a asp-controller="Dealers" asp-action="Create"><i class="bi bi-person-plus me-2"></i>New Dealer</a></li>
+        </ul>
+    }
     else
     {
         <ul class="sidebar-nav">
             <li><a asp-controller="Home" asp-action="Index"><i class="bi bi-house-door me-2"></i>Home</a></li>
             <li><a asp-controller="Customers" asp-action="Index"><i class="bi bi-people me-2"></i>Customers</a></li>
+            <li><a asp-controller="Dealers" asp-action="Index"><i class="bi bi-shop me-2"></i>Dealers</a></li>
             <li><a asp-controller="Inventory" asp-action="Index"><i class="bi bi-box-seam me-2"></i>Inventory</a></li>
             <li><a asp-controller="Payments" asp-action="Index"><i class="bi bi-credit-card me-2"></i>Payments</a></li>
             <li><a asp-controller="Schedules" asp-action="Index"><i class="bi bi-calendar-event me-2"></i>Schedules</a></li>

@@ -76,5 +76,23 @@ public class Customer
 
     [Display(Name = "Registration ID")]
     public int? RegistrationID { get; set; }
+
+    [Display(Name = "Plan No")]
+    [StringLength(100, ErrorMessage = "Plan No cannot exceed 100 characters")]
+    public string? PlanNo { get; set; }
+
+    [Display(Name = "Customer Image")]
+    [StringLength(500, ErrorMessage = "Image path cannot exceed 500 characters")]
+    public string? CustomerImage { get; set; }
+
+    [Display(Name = "Customer Attachments")]
+    [Column(TypeName = "nvarchar(max)")]
+    public string? CustomerAttachment { get; set; }
+
+    [Display(Name = "Dealer")]
+    public int? DealerID { get; set; }
+
+    [ForeignKey(nameof(DealerID))]
+    public virtual Dealer? Dealer { get; set; }
 }
 

@@ -1,0 +1,71 @@
+@model PMS.Web.Models.Dealer
+
+@{
+    ViewData["Title"] = "Dealer Details";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Dealer Details</h2>
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.DealerID" class="btn btn-warning">Edit</a>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Dealer Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Dealer ID:</dt>
+                        <dd class="col-sm-9">@Model.DealerID</dd>
+
+                        <dt class="col-sm-3">Dealer Code:</dt>
+                        <dd class="col-sm-9">@(Model.DealerCode ?? "-")</dd>
+
+                        <dt class="col-sm-3">Dealer Name:</dt>
+                        <dd class="col-sm-9">@Model.DealerName</dd>
+
+                        <dt class="col-sm-3">Company Name:</dt>
+                        <dd class="col-sm-9">@(Model.CompanyName ?? "-")</dd>
+
+                        <dt class="col-sm-3">Contact No:</dt>
+                        <dd class="col-sm-9">@(Model.ContactNo ?? "-")</dd>
+
+                        <dt class="col-sm-3">Email:</dt>
+                        <dd class="col-sm-9">@(Model.Email ?? "-")</dd>
+
+                        <dt class="col-sm-3">Address:</dt>
+                        <dd class="col-sm-9">@(Model.Address ?? "-")</dd>
+
+                        <dt class="col-sm-3">City:</dt>
+                        <dd class="col-sm-9">@(Model.City ?? "-")</dd>
+
+                        <dt class="col-sm-3">Active:</dt>
+                        <dd class="col-sm-9">@(Model.IsActive ? "Yes" : "No")</dd>
+
+                        <dt class="col-sm-3">Created At:</dt>
+                        <dd class="col-sm-9">@(Model.CreatedAt?.ToString("MMM dd, yyyy HH:mm") ?? "N/A")</dd>
+
+                        <dt class="col-sm-3">Created By:</dt>
+                        <dd class="col-sm-9">@(Model.CreatedBy ?? "-")</dd>
+
+                        <dt class="col-sm-3">Remarks:</dt>
+                        <dd class="col-sm-9">@(Model.Remarks ?? "-")</dd>
+                    </dl>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="d-flex gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.DealerID" class="btn btn-warning">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@Model.DealerID" class="btn btn-danger">Delete</a>
+                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

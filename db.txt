@@ -78,6 +78,25 @@ TABLE: Customers
 - CreationDate (date, nullable)
 - Createdby (varchar(100), nullable)
 - RegistrationID (int, nullable)
+- PlanNo (varchar(100), nullable)
+- CustomerImage (nvarchar(500), nullable)
+- CustomerAttachment (nvarchar(max), nullable)
+- DealerID (int, nullable, FK to Dealer)
+
+TABLE: Dealer
+-------------
+- DealerID (int, PK, identity)
+- DealerCode (nvarchar(50), nullable)
+- DealerName (nvarchar(100))
+- CompanyName (nvarchar(150), nullable)
+- ContactNo (nvarchar(100), nullable)
+- Email (nvarchar(100), nullable)
+- Address (nvarchar(255), nullable)
+- City (nvarchar(60), nullable)
+- IsActive (bit, default: 1)
+- CreatedAt (datetime, nullable, default: getdate())
+- CreatedBy (nvarchar(100), nullable)
+- Remarks (nvarchar(500), nullable)
 
 TABLE: InventoryDetail
 ----------------------

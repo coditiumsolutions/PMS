@@ -22,6 +22,7 @@ public class PMSDbContext : DbContext
     public DbSet<Transfer> Transfers { get; set; }
     public DbSet<RequestedProperty> RequestedProperties { get; set; }
     public DbSet<Registration> Registrations { get; set; }
+    public DbSet<Dealer> Dealers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,8 +49,23 @@ public class PMSDbContext : DbContext
             entity.Property(e => e.CreatedBy)
                 .HasColumnName("Createdby");
 
+            entity.HasOne(e => e.Dealer)
+                .WithMany()
+                .HasForeignKey(e => e.DealerID)
+                .OnDelete(DeleteBehavior.SetNull);
+
             // Map to Customers table
             entity.ToTable("Customers");
+        });
+
+        // Configure Dealer entity
+        modelBuilder.Entity<Dealer>(entity =>
+        {
+            entity.HasKey(e => e.DealerID);
+            entity.ToTable("Dealer");
+            entity.Property(e => e.DealerID).ValueGeneratedOnAdd();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
+            entity.HasIndex(e => e.DealerCode).HasFilter("[DealerCode] IS NOT NULL");
         });
 
         // Configure CustomerAuditLog entity

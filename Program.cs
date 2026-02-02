@@ -124,6 +124,9 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+// Serve static files from wwwroot (required for runtime-created uploads, e.g. /uploads/customers/...)
+app.UseStaticFiles();
+
 app.MapStaticAssets();
 
 // Map attribute-routed controllers first

@@ -1,0 +1,97 @@
+@model PMS.Web.Models.Dealer
+
+@{
+    ViewData["Title"] = "New Dealer";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>New Dealer</h2>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DealerCode" class="form-label fw-semibold"></label>
+                                <input asp-for="DealerCode" class="form-control" />
+                                <span asp-validation-for="DealerCode" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DealerName" class="form-label fw-semibold"></label>
+                                <input asp-for="DealerName" class="form-control" />
+                                <span asp-validation-for="DealerName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CompanyName" class="form-label fw-semibold"></label>
+                            <input asp-for="CompanyName" class="form-control" />
+                            <span asp-validation-for="CompanyName" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ContactNo" class="form-label fw-semibold"></label>
+                                <input asp-for="ContactNo" class="form-control" />
+                                <span asp-validation-for="ContactNo" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label fw-semibold"></label>
+                                <input asp-for="Email" class="form-control" type="email" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="City" class="form-label fw-semibold"></label>
+                                <input asp-for="City" class="form-control" />
+                                <span asp-validation-for="City" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="IsActive" class="form-label fw-semibold"></label>
+                                <div class="form-check form-switch mt-2">
+                                    <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                                    <label asp-for="IsActive" class="form-check-label">Active</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CreatedBy" class="form-label fw-semibold"></label>
+                                <input asp-for="CreatedBy" class="form-control" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Remarks" class="form-label fw-semibold"></label>
+                                <input asp-for="Remarks" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Create</button>
+                            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

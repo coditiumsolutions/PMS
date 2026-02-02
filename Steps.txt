@@ -2,6 +2,7 @@ taskkill /F /IM PMS.Web.exe; dotnet build; dotnet run
 dotnet run
 cd D:\PMS_Coditium
 powershell -ExecutionPolicy Bypass -File "deploy-to-iis.ps1"
+powershell -ExecutionPolicy Bypass -File "deploy.ps1"
 APIs
 ====
 
