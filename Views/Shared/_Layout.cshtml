@@ -15,13 +15,21 @@
     @RenderSection("Styles", required: false)
 </head>
 <body>
+    @{
+        var isHomePage = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Home", StringComparison.OrdinalIgnoreCase)
+            && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Index", StringComparison.OrdinalIgnoreCase);
+    }
     @await Html.PartialAsync("_TopBar")
     @await Html.PartialAsync("_SecondTopBar")
     
-    <div class="main-container">
-        @await Html.PartialAsync("_Sidebar")
-        
-        <main class="content-area">
+    <div class="main-container @(isHomePage ? "main-container--no-sidebar" : "")">
+        @if (!isHomePage)
+        {
+            <div class="sidebar-col col-12 col-md-3">
+                @await Html.PartialAsync("_Sidebar")
+            </div>
+        }
+        <main class="content-area @(isHomePage ? "content-area--full col-12" : "col-12 col-md-9")">
             @RenderBody()
         </main>
     </div>

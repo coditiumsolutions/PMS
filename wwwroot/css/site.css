@@ -82,7 +82,29 @@ body {
 /* Main Container */
 .main-container {
     display: flex;
+    flex-wrap: wrap;
+    width: 100%;
     min-height: calc(100vh - 180px);
+}
+
+/* Home page: full-width content, no sidebar */
+.main-container.main-container--no-sidebar {
+    display: block;
+}
+
+.main-container.main-container--no-sidebar .content-area--full {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Sidebar column (Bootstrap col-md-3); sidebar fills column */
+.sidebar-col {
+    flex: 0 0 auto;
+}
+
+.sidebar-col .sidebar {
+    width: 100%;
+    min-width: 0;
 }
 
 /* Sidebar */
