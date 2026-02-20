@@ -5,31 +5,35 @@
 }
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Edit Customer</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Edit Customer</h2>
         @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl as string) && ViewBag.ReturnUrl == "CustomersOperation")
         {
-            <a asp-action="CustomersOperation" class="btn btn-secondary">Back to Operations</a>
+            <a asp-action="CustomersOperation" class="btn btn-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Back to Operations
+            </a>
         }
         else
         {
-            <a asp-action="@(ViewBag.UseCustomersEdit == true ? "CustomersDetail" : "Index")" class="btn btn-secondary">Back to List</a>
+            <a asp-action="@(ViewBag.UseCustomersEdit == true ? "CustomersDetail" : "Index")" class="btn btn-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Back to List
+            </a>
         }
     </div>
 
     <div class="card shadow-sm">
-        <div class="card-body">
+        <div class="card-body py-3">
             <form asp-action="@(ViewBag.UseCustomersEdit == true ? "CustomersEdit" : "Edit")" enctype="multipart/form-data">
                 @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl as string))
                 {
                     <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
                 }
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 mb-3" role="alert"></div>
                 <input type="hidden" asp-for="CustomerNo" />
                 <input type="hidden" asp-for="Uid" />
 
-                <!-- Bootstrap 5 Tabs -->
-                <ul class="nav nav-tabs mb-4" id="customerEditTabs" role="tablist">
+                @* ── Tabs ────────────────────────────────────────────────── *@
+                <ul class="nav nav-tabs mb-3" id="customerEditTabs" role="tablist">
                     <li class="nav-item me-1" role="presentation">
                         <button class="nav-link active bg-light text-dark" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
                             Personal Detail
@@ -52,169 +56,233 @@
                     </li>
                 </ul>
 
-                <!-- Tab Content -->
                 <div class="tab-content" id="customerEditTabContent">
-                    <!-- Tab 1: Personal Detail -->
+
+                    @* ════════════════════════════════════════════════════════
+                       TAB 1 — Personal Detail
+                       ════════════════════════════════════════════════════════ *@
                     <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="CustomerNo" class="form-label fw-semibold"></label>
-                                <input asp-for="CustomerNo" class="form-control" readonly />
-                                <span asp-validation-for="CustomerNo" class="text-danger"></span>
+                        <div class="card mb-3">
+                            <div class="card-header bg-primary text-white py-2">
+                                <h6 class="mb-0"><i class="bi bi-person me-2"></i>Personal Information</h6>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="CreationDate" class="form-label fw-semibold"></label>
-                                <input asp-for="CreationDate" type="date" class="form-control" />
-                                <span asp-validation-for="CreationDate" class="text-danger"></span>
-                            </div>
-                        </div>
+                            <div class="card-body py-3">
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="FullName" class="form-label fw-semibold"></label>
-                                <input asp-for="FullName" class="form-control" />
-                                <span asp-validation-for="FullName" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="FatherName" class="form-label fw-semibold"></label>
-                                <input asp-for="FatherName" class="form-control" />
-                                <span asp-validation-for="FatherName" class="text-danger"></span>
-                            </div>
-                        </div>
+                                <div class="text-uppercase text-muted small fw-semibold mb-2 border-bottom pb-1">Basic Details</div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Cnic" class="form-label fw-semibold"></label>
-                                <input asp-for="Cnic" class="form-control" />
-                                <span asp-validation-for="Cnic" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Gender" class="form-label fw-semibold"></label>
-                                <select asp-for="Gender" class="form-select">
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                                <span asp-validation-for="Gender" class="text-danger"></span>
-                            </div>
-                        </div>
+                                <div class="row align-items-start mb-2">
+                                    <label asp-for="CustomerNo" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <input asp-for="CustomerNo" class="form-control form-control-sm" readonly />
+                                        <span asp-validation-for="CustomerNo" class="text-danger small"></span>
+                                    </div>
+                                    <label asp-for="CreationDate" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <input asp-for="CreationDate" type="date" class="form-control form-control-sm" />
+                                        <span asp-validation-for="CreationDate" class="text-danger small"></span>
+                                    </div>
+                                </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="CreatedBy" class="form-label fw-semibold"></label>
-                                <input asp-for="CreatedBy" class="form-control" />
-                                <span asp-validation-for="CreatedBy" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="PlanNo" class="form-label fw-semibold"></label>
-                                <select asp-for="PlanNo" class="form-select">
-                                    <option value="">Select Plan</option>
-                                    @foreach (var plan in (ViewBag.PlanOptions as IEnumerable<string>) ?? Array.Empty<string>())
-                                    {
-                                        <option value="@plan">@plan</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="DealerID" class="form-label fw-semibold"></label>
-                                <select asp-for="DealerID" class="form-select">
-                                    <option value="">Select Dealer</option>
-                                    @foreach (var d in (ViewBag.DealerOptions as IEnumerable<PMS.Web.Models.Dealer>) ?? Array.Empty<PMS.Web.Models.Dealer>())
-                                    {
-                                        <option value="@d.DealerID">@d.DealerName</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Customer Image</label>
-                                <input type="file" name="customerImage" class="form-control" accept="image/*" />
-                                @if (!string.IsNullOrEmpty(Model.CustomerImage))
-                                {
-                                    <small class="text-muted">Current: @Model.CustomerImage</small>
-                                }
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-semibold">Attachments (multiple)</label>
-                                <input type="file" name="attachmentFiles" class="form-control" multiple />
+                                <div class="row align-items-start mb-2">
+                                    <label asp-for="FullName" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <input asp-for="FullName" class="form-control form-control-sm" />
+                                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                                    </div>
+                                    <label asp-for="FatherName" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <input asp-for="FatherName" class="form-control form-control-sm" />
+                                        <span asp-validation-for="FatherName" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row align-items-start mb-2">
+                                    <label asp-for="Cnic" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <input asp-for="Cnic" class="form-control form-control-sm" />
+                                        <span asp-validation-for="Cnic" class="text-danger small"></span>
+                                    </div>
+                                    <label asp-for="Gender" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <select asp-for="Gender" class="form-select form-select-sm">
+                                            <option value="">Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                        <span asp-validation-for="Gender" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row align-items-start mb-2">
+                                    <label asp-for="PlanNo" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <select asp-for="PlanNo" class="form-select form-select-sm">
+                                            <option value="">Select Plan</option>
+                                            @foreach (var plan in (ViewBag.PlanOptions as IEnumerable<string>) ?? Array.Empty<string>())
+                                            {
+                                                <option value="@plan">@plan</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <label asp-for="DealerID" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <select asp-for="DealerID" class="form-select form-select-sm">
+                                            <option value="">Select Dealer</option>
+                                            @foreach (var d in (ViewBag.DealerOptions as IEnumerable<PMS.Web.Models.Dealer>) ?? Array.Empty<PMS.Web.Models.Dealer>())
+                                            {
+                                                <option value="@d.DealerID">@d.DealershipName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row align-items-start mb-2">
+                                    <label asp-for="CreatedBy" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <input asp-for="CreatedBy" class="form-control form-control-sm" />
+                                        <span asp-validation-for="CreatedBy" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="text-uppercase text-muted small fw-semibold mb-2 border-bottom pb-1 mt-3">Documents</div>
+
+                                <div class="row align-items-start mb-2">
+                                    <label class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end">Customer Image</label>
+                                    <div class="col-md-4">
+                                        <input type="file" name="customerImage" class="form-control form-control-sm" accept="image/*" />
+                                        @if (!string.IsNullOrEmpty(Model.CustomerImage))
+                                        {
+                                            <small class="text-muted">Current: @Model.CustomerImage</small>
+                                        }
+                                    </div>
+                                    <label class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end">Attachments</label>
+                                    <div class="col-md-4">
+                                        <input type="file" name="attachmentFiles" class="form-control form-control-sm" multiple />
+                                        <small class="text-muted">Multiple files allowed</small>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
 
-                    <!-- Tab 2: Contact Detail -->
+                    @* ════════════════════════════════════════════════════════
+                       TAB 2 — Contact Detail
+                       ════════════════════════════════════════════════════════ *@
                     <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ContactNo" class="form-label fw-semibold"></label>
-                                <input asp-for="ContactNo" class="form-control" />
-                                <span asp-validation-for="ContactNo" class="text-danger"></span>
+                        <div class="card mb-3">
+                            <div class="card-header bg-info text-white py-2">
+                                <h6 class="mb-0"><i class="bi bi-telephone me-2"></i>Contact Information</h6>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Email" class="form-label fw-semibold"></label>
-                                <input asp-for="Email" type="email" class="form-control" />
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-                        </div>
+                            <div class="card-body py-3">
 
-                        <h6 class="text-muted mb-3 mt-4">Present Address</h6>
-                        <div class="mb-3">
-                            <label asp-for="PresAddress" class="form-label fw-semibold"></label>
-                            <textarea asp-for="PresAddress" class="form-control" rows="3"></textarea>
-                            <span asp-validation-for="PresAddress" class="text-danger"></span>
-                        </div>
+                                <div class="text-uppercase text-muted small fw-semibold mb-2 border-bottom pb-1">Contact Details</div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="PresCity" class="form-label fw-semibold"></label>
-                                <input asp-for="PresCity" class="form-control" />
-                                <span asp-validation-for="PresCity" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="PresCountry" class="form-label fw-semibold"></label>
-                                <input asp-for="PresCountry" class="form-control" />
-                                <span asp-validation-for="PresCountry" class="text-danger"></span>
-                            </div>
-                        </div>
+                                <div class="row align-items-start mb-2">
+                                    <label asp-for="ContactNo" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <input asp-for="ContactNo" class="form-control form-control-sm" />
+                                        <span asp-validation-for="ContactNo" class="text-danger small"></span>
+                                    </div>
+                                    <label asp-for="Email" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <input asp-for="Email" type="email" class="form-control form-control-sm" />
+                                        <span asp-validation-for="Email" class="text-danger small"></span>
+                                    </div>
+                                </div>
 
-                        <h6 class="text-muted mb-3 mt-4">Permanent Address</h6>
-                        <div class="mb-3">
-                            <label asp-for="PremAddress" class="form-label fw-semibold"></label>
-                            <textarea asp-for="PremAddress" class="form-control" rows="3"></textarea>
-                            <span asp-validation-for="PremAddress" class="text-danger"></span>
-                        </div>
+                                @* Present Address *@
+                                <div class="text-uppercase text-muted small fw-semibold mb-2 border-bottom pb-1 mt-3">Present Address</div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="PremCity" class="form-label fw-semibold"></label>
-                                <input asp-for="PremCity" class="form-control" />
-                                <span asp-validation-for="PremCity" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="PremCountry" class="form-label fw-semibold"></label>
-                                <input asp-for="PremCountry" class="form-control" />
-                                <span asp-validation-for="PremCountry" class="text-danger"></span>
+                                <div class="row align-items-start mb-2">
+                                    <label asp-for="PresAddress" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-10">
+                                        <textarea asp-for="PresAddress" class="form-control form-control-sm" rows="2"></textarea>
+                                        <span asp-validation-for="PresAddress" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row align-items-start mb-2">
+                                    <label asp-for="PresCity" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <input asp-for="PresCity" class="form-control form-control-sm" />
+                                        <span asp-validation-for="PresCity" class="text-danger small"></span>
+                                    </div>
+                                    <label asp-for="PresCountry" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <input asp-for="PresCountry" class="form-control form-control-sm" />
+                                        <span asp-validation-for="PresCountry" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                @* Permanent Address *@
+                                <div class="text-uppercase text-muted small fw-semibold mb-2 border-bottom pb-1 mt-3">Permanent Address</div>
+
+                                <div class="row align-items-start mb-2">
+                                    <label asp-for="PremAddress" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-10">
+                                        <textarea asp-for="PremAddress" class="form-control form-control-sm" rows="2"></textarea>
+                                        <span asp-validation-for="PremAddress" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row align-items-start mb-2">
+                                    <label asp-for="PremCity" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <input asp-for="PremCity" class="form-control form-control-sm" />
+                                        <span asp-validation-for="PremCity" class="text-danger small"></span>
+                                    </div>
+                                    <label asp-for="PremCountry" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                                    <div class="col-md-4">
+                                        <input asp-for="PremCountry" class="form-control form-control-sm" />
+                                        <span asp-validation-for="PremCountry" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
 
-                    <!-- Tab 3: Allotment Detail -->
+                    @* ════════════════════════════════════════════════════════
+                       TAB 3 — Allotment Detail
+                       ════════════════════════════════════════════════════════ *@
                     <div class="tab-pane fade" id="allotment" role="tabpanel" aria-labelledby="allotment-tab">
-                        <p class="text-muted mb-0">Allotment information is not available yet.</p>
+                        <div class="card mb-3">
+                            <div class="card-header bg-warning text-dark py-2">
+                                <h6 class="mb-0"><i class="bi bi-house me-2"></i>Allotment Detail</h6>
+                            </div>
+                            <div class="card-body py-3">
+                                <p class="text-muted mb-0">Allotment information is not available yet.</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Tab 4: History -->
+                    @* ════════════════════════════════════════════════════════
+                       TAB 4 — History
+                       ════════════════════════════════════════════════════════ *@
                     <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
-                        <p class="text-muted mb-0">Customer history is not available yet.</p>
+                        <div class="card mb-3">
+                            <div class="card-header bg-secondary text-white py-2">
+                                <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>History</h6>
+                            </div>
+                            <div class="card-body py-3">
+                                <p class="text-muted mb-0">Customer history is not available yet.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                @* ── Submit ─────────────────────────────────────────────── *@
+                <div class="row mt-3">
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary px-5">
+                            <i class="bi bi-save me-1"></i>Save Changes
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2 px-4">Cancel</a>
                     </div>
                 </div>
 
-                <div class="d-flex gap-2 mt-4">
-                    <input type="submit" value="Save Changes" class="btn btn-primary btn-lg" />
-                    <a asp-action="Index" class="btn btn-secondary btn-lg">Cancel</a>
-                </div>
             </form>
         </div>
     </div>

@@ -5,20 +5,24 @@
 }
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Customers</h2>
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Create New
-        </a>
-    </div>
 
-    <!-- Search Bar -->
+    @* ── Toolbar: Search + Create in one row ─────────────────────────── *@
     <div class="card shadow-sm mb-3">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <label for="searchInput" class="form-label fw-semibold">Search Customers</label>
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search by Customer No, Name, CNIC, or Contact No..." />
+        <div class="card-body py-2">
+            <div class="row align-items-center g-2">
+                <div class="col-md-5 col-lg-4">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" id="searchInput" class="form-control border-start-0"
+                               placeholder="Search by No, Name, CNIC, Contact…" />
+                    </div>
+                </div>
+                <div class="col-md-auto ms-auto">
+                    <a asp-action="Create" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle me-1"></i>Create New
+                    </a>
                 </div>
             </div>
         </div>
@@ -38,11 +42,10 @@
     {
         <div class="card shadow-sm">
             <div class="card-body p-0">
-                <div class="table-responsive" style="max-height: 600px; overflow-y: auto; overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch;">
+                <div class="table-responsive" style="overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch;">
                     <table class="table table-bordered table-hover mb-0" id="customersTable" style="width: 100%; table-layout: auto; min-width: 600px;">
                         <thead class="sticky-top" style="background-color: #071a2e; color: white;">
                             <tr>
-                                <th scope="col" class="ps-2 text-center" style="width: 100px; min-width: 100px;">Actions</th>
                                 <th scope="col" class="sortable" data-sort="text">
                                     @Html.DisplayNameFor(model => model.CustomerNo)
                                     <i class="bi bi-arrow-down-up ms-1"></i>
@@ -69,23 +72,10 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="customersTableBody">
                             @foreach (var item in Model)
                             {
-                                <tr>
-                                    <td class="ps-2 text-center" style="width: 100px; min-width: 100px;">
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <a asp-action="CustomersDetails" asp-route-id="@item.CustomerNo" class="btn btn-sm btn-info" title="View Details" style="padding: 0.1rem 0.2rem;">
-                                                <i class="bi bi-eye" style="font-size: 0.7rem;"></i>
-                                            </a>
-                                            <a asp-action="CustomersEdit" asp-route-id="@item.CustomerNo" class="btn btn-sm btn-warning" title="Edit" style="padding: 0.1rem 0.2rem;">
-                                                <i class="bi bi-pencil" style="font-size: 0.7rem;"></i>
-                                            </a>
-                                            <a asp-action="Delete" asp-route-id="@item.CustomerNo" class="btn btn-sm btn-danger" title="Delete" style="padding: 0.1rem 0.2rem;">
-                                                <i class="bi bi-trash" style="font-size: 0.7rem;"></i>
-                                            </a>
-                                        </div>
-                                    </td>
+                                <tr class="customer-row" data-customer-no="@item.CustomerNo" title="Double-click to open">
                                     <td class="fw-medium">@Html.DisplayFor(modelItem => item.CustomerNo)</td>
                                     <td>@Html.DisplayFor(modelItem => item.FullName)</td>
                                     <td>@Html.DisplayFor(modelItem => item.FatherName)</td>
@@ -97,106 +87,203 @@
                         </tbody>
                     </table>
                 </div>
+
+                @* ── Pagination footer ───────────────────────────────────── *@
+                <div class="d-flex align-items-center justify-content-between px-3 py-2 border-top bg-light flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="form-label mb-0 small text-muted fw-semibold">Rows:</label>
+                        <select id="pageSizeSelect" class="form-select form-select-sm" style="width:75px;">
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <span id="pageInfo" class="small text-muted ms-2"></span>
+                    </div>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0" id="paginationControls"></ul>
+                    </nav>
+                </div>
             </div>
         </div>
     }
 </div>
 
 <script>
-    (function () {
-        // Search functionality
-        const searchInput = document.getElementById('searchInput');
-        const table = document.getElementById('customersTable');
-        
-        if (searchInput && table) {
-            const tbody = table.getElementsByTagName('tbody')[0];
-            if (tbody) {
-                const rows = Array.from(tbody.getElementsByTagName('tr'));
+(function () {
+    const table      = document.getElementById('customersTable');
+    const tbody      = document.getElementById('customersTableBody');
+    const searchInput    = document.getElementById('searchInput');
+    const pageSizeSelect = document.getElementById('pageSizeSelect');
+    const pageInfo       = document.getElementById('pageInfo');
+    const paginationCtrl = document.getElementById('paginationControls');
 
-                function filterTable() {
-                    const searchTerm = searchInput.value.toLowerCase().trim();
-                    
-                    rows.forEach(row => {
-                        const cells = row.getElementsByTagName('td');
-                        let matches = false;
+    if (!table || !tbody) return;
 
-                        // Search in Customer No, Full Name, Father Name, CNIC, and Contact No columns
-                        // Skip first column (Actions) and last column (CreationDate)
-                        for (let i = 1; i < cells.length - 1; i++) {
-                            const cellText = cells[i].textContent || cells[i].innerText;
-                            if (cellText.toLowerCase().indexOf(searchTerm) > -1) {
-                                matches = true;
-                                break;
-                            }
-                        }
+    let allRows     = Array.from(tbody.querySelectorAll('tr.customer-row'));
+    let filteredRows = allRows.slice();
+    let currentPage  = 1;
+    let pageSize     = parseInt(pageSizeSelect?.value || '10');
 
-                        row.style.display = matches || searchTerm === '' ? '' : 'none';
-                    });
-                }
-
-                searchInput.addEventListener('keyup', filterTable);
-                searchInput.addEventListener('input', filterTable);
+    // ── Double-click → details page ───────────────────────────────────
+    allRows.forEach(function (row) {
+        row.addEventListener('dblclick', function () {
+            var customerNo = this.getAttribute('data-customer-no');
+            if (customerNo) {
+                window.location.href = '/Customers/CustomersDetails/' + encodeURIComponent(customerNo);
             }
+        });
+    });
+
+    // ── Render a single page ──────────────────────────────────────────
+    function renderPage() {
+        const total = filteredRows.length;
+        const totalPages = Math.max(1, Math.ceil(total / pageSize));
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        const start = (currentPage - 1) * pageSize;
+        const end   = Math.min(start + pageSize, total);
+
+        // Hide all, show only current page slice
+        allRows.forEach(r => { r.style.display = 'none'; });
+        filteredRows.forEach((r, i) => {
+            r.style.display = (i >= start && i < end) ? '' : 'none';
+        });
+
+        // Info label
+        if (pageInfo) {
+            pageInfo.textContent = total === 0
+                ? 'No records'
+                : `Showing ${start + 1}–${end} of ${total}`;
         }
 
-        // Table sorting functionality
-        if (table) {
-            const tbody = table.querySelector('tbody');
-            const headers = table.querySelectorAll('thead th.sortable');
-            let currentSort = { column: -1, direction: 'asc' };
-            
-            headers.forEach((header, index) => {
-                header.addEventListener('click', () => {
-                    const sortType = header.getAttribute('data-sort');
-                    const isAsc = currentSort.column === index && currentSort.direction === 'asc';
-                    
-                    // Update sort direction
-                    currentSort.column = index;
-                    currentSort.direction = isAsc ? 'desc' : 'asc';
-                    
-                    // Update header icons
-                    headers.forEach((h, i) => {
-                        h.classList.remove('sorted-asc', 'sorted-desc');
-                        if (i === index) {
-                            h.classList.add(isAsc ? 'sorted-desc' : 'sorted-asc');
-                        }
-                    });
-                    
-                    // Sort rows
-                    const rows = Array.from(tbody.querySelectorAll('tr'));
-                    rows.sort((a, b) => {
-                        // Skip sorting if clicking on Actions column (index 0)
-                        if (index === 0) return 0;
-                        
-                        const aCell = a.cells[index];
-                        const bCell = b.cells[index];
-                        
-                        let aValue = aCell.getAttribute('data-sort-value') || aCell.textContent.trim();
-                        let bValue = bCell.getAttribute('data-sort-value') || bCell.textContent.trim();
-                        
-                        if (sortType === 'number') {
-                            aValue = parseInt(aValue) || 0;
-                            bValue = parseInt(bValue) || 0;
-                            return isAsc ? bValue - aValue : aValue - bValue;
-                        } else if (sortType === 'date') {
-                            aValue = new Date(aValue) || new Date(0);
-                            bValue = new Date(bValue) || new Date(0);
-                            return isAsc ? bValue - aValue : aValue - bValue;
-                        } else {
-                            aValue = aValue.toLowerCase();
-                            bValue = bValue.toLowerCase();
-                            if (aValue < bValue) return isAsc ? 1 : -1;
-                            if (aValue > bValue) return isAsc ? -1 : 1;
-                            return 0;
-                        }
-                    });
-                    
-                    // Re-append sorted rows
-                    rows.forEach(row => tbody.appendChild(row));
-                });
-            });
+        // Pagination buttons
+        if (paginationCtrl) {
+            paginationCtrl.innerHTML = '';
+
+            // Prev
+            const prevLi = document.createElement('li');
+            prevLi.className = 'page-item' + (currentPage === 1 ? ' disabled' : '');
+            prevLi.innerHTML = `<a class="page-link" href="#">&laquo;</a>`;
+            prevLi.addEventListener('click', e => { e.preventDefault(); if (currentPage > 1) { currentPage--; renderPage(); } });
+            paginationCtrl.appendChild(prevLi);
+
+            // Page numbers (max 5 visible)
+            const maxVisible = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage   = Math.min(totalPages, startPage + maxVisible - 1);
+            if (endPage - startPage < maxVisible - 1) startPage = Math.max(1, endPage - maxVisible + 1);
+
+            if (startPage > 1) {
+                const li = makePageLi(1);
+                paginationCtrl.appendChild(li);
+                if (startPage > 2) {
+                    const dots = document.createElement('li');
+                    dots.className = 'page-item disabled';
+                    dots.innerHTML = '<span class="page-link">…</span>';
+                    paginationCtrl.appendChild(dots);
+                }
+            }
+
+            for (let p = startPage; p <= endPage; p++) {
+                paginationCtrl.appendChild(makePageLi(p));
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const dots = document.createElement('li');
+                    dots.className = 'page-item disabled';
+                    dots.innerHTML = '<span class="page-link">…</span>';
+                    paginationCtrl.appendChild(dots);
+                }
+                paginationCtrl.appendChild(makePageLi(totalPages));
+            }
+
+            // Next
+            const nextLi = document.createElement('li');
+            nextLi.className = 'page-item' + (currentPage === totalPages ? ' disabled' : '');
+            nextLi.innerHTML = `<a class="page-link" href="#">&raquo;</a>`;
+            nextLi.addEventListener('click', e => { e.preventDefault(); if (currentPage < totalPages) { currentPage++; renderPage(); } });
+            paginationCtrl.appendChild(nextLi);
         }
-    })();
+    }
+
+    function makePageLi(p) {
+        const li = document.createElement('li');
+        li.className = 'page-item' + (p === currentPage ? ' active' : '');
+        li.innerHTML = `<a class="page-link" href="#">${p}</a>`;
+        li.addEventListener('click', e => { e.preventDefault(); currentPage = p; renderPage(); });
+        return li;
+    }
+
+    // ── Search ────────────────────────────────────────────────────────
+    function applyFilter() {
+        const term = searchInput ? searchInput.value.toLowerCase().trim() : '';
+        filteredRows = allRows.filter(row => {
+            if (!term) return true;
+            const cells = row.getElementsByTagName('td');
+            for (let i = 0; i < cells.length - 1; i++) {
+                if ((cells[i].textContent || '').toLowerCase().includes(term)) return true;
+            }
+            return false;
+        });
+        currentPage = 1;
+        renderPage();
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('keyup', applyFilter);
+        searchInput.addEventListener('input', applyFilter);
+    }
+
+    // ── Page size change ──────────────────────────────────────────────
+    if (pageSizeSelect) {
+        pageSizeSelect.addEventListener('change', function () {
+            pageSize = parseInt(this.value);
+            currentPage = 1;
+            renderPage();
+        });
+    }
+
+    // ── Sorting ───────────────────────────────────────────────────────
+    const headers = table.querySelectorAll('thead th.sortable');
+    let currentSort = { column: -1, direction: 'asc' };
+
+    headers.forEach((header, index) => {
+        header.addEventListener('click', () => {
+            const sortType = header.getAttribute('data-sort');
+            const isAsc = currentSort.column === index && currentSort.direction === 'asc';
+            currentSort = { column: index, direction: isAsc ? 'desc' : 'asc' };
+
+            headers.forEach((h, i) => {
+                h.classList.remove('sorted-asc', 'sorted-desc');
+                if (i === index) h.classList.add(isAsc ? 'sorted-desc' : 'sorted-asc');
+            });
+
+            allRows.sort((a, b) => {
+                let aValue = a.cells[index].getAttribute('data-sort-value') || a.cells[index].textContent.trim();
+                let bValue = b.cells[index].getAttribute('data-sort-value') || b.cells[index].textContent.trim();
+
+                if (sortType === 'number') {
+                    return isAsc ? parseInt(bValue) - parseInt(aValue) : parseInt(aValue) - parseInt(bValue);
+                } else if (sortType === 'date') {
+                    return isAsc ? new Date(bValue) - new Date(aValue) : new Date(aValue) - new Date(bValue);
+                } else {
+                    aValue = aValue.toLowerCase(); bValue = bValue.toLowerCase();
+                    return isAsc ? (aValue < bValue ? 1 : aValue > bValue ? -1 : 0)
+                                 : (aValue < bValue ? -1 : aValue > bValue ? 1 : 0);
+                }
+            });
+
+            // Re-append sorted rows to DOM then re-filter
+            allRows.forEach(r => tbody.appendChild(r));
+            applyFilter();
+        });
+    });
+
+    // ── Initial render ────────────────────────────────────────────────
+    renderPage();
+})();
 </script>
 
 @if (TempData["SuccessMessage"] != null)
@@ -219,17 +306,16 @@
         overflow-x: hidden;
         max-width: 100%;
     }
-    
+
     #customersTable {
         font-size: 0.85rem;
         width: 100%;
         table-layout: auto;
     }
-    
+
     #customersTable thead th {
         cursor: pointer;
         user-select: none;
-        position: relative;
         white-space: nowrap;
         background-color: #071a2e !important;
         color: white !important;
@@ -237,47 +323,32 @@
         padding: 0.5rem 0.4rem;
         font-size: 0.8rem;
     }
-    
+
     #customersTable thead th.sortable:hover {
         background-color: rgba(255, 255, 255, 0.1) !important;
     }
-    
+
     #customersTable thead th.sortable i {
         opacity: 0.7;
         font-size: 0.7rem;
         transition: opacity 0.2s;
         color: white;
     }
-    
-    #customersTable thead th.sortable:hover i {
-        opacity: 1;
-        color: white;
-    }
-    
-    #customersTable thead th.sortable.sorted-asc i::before {
-        content: "\f128"; /* bi-arrow-up */
-    }
-    
-    #customersTable thead th.sortable.sorted-desc i::before {
-        content: "\f12a"; /* bi-arrow-down */
-    }
-    
+
+    #customersTable thead th.sortable:hover i { opacity: 1; color: white; }
+
+    #customersTable thead th.sortable.sorted-asc  i::before { content: "\f128"; }
+    #customersTable thead th.sortable.sorted-desc i::before { content: "\f12a"; }
+
     #customersTable tbody tr {
+        cursor: pointer;
         transition: background-color 0.15s ease;
     }
-    
-    #customersTable tbody tr:nth-child(even) {
-        background-color: #f8f9fa;
-    }
-    
-    #customersTable tbody tr:nth-child(odd) {
-        background-color: #ffffff;
-    }
-    
-    #customersTable tbody tr:hover {
-        background-color: #e9ecef !important;
-    }
-    
+
+    #customersTable tbody tr:nth-child(even) { background-color: #f8f9fa; }
+    #customersTable tbody tr:nth-child(odd)  { background-color: #ffffff; }
+    #customersTable tbody tr:hover           { background-color: #cfe2ff !important; }
+
     #customersTable tbody td {
         vertical-align: middle;
         padding: 0.4rem 0.3rem;
@@ -287,95 +358,39 @@
         text-overflow: ellipsis;
         font-size: 0.8rem;
     }
-    
-    #customersTable tbody td:first-child {
-        white-space: normal;
-        max-width: 100px;
-        overflow: visible;
-        padding: 0.3rem 0.2rem;
-    }
-    
-    #customersTable .btn-group {
-        display: inline-flex;
-        gap: 1px;
-    }
-    
-    #customersTable .btn-group .btn {
-        padding: 0.1rem 0.2rem;
-        border-radius: 0.2rem;
-        min-width: 24px;
-    }
-    
-    #customersTable .btn-group .btn i {
-        font-size: 0.7rem;
-    }
-    
-    /* Ensure horizontal scrollbar is visible */
+
     .table-responsive {
         overflow-x: auto !important;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
-    
-    .table-responsive::-webkit-scrollbar {
-        height: 12px;
-        width: 12px;
+
+    .table-responsive::-webkit-scrollbar        { height: 8px; width: 8px; }
+    .table-responsive::-webkit-scrollbar-track  { background: #f1f1f1; border-radius: 4px; }
+    .table-responsive::-webkit-scrollbar-thumb  { background: #888; border-radius: 4px; }
+    .table-responsive::-webkit-scrollbar-thumb:hover { background: #555; }
+
+    #paginationControls .page-item.active .page-link {
+        background-color: #071a2e;
+        border-color: #071a2e;
+        color: white;
     }
-    
-    .table-responsive::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 6px;
+
+    #paginationControls .page-link {
+        color: #071a2e;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.55rem;
     }
-    
-    .table-responsive::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 6px;
-    }
-    
-    .table-responsive::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-    
-    /* Responsive adjustments */
+
     @@media (max-width: 1200px) {
-        #customersTable {
-            font-size: 0.8rem;
-        }
-        
-        #customersTable tbody td {
-            padding: 0.35rem 0.25rem;
-            max-width: 120px;
-        }
-        
-        #customersTable thead th {
-            padding: 0.45rem 0.35rem;
-            font-size: 0.75rem;
-        }
+        #customersTable { font-size: 0.8rem; }
+        #customersTable tbody td  { padding: 0.35rem 0.25rem; max-width: 120px; }
+        #customersTable thead th  { padding: 0.45rem 0.35rem; font-size: 0.75rem; }
     }
-    
+
     @@media (max-width: 768px) {
-        #customersTable {
-            font-size: 0.75rem;
-            min-width: 550px;
-        }
-        
-        #customersTable tbody td {
-            padding: 0.3rem 0.2rem;
-            max-width: 100px;
-        }
-        
-        #customersTable thead th {
-            padding: 0.4rem 0.25rem;
-            font-size: 0.7rem;
-        }
-        
-        #customersTable .btn-group .btn {
-            padding: 0.08rem 0.15rem;
-            min-width: 20px;
-        }
-        
-        #customersTable .btn-group .btn i {
-            font-size: 0.65rem;
-        }
+        #customersTable { font-size: 0.75rem; min-width: 550px; }
+        #customersTable tbody td  { padding: 0.3rem 0.2rem; max-width: 100px; }
+        #customersTable thead th  { padding: 0.4rem 0.25rem; font-size: 0.7rem; }
     }
 </style>

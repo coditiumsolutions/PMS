@@ -5,9 +5,7 @@
         <h3 class="sidebar-heading">Customers</h3>
         <ul class="sidebar-nav">
             <li><a asp-controller="Customers" asp-action="Dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
-            <li><a asp-controller="Customers" asp-action="Create"><i class="bi bi-person-plus me-2"></i>New Customer</a></li>
             <li><a asp-controller="Customers" asp-action="CustomersDetail"><i class="bi bi-people me-2"></i>Customers</a></li>
-            <li><a asp-controller="Customers" asp-action="Summary"><i class="bi bi-graph-up me-2"></i>Summary</a></li>
             <li class="nav-item-dropdown">
                 <a href="#" class="nav-parent-link" data-bs-toggle="collapse" data-bs-target="#othersSubmenu" aria-expanded="false" aria-controls="othersSubmenu">
                     <span><i class="bi bi-three-dots-vertical me-2"></i>Others</span>
@@ -121,8 +119,8 @@
     {
         <h3 class="sidebar-heading">Dealers</h3>
         <ul class="sidebar-nav">
-            <li><a asp-controller="Dealers" asp-action="Dashboard"><i class="bi bi-speedometer2 me-2"></i>Performance Dashboard</a></li>
-            <li><a asp-controller="Dealers" asp-action="Index"><i class="bi bi-people me-2"></i>All Dealers</a></li>
+            <li><a asp-controller="Dealers" asp-action="Index"><i class="bi bi-speedometer2 me-2"></i>Main Page</a></li>
+            <li><a asp-controller="Dealers" asp-action="AllDealers"><i class="bi bi-people me-2"></i>All Dealers</a></li>
             <li><a asp-controller="Dealers" asp-action="Create"><i class="bi bi-person-plus me-2"></i>New Dealer</a></li>
         </ul>
     }

@@ -7,7 +7,9 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Delete Customer</h2>
-        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        <a asp-action="CustomersDetails" asp-route-id="@Model.CustomerNo" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
     </div>
 
     <div class="row">
@@ -57,7 +59,7 @@
                 <input type="hidden" asp-for="CustomerNo" />
                 <div class="d-flex gap-2">
                     <input type="submit" value="Delete Customer" class="btn btn-danger btn-lg" />
-                    <a asp-action="Index" class="btn btn-secondary btn-lg">Cancel</a>
+                    <a asp-action="CustomersDetails" asp-route-id="@Model.CustomerNo" class="btn btn-secondary btn-lg">Cancel</a>
                 </div>
             </form>
         </div>
