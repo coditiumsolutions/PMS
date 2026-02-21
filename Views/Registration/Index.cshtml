@@ -30,7 +30,6 @@
                     <table class="table table-bordered table-hover mb-0" id="registrationsTable" style="width: 100%; table-layout: auto; min-width: 800px;">
                         <thead class="sticky-top" style="background-color: #071a2e; color: white;">
                             <tr>
-                                <th scope="col" class="ps-3 text-center" style="width: 140px; min-width: 140px;">Actions</th>
                                 <th scope="col" class="sortable" data-sort="number">
                                     @Html.DisplayNameFor(model => model.RegID)
                                     <i class="bi bi-arrow-down-up ms-1"></i>
@@ -40,15 +39,7 @@
                                     <i class="bi bi-arrow-down-up ms-1"></i>
                                 </th>
                                 <th scope="col" class="sortable" data-sort="text">
-                                    @Html.DisplayNameFor(model => model.CNIC)
-                                    <i class="bi bi-arrow-down-up ms-1"></i>
-                                </th>
-                                <th scope="col" class="sortable" data-sort="text">
                                     @Html.DisplayNameFor(model => model.Phone)
-                                    <i class="bi bi-arrow-down-up ms-1"></i>
-                                </th>
-                                <th scope="col" class="sortable" data-sort="text">
-                                    @Html.DisplayNameFor(model => model.Email)
                                     <i class="bi bi-arrow-down-up ms-1"></i>
                                 </th>
                                 <th scope="col" class="sortable" data-sort="text">
@@ -63,9 +54,8 @@
                                     @Html.DisplayNameFor(model => model.Status)
                                     <i class="bi bi-arrow-down-up ms-1"></i>
                                 </th>
-                                <th scope="col" class="sortable pe-3" data-sort="date">
-                                    @Html.DisplayNameFor(model => model.CreatedAt)
-                                    <i class="bi bi-arrow-down-up ms-1"></i>
+                                <th scope="col" class="ps-3 text-center pe-3" style="width: 140px; min-width: 140px;">
+                                    Actions
                                 </th>
                             </tr>
                         </thead>
@@ -80,7 +70,32 @@
                                 var canCreateCustomer = isApproved && !hasCustomer;
                                 
                                 <tr>
-                                    <td class="ps-3 text-center" style="width: 140px; min-width: 140px;">
+                                    <td class="fw-medium">@Html.DisplayFor(modelItem => item.RegID)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.FullName)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Phone)</td>
+                                    <td data-sort-value="@(item.Project?.ProjectName ?? "")">
+                                        @(item.Project?.ProjectName ?? "-")
+                                    </td>
+                                    <td>@Html.DisplayFor(modelItem => item.RequestedSize)</td>
+                                    <td>
+                                        @if (item.Status?.ToLower() == "pending")
+                                        {
+                                            <span class="badge bg-warning text-dark">@Html.DisplayFor(modelItem => item.Status)</span>
+                                        }
+                                        else if (item.Status?.ToLower() == "approved" || item.Status?.ToLower() == "completed")
+                                        {
+                                            <span class="badge bg-success">@Html.DisplayFor(modelItem => item.Status)</span>
+                                        }
+                                        else if (item.Status?.ToLower() == "rejected" || item.Status?.ToLower() == "cancelled")
+                                        {
+                                            <span class="badge bg-danger">@Html.DisplayFor(modelItem => item.Status)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@Html.DisplayFor(modelItem => item.Status)</span>
+                                        }
+                                    </td>
+                                    <td class="ps-3 text-center pe-3" style="width: 140px; min-width: 140px;">
                                         <div class="btn-group btn-group-sm" role="group">
                                             <a asp-action="Details" asp-route-id="@item.RegID" class="btn btn-sm btn-info" title="View Details" style="padding: 0.15rem 0.3rem;">
                                                 <i class="bi bi-eye" style="font-size: 0.75rem;"></i>
@@ -108,34 +123,6 @@
                                             }
                                         </div>
                                     </td>
-                                    <td class="fw-medium">@Html.DisplayFor(modelItem => item.RegID)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.FullName)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.CNIC)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.Phone)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.Email)</td>
-                                    <td data-sort-value="@(item.Project?.ProjectName ?? "")">
-                                        @(item.Project?.ProjectName ?? "-")
-                                    </td>
-                                    <td>@Html.DisplayFor(modelItem => item.RequestedSize)</td>
-                                    <td>
-                                        @if (item.Status?.ToLower() == "pending")
-                                        {
-                                            <span class="badge bg-warning text-dark">@Html.DisplayFor(modelItem => item.Status)</span>
-                                        }
-                                        else if (item.Status?.ToLower() == "approved" || item.Status?.ToLower() == "completed")
-                                        {
-                                            <span class="badge bg-success">@Html.DisplayFor(modelItem => item.Status)</span>
-                                        }
-                                        else if (item.Status?.ToLower() == "rejected" || item.Status?.ToLower() == "cancelled")
-                                        {
-                                            <span class="badge bg-danger">@Html.DisplayFor(modelItem => item.Status)</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">@Html.DisplayFor(modelItem => item.Status)</span>
-                                        }
-                                    </td>
-                                    <td class="pe-3" data-sort-value="@(item.CreatedAt?.ToString("yyyy-MM-dd") ?? "")">@(item.CreatedAt?.ToString("MMM dd, yyyy") ?? "")</td>
                                 </tr>
                             }
                         </tbody>
@@ -218,7 +205,7 @@
         text-overflow: ellipsis;
     }
     
-    #registrationsTable tbody td:first-child {
+    #registrationsTable tbody td:last-child {
         white-space: normal;
         max-width: 140px;
         overflow: visible;
@@ -297,9 +284,6 @@
                 // Sort rows
                 const rows = Array.from(tbody.querySelectorAll('tr'));
                 rows.sort((a, b) => {
-                    // Skip sorting if clicking on Actions column (index 0)
-                    if (index === 0) return 0;
-                    
                     const aCell = a.cells[index];
                     const bCell = b.cells[index];
                     

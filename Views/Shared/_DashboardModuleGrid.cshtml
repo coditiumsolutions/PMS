@@ -7,31 +7,31 @@
 @{
     var modules = new[]
     {
-        new { Name = "Customers", Icon = "bi-people-fill", Description = "Manage customer records, profiles, and history", Link = Url.Action("Index", "Customers"), Accent = "pms-accent-blue" },
-        new { Name = "Payments", Icon = "bi-credit-card-fill", Description = "Process payments, view history, and manage collections", Link = Url.Action("Index", "Payments"), Accent = "pms-accent-teal" },
-        new { Name = "Challans", Icon = "bi-file-earmark-text-fill", Description = "Create and manage deposit challans and verification", Link = Url.Action("AllChallans", "Payments"), Accent = "pms-accent-green" },
-        new { Name = "Property", Icon = "bi-building", Description = "Property inventory, plots, allotment, and availability", Link = Url.Action("Index", "Inventory"), Accent = "pms-accent-blue" },
-        new { Name = "Dealers", Icon = "bi-shop", Description = "Affiliated dealers and agents", Link = Url.Action("Index", "Dealers"), Accent = "pms-accent-teal" },
+        new { Name = "Registration", Icon = "bi-clipboard-check-fill", Description = "Manage property registrations and requests", Link = Url.Action("Index", "Registration"), Accent = "pms-accent-blue" },
+        new { Name = "Customers", Icon = "bi-people-fill", Description = "Manage customer records, profiles, and history", Link = Url.Action("Index", "Customers"), Accent = "pms-accent-yellow" },
+        new { Name = "Payments", Icon = "bi-credit-card-fill", Description = "Process payments, view history, and manage collections", Link = Url.Action("Index", "Payments"), Accent = "pms-accent-blue" },
+        new { Name = "Challans", Icon = "bi-file-earmark-text-fill", Description = "Create and manage deposit challans and verification", Link = Url.Action("AllChallans", "Payments"), Accent = "pms-accent-purple" },
+        new { Name = "Property", Icon = "bi-building", Description = "Property inventory, plots, allotment, and availability", Link = Url.Action("Index", "Inventory"), Accent = "pms-accent-teal" },
+        new { Name = "Dealers", Icon = "bi-shop", Description = "Affiliated dealers and agents", Link = Url.Action("Index", "Dealers"), Accent = "pms-accent-yellow" },
         new { Name = "Transfer", Icon = "bi-arrow-left-right", Description = "Property transfers, buyer-seller workflows, and NOCs", Link = Url.Action("Index", "Transfers"), Accent = "pms-accent-orange" },
-        new { Name = "Merger", Icon = "bi-diagram-3-fill", Description = "Plot merger and split operations", Link = Url.Action("Index", "Transfers"), Accent = "pms-accent-teal" },
-        new { Name = "Refund", Icon = "bi-currency-exchange", Description = "Refund requests and processing", Link = Url.Action("Index", "Payments"), Accent = "pms-accent-green" },
-        new { Name = "Waiver", Icon = "bi-hand-thumbs-up-fill", Description = "Waiver approvals and fee exemptions", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-orange" },
-        new { Name = "Billing Management", Icon = "bi-receipt", Description = "Invoices, dues, and payment schedules", Link = Url.Action("Index", "Schedules"), Accent = "pms-accent-blue" },
-        new { Name = "AI Reports", Icon = "bi-cpu-fill", Description = "Analytics, forecasts, and smart insights", Link = Url.Action("Index", "AIRAG"), Accent = "pms-accent-teal" },
+        new { Name = "Merger", Icon = "bi-diagram-3-fill", Description = "Plot merger and split operations", Link = Url.Action("Index", "Transfers"), Accent = "pms-accent-cyan" },
+        new { Name = "Refund", Icon = "bi-currency-exchange", Description = "Refund requests and processing", Link = Url.Action("Index", "Payments"), Accent = "pms-accent-yellow" },
+        new { Name = "Waiver", Icon = "bi-hand-thumbs-up-fill", Description = "Waiver approvals and fee exemptions", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-red" },
+        new { Name = "Billing Management", Icon = "bi-receipt", Description = "Invoices, dues, and payment schedules", Link = Url.Action("Index", "Schedules"), Accent = "pms-accent-indigo" },
+        new { Name = "AI Reports", Icon = "bi-cpu-fill", Description = "Analytics, forecasts, and smart insights", Link = Url.Action("Index", "AIRAG"), Accent = "pms-accent-pink" },
         new { Name = "Warehouse", Icon = "bi-box-seam-fill", Description = "Inventory and warehouse management", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-green" },
-        new { Name = "Setup", Icon = "bi-gear-fill", Description = "Configurations, projects, roles, and users", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-orange" },
-        new { Name = "Registration", Icon = "bi-clipboard-check-fill", Description = "Manage property registrations and requests", Link = Url.Action("Dashboard", "Registration"), Accent = "pms-accent-blue" }
+        new { Name = "Setup", Icon = "bi-gear-fill", Description = "Configurations, projects, roles, and users", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-blue" }
     };
 }
-<div class="pms-module-grid-container bg-light rounded-3 p-4">
-    <div class="row g-3 g-md-4">
+<div class="pms-module-grid-container rounded-3 p-3">
+    <div class="row g-2 g-md-3">
         @foreach (var m in modules)
         {
             <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
                 <a href="@(m.Link ?? "#")" class="pms-module-tile-link text-decoration-none">
                     <div class="pms-module-tile card border-0 shadow-sm h-100 @m.Accent" title="@m.Description">
-                        <div class="card-body text-center d-flex flex-column justify-content-center py-4 px-3">
-                            <div class="pms-module-icon mb-3">
+                        <div class="card-body text-center d-flex flex-column justify-content-center py-3 px-2">
+                            <div class="pms-module-icon mb-2">
                                 <i class="bi @m.Icon" aria-hidden="true"></i>
                             </div>
                             <h5 class="pms-module-name mb-0">@m.Name</h5>

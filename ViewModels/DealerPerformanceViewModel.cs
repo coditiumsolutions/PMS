@@ -22,10 +22,8 @@ public class DealerPerformanceKPIs
 public class DealerPerformanceItem
 {
     public int DealerID { get; set; }
-    public string DealerCode { get; set; } = string.Empty;
-    public string DealerName { get; set; } = string.Empty;
-    public string? CompanyName { get; set; }
-    public bool IsActive { get; set; }
+    public string DealershipName { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
     public int CustomersAcquired { get; set; }
     public decimal TotalRevenue { get; set; }
     public List<PlanUsageItem> PlanUsage { get; set; } = new();

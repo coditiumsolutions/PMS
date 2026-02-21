@@ -1,16 +1,11 @@
 DATABASE SCHEMA REPORT
 ======================
 
-Generated: 2026-01-27 10:00:00
+Generated: 2026-02-21 12:39:56
 
-TABLE: __EFMigrationsHistory
+TABLE: dbo.BlockStatus
 ----------------------------
-- MigrationId (nvarchar(150))
-- ProductVersion (nvarchar(32))
-
-TABLE: BlockStatus
-------------------
-- UID (int)
+- UID (int, PK)
 - CustomerNo (nvarchar(50))
 - BlockedStatus (nvarchar(50))
 - BlockedDate (date, nullable)
@@ -18,9 +13,9 @@ TABLE: BlockStatus
 - BlockedReason (nvarchar(255), nullable)
 - RecordStatus (nvarchar(20), default: ('Exist'))
 
-TABLE: Challan
---------------
-- uid (int)
+TABLE: dbo.Challan
+----------------------------
+- uid (int, PK)
 - customerno (varchar(50))
 - depsoiteslipno (varchar(100))
 - bankname (varchar(50))
@@ -32,37 +27,38 @@ TABLE: Challan
 - createdby (varchar(50), nullable)
 - verifiedby (varchar(50), nullable)
 - creationdate (date, nullable)
+- AmountPaid (int, default: ((0)))
 
-TABLE: Configuration
---------------------
-- UId (int)
+TABLE: dbo.Configuration
+----------------------------
+- UId (int, PK)
 - ConfigId (int, nullable)
 - ConfigKey (varchar(50), nullable)
 - ConfigValue (varchar(100), nullable)
 
-TABLE: Configurations
----------------------
-- Id (int)
+TABLE: dbo.Configurations
+----------------------------
+- Id (int, PK)
 - ConfigKey (nvarchar(100))
 - ConfigValue (nvarchar(500))
 - IsActive (bit)
 
-TABLE: CustomerAuditLog
------------------------
-- LogID (int)
+TABLE: dbo.CustomerAuditLog
+----------------------------
+- LogID (int, PK)
 - CustomerID (nvarchar(50))
 - ActionType (nvarchar(20))
 - ChangedFields (nvarchar(max), nullable)
 - OldValues (nvarchar(max), nullable)
 - NewValues (nvarchar(max), nullable)
 - ActionBy (nvarchar(50))
-- ActionDate (datetime, nullable)
+- ActionDate (datetime, default: (getdate()))
 - Remarks (nvarchar(500), nullable)
 
-TABLE: Customers
-----------------
+TABLE: dbo.Customers
+----------------------------
 - uid (int)
-- CustomerNo (varchar(50))
+- CustomerNo (varchar(50), PK)
 - FullName (varchar(100))
 - FatherName (varchar(100))
 - CnicNo (varchar(60))
@@ -78,29 +74,31 @@ TABLE: Customers
 - CreationDate (date, nullable)
 - Createdby (varchar(100), nullable)
 - RegistrationID (int, nullable)
-- PlanNo (varchar(100), nullable)
+- PlanNo (nvarchar(100), nullable)
 - CustomerImage (nvarchar(500), nullable)
 - CustomerAttachment (nvarchar(max), nullable)
-- DealerID (int, nullable, FK to Dealer)
+- DealerID (int, nullable)
 
-TABLE: Dealer
--------------
-- DealerID (int, PK, identity)
-- DealerCode (nvarchar(50), nullable)
-- DealerName (nvarchar(100))
-- CompanyName (nvarchar(150), nullable)
-- ContactNo (nvarchar(100), nullable)
-- Email (nvarchar(100), nullable)
-- Address (nvarchar(255), nullable)
-- City (nvarchar(60), nullable)
-- IsActive (bit, default: 1)
-- CreatedAt (datetime, nullable, default: getdate())
-- CreatedBy (nvarchar(100), nullable)
-- Remarks (nvarchar(500), nullable)
+TABLE: dbo.Dealers
+----------------------------
+- DealerID (int, PK)
+- DealershipName (nvarchar(500))
+- RegisterationDate (date)
+- Status (nvarchar(50))
+- MembershipType (nchar(10))
+- OwnerName (nvarchar(500))
+- OwnerCNIC (nvarchar(50))
+- MobileNo (nvarchar(50))
+- PhoneNumber (nvarchar(50))
+- Email (nvarchar(50))
+- Address (nvarchar(50))
+- OwnerDetails (nvarchar(max))
+- Details (nvarchar(max), nullable)
+- IncentivePercentage (float, nullable, default: ((5.0)))
 
-TABLE: InventoryDetail
-----------------------
-- UID (int)
+TABLE: dbo.InventoryDetail
+----------------------------
+- UID (int, PK)
 - Project (varchar(100), nullable)
 - SubProject (varchar(100), nullable)
 - Sector (varchar(50), nullable)
@@ -120,9 +118,9 @@ TABLE: InventoryDetail
 - UnitNo (varchar(50), nullable)
 - CreationDate (date, default: (getdate()))
 
-TABLE: JointOwners
-------------------
-- uid (int)
+TABLE: dbo.JointOwners
+----------------------------
+- uid (int, PK)
 - customerno (varchar(50))
 - jointname (varchar(100), nullable)
 - jointfname (varchar(100), nullable)
@@ -130,9 +128,9 @@ TABLE: JointOwners
 - jointcontactno (varchar(100), nullable)
 - jointaddress (varchar(100), nullable)
 
-TABLE: Nominee
---------------
-- uid (int)
+TABLE: dbo.Nominee
+----------------------------
+- uid (int, PK)
 - customerno (varchar(50))
 - nominame (varchar(100))
 - nomifname (varchar(100), nullable)
@@ -140,10 +138,10 @@ TABLE: Nominee
 - nomicontactno (varchar(100), nullable)
 - nomirelation (varchar(20), nullable)
 
-TABLE: PaymentPlan
-------------------
+TABLE: dbo.PaymentPlan
+----------------------------
 - uid (int)
-- planno (varchar(100))
+- planno (varchar(100), PK)
 - plandetail (varchar(50), nullable)
 - totalamount (varchar(255), nullable)
 - paymenttype (varchar(60), nullable)
@@ -152,9 +150,9 @@ TABLE: PaymentPlan
 - creationdate (date, nullable)
 - sizedetail (varchar(50), nullable)
 
-TABLE: paymentplanchild
------------------------
-- uid (int)
+TABLE: dbo.paymentplanchild
+----------------------------
+- uid (int, PK)
 - planno (varchar(100))
 - paymentdesc (varchar(100), nullable)
 - installmentno (varchar(60), nullable)
@@ -167,9 +165,9 @@ TABLE: paymentplanchild
 - createdby (varchar(50), nullable)
 - creationdate (varchar(60), nullable)
 
-TABLE: Payments
----------------
-- uId (int)
+TABLE: dbo.Payments
+----------------------------
+- uId (int, PK)
 - customerno (varchar(50))
 - PaidAmount (varchar(255), nullable)
 - PaidDate (varchar(60), nullable)
@@ -185,28 +183,48 @@ TABLE: Payments
 - InstallNo (varchar(50), nullable)
 - PaymentDescription (varchar(500), nullable)
 - CreatedOn (varchar(60))
+- CreatedAt (datetime2, default: (getdate()))
+- LastModified (datetime2, nullable)
 
-TABLE: Projects
----------------
-- Id (int)
+TABLE: dbo.Projects
+----------------------------
+- Id (int, PK)
 - ProjectName (nvarchar(100))
 - ProjectDescription (nvarchar(500))
 - CreatedAt (datetime, nullable, default: (getdate()))
 - SubProject (nvarchar(100), default: ('MAIN'))
 - Prefix (nvarchar(50), nullable)
 
-TABLE: RequestedProperty
-------------------------
-- uid (int)
+TABLE: dbo.Registration
+----------------------------
+- uid (int, PK)
+- FullName (nvarchar(150), nullable)
+- CNIC (nvarchar(50), nullable)
+- Phone (nvarchar(50), nullable)
+- ContactNo1 (nvarchar(50), nullable)
+- ContactNo2 (nvarchar(50), nullable)
+- Email (nvarchar(150), nullable)
+- RequestedProject (int, nullable)
+- RequestedSize (nvarchar(100), nullable)
+- MailingAddress (nvarchar(250), nullable)
+- MailingCity (nvarchar(100), nullable)
+- MailingCountry (nvarchar(100), nullable)
+- Remarks (nvarchar(max), nullable)
+- CreatedAt (datetime, nullable, default: (getdate()))
+- Status (nvarchar(50), nullable, default: ('Pending'))
+
+TABLE: dbo.RequestedProperty
+----------------------------
+- uid (int, PK)
 - customerno (varchar(50))
 - reqproject (varchar(20), nullable)
 - reqsize (varchar(20), nullable)
 - reqcategory (varchar(20), nullable)
 - reqconstruction (varchar(20), nullable)
 
-TABLE: Transfer
----------------
-- uId (int)
+TABLE: dbo.Transfer
+----------------------------
+- uId (int, PK)
 - CustomerNo (varchar(50))
 - TransferType (varchar(50))
 - NatureOfTransfer (varchar(50))
@@ -231,9 +249,9 @@ TABLE: Transfer
 - NdcAmount (varchar(50), nullable)
 - NdcDetail (varchar(100), nullable)
 
-TABLE: TransferFee
-------------------
-- UID (int)
+TABLE: dbo.TransferFee
+----------------------------
+- UID (int, PK)
 - EffectiveDate (varchar(50), nullable)
 - SubProject (varchar(50), nullable)
 - TransferType (varchar(50), nullable)
@@ -245,9 +263,9 @@ TABLE: TransferFee
 - CreatedOn (varchar(50), nullable)
 - CreatedBy (varchar(50), nullable)
 
-TABLE: TransferPayment
-----------------------
-- uId (int)
+TABLE: dbo.TransferPayment
+----------------------------
+- uId (int, PK)
 - CustomerNo (varchar(50))
 - CnicNo (varchar(60))
 - FileStatus (varchar(50), nullable)
@@ -262,9 +280,9 @@ TABLE: TransferPayment
 - CreatedBy (varchar(50), nullable)
 - Consumed (bit, default: ((0)))
 
-TABLE: Users
-------------
-- uid (int)
+TABLE: dbo.Users
+----------------------------
+- uid (int, PK)
 - EmployeeId (varchar(50), nullable)
 - Username (nvarchar(100))
 - PasswordHash (nvarchar(255))
@@ -273,15 +291,8 @@ TABLE: Users
 - CreatedOn (varchar(max), nullable)
 - History (varchar(max), nullable)
 
-TABLE: Registration
--------------------
-- RegID (int, primary key, identity)
-- FullName (nvarchar(150), nullable)
-- CNIC (nvarchar(50), nullable)
-- Phone (nvarchar(50), nullable)
-- Email (nvarchar(150), nullable)
-- ProjectID (int, nullable)
-- RequestedSize (nvarchar(100), nullable)
-- Remarks (nvarchar(max), nullable)
-- CreatedAt (datetime, nullable, default: (getdate()))
-- Status (nvarchar(50), nullable, default: ('Pending'))
+TABLE: dbo.__EFMigrationsHistory
+----------------------------
+- MigrationId (nvarchar(150), PK)
+- ProductVersion (nvarchar(32))
+

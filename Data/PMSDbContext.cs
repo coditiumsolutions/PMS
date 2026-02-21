@@ -58,14 +58,13 @@ public class PMSDbContext : DbContext
             entity.ToTable("Customers");
         });
 
-        // Configure Dealer entity
+        // Configure Dealer entity (dbo.Dealers)
         modelBuilder.Entity<Dealer>(entity =>
         {
             entity.HasKey(e => e.DealerID);
-            entity.ToTable("Dealer");
+            entity.ToTable("Dealers");
             entity.Property(e => e.DealerID).ValueGeneratedOnAdd();
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETDATE()");
-            entity.HasIndex(e => e.DealerCode).HasFilter("[DealerCode] IS NOT NULL");
+            entity.Property(e => e.IncentivePercentage).HasDefaultValue(5.0);
         });
 
         // Configure CustomerAuditLog entity
@@ -222,7 +221,12 @@ public class PMSDbContext : DbContext
             
             // Configure RegID as identity
             entity.Property(e => e.RegID)
+                .HasColumnName("uid")
                 .ValueGeneratedOnAdd();
+
+            // Map property name to existing database column name
+            entity.Property(e => e.ProjectID)
+                .HasColumnName("RequestedProject");
             
             // Set default values
             entity.Property(e => e.CreatedAt)

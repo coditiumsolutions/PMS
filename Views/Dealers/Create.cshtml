@@ -1,93 +1,144 @@
 @model PMS.Web.Models.Dealer
 
 @{
-    ViewData["Title"] = "New Dealer";
+    ViewData["Title"] = "Create Dealer";
 }
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>New Dealer</h2>
-        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        <h2 class="mb-0">Create Dealer</h2>
+        <a asp-action="AllDealers" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back to List
+        </a>
     </div>
 
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form asp-action="Create" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white py-2">
+            <h6 class="mb-0"><i class="bi bi-person-badge me-2"></i>Dealer Information</h6>
+        </div>
+        <div class="card-body py-3">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 mb-3"></div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="DealerCode" class="form-label fw-semibold"></label>
-                                <input asp-for="DealerCode" class="form-control" />
-                                <span asp-validation-for="DealerCode" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="DealerName" class="form-label fw-semibold"></label>
-                                <input asp-for="DealerName" class="form-control" />
-                                <span asp-validation-for="DealerName" class="text-danger"></span>
-                            </div>
-                        </div>
+                @* ── Dealership Info ────────────────────────────────────────── *@
+                <div class="text-uppercase text-muted small fw-semibold mb-2 border-bottom pb-1">Dealership Info</div>
 
-                        <div class="mb-3">
-                            <label asp-for="CompanyName" class="form-label fw-semibold"></label>
-                            <input asp-for="CompanyName" class="form-control" />
-                            <span asp-validation-for="CompanyName" class="text-danger"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ContactNo" class="form-label fw-semibold"></label>
-                                <input asp-for="ContactNo" class="form-control" />
-                                <span asp-validation-for="ContactNo" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Email" class="form-label fw-semibold"></label>
-                                <input asp-for="Email" class="form-control" type="email" />
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Address" class="form-label fw-semibold"></label>
-                            <textarea asp-for="Address" class="form-control" rows="2"></textarea>
-                            <span asp-validation-for="Address" class="text-danger"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="City" class="form-label fw-semibold"></label>
-                                <input asp-for="City" class="form-control" />
-                                <span asp-validation-for="City" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="IsActive" class="form-label fw-semibold"></label>
-                                <div class="form-check form-switch mt-2">
-                                    <input asp-for="IsActive" class="form-check-input" type="checkbox" />
-                                    <label asp-for="IsActive" class="form-check-label">Active</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="CreatedBy" class="form-label fw-semibold"></label>
-                                <input asp-for="CreatedBy" class="form-control" />
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Remarks" class="form-label fw-semibold"></label>
-                                <input asp-for="Remarks" class="form-control" />
-                            </div>
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">Create</button>
-                            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
+                <div class="row align-items-start mb-2">
+                    <label asp-for="DealershipName" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                    <div class="col-md-4">
+                        <input asp-for="DealershipName" class="form-control form-control-sm" />
+                        <span asp-validation-for="DealershipName" class="text-danger small"></span>
+                    </div>
+                    <label asp-for="RegisterationDate" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                    <div class="col-md-4">
+                        <input asp-for="RegisterationDate" class="form-control form-control-sm" type="date" />
+                        <span asp-validation-for="RegisterationDate" class="text-danger small"></span>
+                    </div>
                 </div>
-            </div>
+
+                <div class="row align-items-start mb-2">
+                    <label asp-for="Status" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                    <div class="col-md-4">
+                        <select asp-for="Status" class="form-select form-select-sm">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Suspended">Suspended</option>
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
+                    <label asp-for="MembershipType" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                    <div class="col-md-4">
+                        <select asp-for="MembershipType" class="form-select form-select-sm">
+                            <option value="">-- Select --</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Silver">Silver</option>
+                            <option value="Bronse">Bronse</option>
+                            <option value="Standard">Standard</option>
+                        </select>
+                        <span asp-validation-for="MembershipType" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row align-items-start mb-2">
+                    <label asp-for="IncentivePercentage" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                    <div class="col-md-4">
+                        <input asp-for="IncentivePercentage" class="form-control form-control-sm" type="number" step="0.01" min="0" max="100" />
+                        <span asp-validation-for="IncentivePercentage" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                @* ── Owner Info ─────────────────────────────────────────────── *@
+                <div class="text-uppercase text-muted small fw-semibold mb-2 border-bottom pb-1 mt-3">Owner Info</div>
+
+                <div class="row align-items-start mb-2">
+                    <label asp-for="OwnerName" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                    <div class="col-md-4">
+                        <input asp-for="OwnerName" class="form-control form-control-sm" />
+                        <span asp-validation-for="OwnerName" class="text-danger small"></span>
+                    </div>
+                    <label asp-for="OwnerCNIC" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                    <div class="col-md-4">
+                        <input asp-for="OwnerCNIC" class="form-control form-control-sm" placeholder="12345-1234567-1" maxlength="15" />
+                        <span asp-validation-for="OwnerCNIC" class="text-danger small"></span>
+                        <small class="text-muted">Format: xxxxx-xxxxxxx-x</small>
+                    </div>
+                </div>
+
+                <div class="row align-items-start mb-2">
+                    <label asp-for="OwnerDetails" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                    <div class="col-md-10">
+                        <textarea asp-for="OwnerDetails" class="form-control form-control-sm" rows="2"></textarea>
+                    </div>
+                </div>
+
+                @* ── Contact Info ───────────────────────────────────────────── *@
+                <div class="text-uppercase text-muted small fw-semibold mb-2 border-bottom pb-1 mt-3">Contact Info</div>
+
+                <div class="row align-items-start mb-2">
+                    <label asp-for="MobileNo" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                    <div class="col-md-4">
+                        <input asp-for="MobileNo" class="form-control form-control-sm" />
+                        <span asp-validation-for="MobileNo" class="text-danger small"></span>
+                    </div>
+                    <label asp-for="PhoneNumber" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                    <div class="col-md-4">
+                        <input asp-for="PhoneNumber" class="form-control form-control-sm" />
+                    </div>
+                </div>
+
+                <div class="row align-items-start mb-2">
+                    <label asp-for="Email" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                    <div class="col-md-4">
+                        <input asp-for="Email" class="form-control form-control-sm" type="email" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                    <label asp-for="Address" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                    <div class="col-md-4">
+                        <input asp-for="Address" class="form-control form-control-sm" maxlength="50" />
+                    </div>
+                </div>
+
+                @* ── Additional Details ─────────────────────────────────────── *@
+                <div class="text-uppercase text-muted small fw-semibold mb-2 border-bottom pb-1 mt-3">Additional Details</div>
+
+                <div class="row align-items-start mb-2">
+                    <label asp-for="Details" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
+                    <div class="col-md-10">
+                        <textarea asp-for="Details" class="form-control form-control-sm" rows="2"></textarea>
+                    </div>
+                </div>
+
+                @* ── Submit ─────────────────────────────────────────────────── *@
+                <div class="row mt-4">
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary px-5">
+                            <i class="bi bi-save me-1"></i>Create Dealer
+                        </button>
+                        <a asp-action="AllDealers" class="btn btn-secondary ms-2 px-4">Cancel</a>
+                    </div>
+                </div>
+
+            </form>
         </div>
     </div>
 </div>

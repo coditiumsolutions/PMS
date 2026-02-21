@@ -2,9 +2,13 @@
 
   <ItemGroup>
     <Compile Remove="PMS.Web\**" />
+    <Compile Remove="SchemaExport\**" />
     <Content Remove="PMS.Web\**" />
+    <Content Remove="SchemaExport\**" />
     <None Remove="PMS.Web\**" />
+    <None Remove="SchemaExport\**" />
     <EmbeddedResource Remove="PMS.Web\**" />
+    <EmbeddedResource Remove="SchemaExport\**" />
   </ItemGroup>
 
   <PropertyGroup>

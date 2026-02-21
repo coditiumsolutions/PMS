@@ -15,11 +15,9 @@ public class DealersController : Controller
         _context = context;
     }
 
-    // GET: Dealers/Dashboard - Dealer Performance Report
-    public async Task<IActionResult> Dashboard()
+    private async Task<DealerPerformanceViewModel> BuildDealerPerformanceModelAsync()
     {
-        ViewBag.ActiveModule = "Dealers";
-        var dealers = await _context.Dealers.OrderBy(d => d.DealerName).ToListAsync();
+        var dealers = await _context.Dealers.OrderBy(d => d.DealershipName).ToListAsync();
         var customers = await _context.Customers.Where(c => c.DealerID != null).Include(c => c.Dealer).ToListAsync();
         var payments = await _context.Payments.ToListAsync();
 
@@ -48,10 +46,8 @@ public class DealersController : Controller
             dealerStats.Add(new DealerPerformanceItem
             {
                 DealerID = dealer.DealerID,
-                DealerCode = dealer.DealerCode ?? "",
-                DealerName = dealer.DealerName,
-                CompanyName = dealer.CompanyName,
-                IsActive = dealer.IsActive,
+                DealershipName = dealer.DealershipName ?? "",
+                Status = dealer.Status ?? "",
                 CustomersAcquired = dealerCustomers.Count,
                 TotalRevenue = totalRevenue,
                 PlanUsage = planUsage,
@@ -62,13 +58,14 @@ public class DealersController : Controller
         var totalCustomersAcquired = dealerStats.Sum(d => d.CustomersAcquired);
         var totalRevenueFromDealers = dealerStats.Sum(d => d.TotalRevenue);
         var dealersWithCustomers = dealerStats.Count(d => d.CustomersAcquired > 0);
+        var activeDealers = dealers.Count(d => string.Equals(d.Status, "Active", StringComparison.OrdinalIgnoreCase));
 
-        var model = new DealerPerformanceViewModel
+        return new DealerPerformanceViewModel
         {
             KPIs = new DealerPerformanceKPIs
             {
                 TotalDealers = dealers.Count,
-                ActiveDealers = dealers.Count(d => d.IsActive),
+                ActiveDealers = activeDealers,
                 TotalCustomersAcquired = totalCustomersAcquired,
                 TotalRevenueFromDealers = totalRevenueFromDealers,
                 AverageRevenuePerDealer = dealersWithCustomers > 0 ? totalRevenueFromDealers / dealersWithCustomers : 0,
@@ -76,7 +73,21 @@ public class DealersController : Controller
             },
             DealerStats = dealerStats.OrderByDescending(d => d.TotalRevenue).ToList()
         };
+    }
 
+    // GET: Dealers (main page - same content as Dashboard)
+    public async Task<IActionResult> Index()
+    {
+        ViewBag.ActiveModule = "Dealers";
+        var model = await BuildDealerPerformanceModelAsync();
+        return View("Dashboard", model);
+    }
+
+    // GET: Dealers/Dashboard - Dealer Performance Report (same as Index)
+    public async Task<IActionResult> Dashboard()
+    {
+        ViewBag.ActiveModule = "Dealers";
+        var model = await BuildDealerPerformanceModelAsync();
         return View(model);
     }
 
@@ -86,12 +97,12 @@ public class DealersController : Controller
         return decimal.TryParse(value.Trim(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var amount) ? amount : 0m;
     }
 
-    // GET: Dealers
-    public async Task<IActionResult> Index()
+    // GET: Dealers/AllDealers
+    public async Task<IActionResult> AllDealers()
     {
         ViewBag.ActiveModule = "Dealers";
-        var dealers = await _context.Dealers.OrderBy(d => d.DealerName).ToListAsync();
-        return View(dealers);
+        var dealers = await _context.Dealers.OrderBy(d => d.DealershipName).ToListAsync();
+        return View("Index", dealers);
     }
 
     // GET: Dealers/Details/5
@@ -112,18 +123,17 @@ public class DealersController : Controller
     public IActionResult Create()
     {
         ViewBag.ActiveModule = "Dealers";
-        return View(new Dealer { IsActive = true });
+        return View(new Dealer { Status = "Active", RegisterationDate = DateTime.Today, MembershipType = "Standard", IncentivePercentage = 5.0 });
     }
 
     // POST: Dealers/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("DealerCode,DealerName,CompanyName,ContactNo,Email,Address,City,IsActive,CreatedBy,Remarks")] Dealer dealer)
+    public async Task<IActionResult> Create([Bind("DealershipName,RegisterationDate,Status,MembershipType,OwnerName,OwnerCNIC,MobileNo,PhoneNumber,Email,Address,OwnerDetails,Details,IncentivePercentage")] Dealer dealer)
     {
         ViewBag.ActiveModule = "Dealers";
         if (ModelState.IsValid)
         {
-            dealer.CreatedAt = DateTime.Now;
             _context.Dealers.Add(dealer);
             await _context.SaveChangesAsync();
             TempData["SuccessMessage"] = "Dealer created successfully.";
@@ -149,7 +159,7 @@ public class DealersController : Controller
     // POST: Dealers/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("DealerID,DealerCode,DealerName,CompanyName,ContactNo,Email,Address,City,IsActive,CreatedAt,CreatedBy,Remarks")] Dealer dealer)
+    public async Task<IActionResult> Edit(int id, [Bind("DealerID,DealershipName,RegisterationDate,Status,MembershipType,OwnerName,OwnerCNIC,MobileNo,PhoneNumber,Email,Address,OwnerDetails,Details,IncentivePercentage")] Dealer dealer)
     {
         ViewBag.ActiveModule = "Dealers";
         if (id != dealer.DealerID)

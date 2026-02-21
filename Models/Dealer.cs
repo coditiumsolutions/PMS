@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace PMS.Web.Models;
 
 /// <summary>
-/// Affiliated dealer / agent for the property management system.
+/// Dealer entity mapped to dbo.Dealers table.
 /// </summary>
 public class Dealer
 {
@@ -13,47 +13,63 @@ public class Dealer
     [Display(Name = "Dealer ID")]
     public int DealerID { get; set; }
 
-    [Display(Name = "Dealer Code")]
+    [Required(ErrorMessage = "Dealership Name is required")]
+    [Display(Name = "Dealership Name")]
+    [StringLength(500, MinimumLength = 2, ErrorMessage = "Dealership Name must be between 2 and 500 characters")]
+    public string DealershipName { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Registration Date is required")]
+    [Display(Name = "Registration Date")]
+    [DataType(DataType.Date)]
+    public DateTime RegisterationDate { get; set; }
+
+    [Display(Name = "Status")]
+    [Required(ErrorMessage = "Status is required")]
     [StringLength(50)]
-    public string? DealerCode { get; set; }
+    public string Status { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Dealer Name is required")]
-    [Display(Name = "Dealer Name")]
-    [StringLength(100)]
-    public string DealerName { get; set; } = string.Empty;
+    [Display(Name = "Membership Type")]
+    [Required(ErrorMessage = "Membership Type is required")]
+    [StringLength(10)]
+    public string MembershipType { get; set; } = string.Empty;
 
-    [Display(Name = "Company Name")]
-    [StringLength(150)]
-    public string? CompanyName { get; set; }
+    [Required(ErrorMessage = "Owner Name is required")]
+    [Display(Name = "Owner Name")]
+    [StringLength(500, MinimumLength = 2, ErrorMessage = "Owner Name must be between 2 and 500 characters")]
+    public string OwnerName { get; set; } = string.Empty;
 
-    [Display(Name = "Contact No")]
-    [StringLength(100)]
-    public string? ContactNo { get; set; }
+    [Required(ErrorMessage = "Owner CNIC is required")]
+    [Display(Name = "Owner CNIC (National ID)")]
+    [StringLength(15)]
+    [RegularExpression(@"^\d{5}-\d{7}-\d{1}$", ErrorMessage = "National ID must be in format xxxxx-xxxxxxx-x (e.g. 12345-1234567-1)")]
+    public string OwnerCNIC { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Mobile No is required")]
+    [Display(Name = "Mobile No")]
+    [StringLength(50)]
+    [RegularExpression(@"^[\d\s\-+()]{10,50}$", ErrorMessage = "Enter a valid mobile number (at least 10 digits)")]
+    public string MobileNo { get; set; } = string.Empty;
+
+    [Display(Name = "Phone Number")]
+    [StringLength(50)]
+    public string? PhoneNumber { get; set; }
 
     [EmailAddress]
     [Display(Name = "Email")]
-    [StringLength(100)]
+    [StringLength(50)]
     public string? Email { get; set; }
 
     [Display(Name = "Address")]
-    [StringLength(255)]
+    [StringLength(50)]
     public string? Address { get; set; }
 
-    [Display(Name = "City")]
-    [StringLength(60)]
-    public string? City { get; set; }
+    [Display(Name = "Owner Details")]
+    public string? OwnerDetails { get; set; }
 
-    [Display(Name = "Active")]
-    public bool IsActive { get; set; } = true;
+    [Display(Name = "Details")]
+    public string? Details { get; set; }
 
-    [Display(Name = "Created At")]
-    public DateTime? CreatedAt { get; set; }
-
-    [Display(Name = "Created By")]
-    [StringLength(100)]
-    public string? CreatedBy { get; set; }
-
-    [Display(Name = "Remarks")]
-    [StringLength(500)]
-    public string? Remarks { get; set; }
+    [Display(Name = "Incentive Percentage")]
+    [Range(0, 100, ErrorMessage = "Incentive Percentage must be between 0 and 100")]
+    public double? IncentivePercentage { get; set; } = 5.0;
 }

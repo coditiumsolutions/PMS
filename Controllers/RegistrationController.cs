@@ -115,7 +115,7 @@ public class RegistrationController : Controller
     // POST: Registration/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("FullName,CNIC,Phone,Email,ProjectID,RequestedSize,Remarks,Status")] Registration registration)
+    public async Task<IActionResult> Create([Bind("FullName,CNIC,Phone,ContactNo1,ContactNo2,Email,ProjectID,RequestedSize,MailingAddress,MailingCity,MailingCountry,Remarks,Status")] Registration registration)
     {
         ViewBag.ActiveModule = "Registration";
         

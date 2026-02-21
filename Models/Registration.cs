@@ -21,12 +21,20 @@ public class Registration
     [StringLength(50)]
     public string? Phone { get; set; }
 
+    [Display(Name = "Contact No 1")]
+    [StringLength(50)]
+    public string? ContactNo1 { get; set; }
+
+    [Display(Name = "Contact No 2")]
+    [StringLength(50)]
+    public string? ContactNo2 { get; set; }
+
     [Display(Name = "Email")]
     [StringLength(150)]
     [EmailAddress]
     public string? Email { get; set; }
 
-    [Display(Name = "Project ID")]
+    [Display(Name = "Requested Project")]
     public int? ProjectID { get; set; }
 
     [ForeignKey("ProjectID")]
@@ -35,6 +43,18 @@ public class Registration
     [Display(Name = "Requested Size")]
     [StringLength(100)]
     public string? RequestedSize { get; set; }
+
+    [Display(Name = "Mailing Address")]
+    [StringLength(250)]
+    public string? MailingAddress { get; set; }
+
+    [Display(Name = "Mailing City")]
+    [StringLength(100)]
+    public string? MailingCity { get; set; }
+
+    [Display(Name = "Mailing Country")]
+    [StringLength(100)]
+    public string? MailingCountry { get; set; }
 
     [Display(Name = "Remarks")]
     public string? Remarks { get; set; }

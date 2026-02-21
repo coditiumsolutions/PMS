@@ -6,66 +6,121 @@
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Dealer Details</h2>
+        <h2 class="mb-0">Dealer Details</h2>
         <div class="d-flex gap-2">
-            <a asp-action="Edit" asp-route-id="@Model.DealerID" class="btn btn-warning">Edit</a>
-            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            <a asp-action="Edit" asp-route-id="@Model.DealerID" class="btn btn-warning btn-sm">
+                <i class="bi bi-pencil me-1"></i>Edit
+            </a>
+            <a asp-action="AllDealers" class="btn btn-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Back to List
+            </a>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Dealer Information</h5>
-                </div>
-                <div class="card-body">
-                    <dl class="row">
-                        <dt class="col-sm-3">Dealer ID:</dt>
-                        <dd class="col-sm-9">@Model.DealerID</dd>
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white py-2">
+            <h6 class="mb-0"><i class="bi bi-person-badge me-2"></i>Dealer Information</h6>
+        </div>
+        <div class="card-body py-3">
 
-                        <dt class="col-sm-3">Dealer Code:</dt>
-                        <dd class="col-sm-9">@(Model.DealerCode ?? "-")</dd>
+            @* ── Dealership Info ────────────────────────────────────────── *@
+            <div class="text-uppercase text-muted small fw-semibold mb-2 border-bottom pb-1">Dealership Info</div>
 
-                        <dt class="col-sm-3">Dealer Name:</dt>
-                        <dd class="col-sm-9">@Model.DealerName</dd>
+            <div class="row mb-2">
+                <div class="col-md-2 fw-semibold text-end text-muted small">Dealer ID</div>
+                <div class="col-md-4">@Model.DealerID</div>
+                <div class="col-md-2 fw-semibold text-end text-muted small">Dealership Name</div>
+                <div class="col-md-4">@Model.DealershipName</div>
+            </div>
 
-                        <dt class="col-sm-3">Company Name:</dt>
-                        <dd class="col-sm-9">@(Model.CompanyName ?? "-")</dd>
-
-                        <dt class="col-sm-3">Contact No:</dt>
-                        <dd class="col-sm-9">@(Model.ContactNo ?? "-")</dd>
-
-                        <dt class="col-sm-3">Email:</dt>
-                        <dd class="col-sm-9">@(Model.Email ?? "-")</dd>
-
-                        <dt class="col-sm-3">Address:</dt>
-                        <dd class="col-sm-9">@(Model.Address ?? "-")</dd>
-
-                        <dt class="col-sm-3">City:</dt>
-                        <dd class="col-sm-9">@(Model.City ?? "-")</dd>
-
-                        <dt class="col-sm-3">Active:</dt>
-                        <dd class="col-sm-9">@(Model.IsActive ? "Yes" : "No")</dd>
-
-                        <dt class="col-sm-3">Created At:</dt>
-                        <dd class="col-sm-9">@(Model.CreatedAt?.ToString("MMM dd, yyyy HH:mm") ?? "N/A")</dd>
-
-                        <dt class="col-sm-3">Created By:</dt>
-                        <dd class="col-sm-9">@(Model.CreatedBy ?? "-")</dd>
-
-                        <dt class="col-sm-3">Remarks:</dt>
-                        <dd class="col-sm-9">@(Model.Remarks ?? "-")</dd>
-                    </dl>
-                </div>
-                <div class="card-footer bg-white">
-                    <div class="d-flex gap-2">
-                        <a asp-action="Edit" asp-route-id="@Model.DealerID" class="btn btn-warning">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@Model.DealerID" class="btn btn-danger">Delete</a>
-                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-                    </div>
+            <div class="row mb-2">
+                <div class="col-md-2 fw-semibold text-end text-muted small">Registration Date</div>
+                <div class="col-md-4">@Model.RegisterationDate.ToString("dd MMM yyyy")</div>
+                <div class="col-md-2 fw-semibold text-end text-muted small">Status</div>
+                <div class="col-md-4">
+                    @{
+                        var statusClass = Model.Status switch {
+                            "Active"    => "badge bg-success",
+                            "Inactive"  => "badge bg-secondary",
+                            "Suspended" => "badge bg-danger",
+                            _           => "badge bg-light text-dark"
+                        };
+                    }
+                    <span class="@statusClass">@(Model.Status ?? "-")</span>
                 </div>
             </div>
+
+            <div class="row mb-2">
+                <div class="col-md-2 fw-semibold text-end text-muted small">Membership Type</div>
+                <div class="col-md-4">@(Model.MembershipType ?? "-")</div>
+                <div class="col-md-2 fw-semibold text-end text-muted small">Incentive %</div>
+                <div class="col-md-4">@(Model.IncentivePercentage?.ToString("N1") ?? "-")</div>
+            </div>
+
+            @* ── Owner Info ─────────────────────────────────────────────── *@
+            <div class="text-uppercase text-muted small fw-semibold mb-2 border-bottom pb-1 mt-3">Owner Info</div>
+
+            <div class="row mb-2">
+                <div class="col-md-2 fw-semibold text-end text-muted small">Owner Name</div>
+                <div class="col-md-4">@(Model.OwnerName ?? "-")</div>
+                <div class="col-md-2 fw-semibold text-end text-muted small">Owner CNIC</div>
+                <div class="col-md-4">@(Model.OwnerCNIC ?? "-")</div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-2 fw-semibold text-end text-muted small">Owner Details</div>
+                <div class="col-md-10">@(string.IsNullOrWhiteSpace(Model.OwnerDetails) ? "-" : Model.OwnerDetails)</div>
+            </div>
+
+            @* ── Contact Info ───────────────────────────────────────────── *@
+            <div class="text-uppercase text-muted small fw-semibold mb-2 border-bottom pb-1 mt-3">Contact Info</div>
+
+            <div class="row mb-2">
+                <div class="col-md-2 fw-semibold text-end text-muted small">Mobile No</div>
+                <div class="col-md-4">@(Model.MobileNo ?? "-")</div>
+                <div class="col-md-2 fw-semibold text-end text-muted small">Phone Number</div>
+                <div class="col-md-4">@(Model.PhoneNumber ?? "-")</div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-2 fw-semibold text-end text-muted small">Email</div>
+                <div class="col-md-4">
+                    @if (!string.IsNullOrWhiteSpace(Model.Email))
+                    {
+                        <a href="mailto:@Model.Email">@Model.Email</a>
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </div>
+                <div class="col-md-2 fw-semibold text-end text-muted small">Address</div>
+                <div class="col-md-4">@(Model.Address ?? "-")</div>
+            </div>
+
+            @* ── Additional Details ─────────────────────────────────────── *@
+            <div class="text-uppercase text-muted small fw-semibold mb-2 border-bottom pb-1 mt-3">Additional Details</div>
+
+            <div class="row mb-2">
+                <div class="col-md-2 fw-semibold text-end text-muted small">Details</div>
+                <div class="col-md-10">@(string.IsNullOrWhiteSpace(Model.Details) ? "-" : Model.Details)</div>
+            </div>
+
+            @* ── Actions ────────────────────────────────────────────────── *@
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <a asp-action="Edit" asp-route-id="@Model.DealerID" class="btn btn-warning px-4">
+                        <i class="bi bi-pencil me-1"></i>Edit
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.DealerID" class="btn btn-danger ms-2 px-4">
+                        <i class="bi bi-trash me-1"></i>Delete
+                    </a>
+                    <a asp-action="AllDealers" class="btn btn-secondary ms-2 px-4">
+                        <i class="bi bi-arrow-left me-1"></i>Back to List
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

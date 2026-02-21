@@ -173,7 +173,7 @@ public class CustomersController : Controller
                 .ToListAsync();
 
             ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
-            ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
+            ViewBag.DealerOptions = await _context.Dealers.Where(d => d.Status == "Active").OrderBy(d => d.DealershipName).ToListAsync();
 
             ViewBag.FromRegistration = true;
             ViewBag.RegistrationID = registration.RegID;
@@ -200,7 +200,7 @@ public class CustomersController : Controller
             .ToListAsync();
 
         ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
-        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.Status == "Active").OrderBy(d => d.DealershipName).ToListAsync();
 
         // New customer case
         if (string.IsNullOrWhiteSpace(id))
@@ -249,7 +249,7 @@ public class CustomersController : Controller
             .ToListAsync();
 
         ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
-        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.Status == "Active").OrderBy(d => d.DealershipName).ToListAsync();
 
         var model = new CustomerCreateViewModel
         {
@@ -468,7 +468,7 @@ public class CustomersController : Controller
             .ToListAsync();
 
         ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
-        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.Status == "Active").OrderBy(d => d.DealershipName).ToListAsync();
 
         return View(model);
     }
@@ -488,7 +488,7 @@ public class CustomersController : Controller
             return NotFound();
         }
         ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
-        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.Status == "Active").OrderBy(d => d.DealershipName).ToListAsync();
         return View(customer);
     }
 
@@ -576,7 +576,7 @@ public class CustomersController : Controller
             return RedirectToAction(nameof(Index));
         }
         ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
-        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.Status == "Active").OrderBy(d => d.DealershipName).ToListAsync();
         return View(customer);
     }
 
@@ -597,7 +597,7 @@ public class CustomersController : Controller
             return NotFound();
         }
         ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
-        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.Status == "Active").OrderBy(d => d.DealershipName).ToListAsync();
         return View("Edit", customer);
     }
 
@@ -689,7 +689,7 @@ public class CustomersController : Controller
         }
         ViewBag.ReturnUrl = returnUrl;
         ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
-        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.IsActive).OrderBy(d => d.DealerName).ToListAsync();
+        ViewBag.DealerOptions = await _context.Dealers.Where(d => d.Status == "Active").OrderBy(d => d.DealershipName).ToListAsync();
         return View("Edit", customer);
     }
 
@@ -743,7 +743,8 @@ public class CustomersController : Controller
             throw;
         }
 
-        return RedirectToAction(nameof(Index));
+        TempData["SuccessMessage"] = "Customer deleted successfully.";
+        return RedirectToAction(nameof(CustomersDetail));
     }
 
     // GET: Customers/Summary
@@ -820,21 +821,21 @@ public class CustomersController : Controller
     }
 
     // GET: Customers/History
-    public async Task<IActionResult> History(string? customerId = null)
+    public async Task<IActionResult> History(string? customerId = null, string? actionType = null)
     {
         ViewBag.ActiveModule = "Customers";
+        ViewBag.CustomerId  = customerId;
+        ViewBag.ActionType  = actionType;
 
-        // When no customerId is provided, keep the grid empty
-        if (string.IsNullOrWhiteSpace(customerId))
-        {
-            ViewBag.CustomerId = null;
-            return View(System.Linq.Enumerable.Empty<CustomerAuditLog>());
-        }
+        var query = _context.CustomerAuditLogs.AsQueryable();
 
-        // Filter by customer ID and show only relevant records
-        ViewBag.CustomerId = customerId;
-        var auditLogs = await _context.CustomerAuditLogs
-            .Where(a => a.CustomerID == customerId)
+        if (!string.IsNullOrWhiteSpace(customerId))
+            query = query.Where(a => a.CustomerID == customerId);
+
+        if (!string.IsNullOrWhiteSpace(actionType))
+            query = query.Where(a => a.ActionType == actionType);
+
+        var auditLogs = await query
             .OrderByDescending(a => a.ActionDate)
             .ToListAsync();
 
