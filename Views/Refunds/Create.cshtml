@@ -1,0 +1,250 @@
+@model PMS.Web.Models.Refund
+
+@{
+    ViewData["Title"] = "Create Refund";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Create Refund</h2>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <label for="customerSearchNo" class="form-label fw-semibold mb-2">Search Customer By Customer No</label>
+            <div class="input-group">
+                <input type="text" id="customerSearchNo" class="form-control" placeholder="Enter Customer No (e.g. CUST001)" />
+                <button type="button" id="btnSearchCustomer" class="btn btn-outline-primary">Search</button>
+            </div>
+            <small id="customerSearchMessage" class="form-text text-muted d-block mt-2"></small>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-12 col-md-2">
+                        <label asp-for="RefundType" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <select asp-for="RefundType" class="form-select">
+                            <option value="">-- Select Refund Type --</option>
+                            <option value="Full Refund">Full Refund</option>
+                            <option value="Partial Refund">Partial Refund</option>
+                        </select>
+                        <span asp-validation-for="RefundType" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label asp-for="CustomerNo" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="CustomerNo" class="form-control" readonly />
+                        <span asp-validation-for="CustomerNo" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-12 col-md-2">
+                        <label asp-for="CustomerName" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="CustomerName" class="form-control" readonly />
+                        <span asp-validation-for="CustomerName" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label asp-for="FatherName" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="FatherName" class="form-control" readonly />
+                        <span asp-validation-for="FatherName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-12 col-md-2">
+                        <label asp-for="CNICNo" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="CNICNo" class="form-control" readonly />
+                        <span asp-validation-for="CNICNo" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label asp-for="ApplicationNo" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="ApplicationNo" class="form-control" readonly />
+                        <span asp-validation-for="ApplicationNo" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-12 col-md-2">
+                        <label asp-for="ProjectName" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="ProjectName" class="form-control" readonly />
+                        <span asp-validation-for="ProjectName" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label asp-for="PlotSize" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="PlotSize" class="form-control" readonly />
+                        <span asp-validation-for="PlotSize" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-12 col-md-2">
+                        <label asp-for="PropertyDetail" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="PropertyDetail" class="form-control" readonly />
+                        <span asp-validation-for="PropertyDetail" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label asp-for="Detail" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <textarea asp-for="Detail" class="form-control" rows="2" readonly></textarea>
+                        <span asp-validation-for="Detail" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-12 col-md-2">
+                        <label asp-for="CreatedDate" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="CreatedDate" class="form-control" type="datetime-local" readonly />
+                        <span asp-validation-for="CreatedDate" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label asp-for="CreatedBy" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="CreatedBy" class="form-control" readonly />
+                        <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Refund Amount Details</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm mb-0 align-middle">
+                                <tbody>
+                                    <tr>
+                                        <th class="w-25">@Html.DisplayNameFor(model => model.TotalPaidAmount)</th>
+                                        <td>
+                                            <input asp-for="TotalPaidAmount" class="form-control" type="number" readonly />
+                                            <span asp-validation-for="TotalPaidAmount" class="text-danger"></span>
+                                        </td>
+                                        <th class="w-25">@Html.DisplayNameFor(model => model.RefundableAmount)</th>
+                                        <td>
+                                            <input asp-for="RefundableAmount" class="form-control" type="number" readonly />
+                                            <span asp-validation-for="RefundableAmount" class="text-danger"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.DisplayNameFor(model => model.Deduction)</th>
+                                        <td>
+                                            <input asp-for="Deduction" class="form-control" type="number" readonly />
+                                            <span asp-validation-for="Deduction" class="text-danger"></span>
+                                        </td>
+                                        <th>@Html.DisplayNameFor(model => model.AmountToRefund)</th>
+                                        <td>
+                                            <input asp-for="AmountToRefund" class="form-control" type="number" readonly />
+                                            <span asp-validation-for="AmountToRefund" class="text-danger"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary px-4">Create</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4 ms-2">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        (() => {
+            const searchInput = document.getElementById("customerSearchNo");
+            const searchButton = document.getElementById("btnSearchCustomer");
+            const messageEl = document.getElementById("customerSearchMessage");
+
+            const setMessage = (text, isError = false) => {
+                messageEl.textContent = text;
+                messageEl.classList.toggle("text-danger", isError);
+                messageEl.classList.toggle("text-success", !isError);
+                messageEl.classList.toggle("text-muted", false);
+            };
+
+            const fillField = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.value = value ?? "";
+                }
+            };
+
+            const lookupCustomer = async () => {
+                const customerNo = (searchInput?.value || "").trim();
+                if (!customerNo) {
+                    setMessage("Please enter Customer No first.", true);
+                    return;
+                }
+
+                setMessage("Searching customer...");
+
+                try {
+                    const response = await fetch(`@Url.Action("LookupCustomer", "Refunds")?customerNo=${encodeURIComponent(customerNo)}`, {
+                        method: "GET",
+                        headers: { "X-Requested-With": "XMLHttpRequest" }
+                    });
+
+                    const payload = await response.json();
+
+                    if (!response.ok || !payload.success) {
+                        setMessage(payload.message || "Customer not found.", true);
+                        return;
+                    }
+
+                    const data = payload.data || {};
+                    fillField("CustomerNo", data.customerNo);
+                    fillField("CustomerName", data.customerName);
+                    fillField("FatherName", data.fatherName);
+                    fillField("CNICNo", data.cnicNo);
+                    fillField("ProjectName", data.projectName);
+                    fillField("PlotSize", data.plotSize);
+                    fillField("PropertyDetail", data.propertyDetail);
+
+                    setMessage("Customer data loaded successfully.");
+                } catch {
+                    setMessage("Unable to fetch customer right now. Please try again.", true);
+                }
+            };
+
+            searchButton?.addEventListener("click", lookupCustomer);
+            searchInput?.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    lookupCustomer();
+                }
+            });
+        })();
+    </script>
+}

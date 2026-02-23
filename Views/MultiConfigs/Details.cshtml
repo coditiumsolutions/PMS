@@ -1,0 +1,31 @@
+@model PMS.Web.Models.MultiConfig
+
+@{
+    ViewData["Title"] = "Multi Config Details";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Multi Config Details</h2>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UId)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.UId)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ConfigKey)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.ConfigKey)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ConfigValue)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.ConfigValue)</dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-white">
+            <a asp-action="Edit" asp-route-id="@Model.UId" class="btn btn-warning">Edit</a>
+            <a asp-action="Delete" asp-route-id="@Model.UId" class="btn btn-danger">Delete</a>
+        </div>
+    </div>
+</div>

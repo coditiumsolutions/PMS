@@ -26,6 +26,7 @@ public class Customer
     [Required(ErrorMessage = "CNIC is required")]
     [Display(Name = "CNIC")]
     [StringLength(60, ErrorMessage = "CNIC cannot exceed 60 characters")]
+    [RegularExpression(@"^\d{5}-\d{7}-\d$", ErrorMessage = "CNIC format must be xxxxx-xxxxxxx-x")]
     public string Cnic { get; set; } = string.Empty;
 
     [Display(Name = "Contact No")]

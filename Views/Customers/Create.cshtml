@@ -179,12 +179,24 @@
                         <div class="row align-items-start mb-2">
                             <label asp-for="Customer.PresCity" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
                             <div class="col-md-4">
-                                <input asp-for="Customer.PresCity" class="form-control form-control-sm" />
+                                <select asp-for="Customer.PresCity" class="form-select form-select-sm">
+                                    <option value="">Select City</option>
+                                    @foreach (var city in (ViewBag.CityOptions as IEnumerable<string>) ?? Array.Empty<string>())
+                                    {
+                                        <option value="@city">@city</option>
+                                    }
+                                </select>
                                 <span asp-validation-for="Customer.PresCity" class="text-danger small"></span>
                             </div>
                             <label asp-for="Customer.PresCountry" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
                             <div class="col-md-4">
-                                <input asp-for="Customer.PresCountry" class="form-control form-control-sm" />
+                                <select asp-for="Customer.PresCountry" class="form-select form-select-sm">
+                                    <option value="">Select Country</option>
+                                    @foreach (var country in (ViewBag.CountryOptions as IEnumerable<string>) ?? Array.Empty<string>())
+                                    {
+                                        <option value="@country">@country</option>
+                                    }
+                                </select>
                                 <span asp-validation-for="Customer.PresCountry" class="text-danger small"></span>
                             </div>
                         </div>
@@ -203,12 +215,24 @@
                         <div class="row align-items-start mb-2">
                             <label asp-for="Customer.PremCity" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
                             <div class="col-md-4">
-                                <input asp-for="Customer.PremCity" class="form-control form-control-sm" />
+                                <select asp-for="Customer.PremCity" class="form-select form-select-sm">
+                                    <option value="">Select City</option>
+                                    @foreach (var city in (ViewBag.CityOptions as IEnumerable<string>) ?? Array.Empty<string>())
+                                    {
+                                        <option value="@city">@city</option>
+                                    }
+                                </select>
                                 <span asp-validation-for="Customer.PremCity" class="text-danger small"></span>
                             </div>
                             <label asp-for="Customer.PremCountry" class="col-md-2 col-form-label col-form-label-sm fw-semibold text-end"></label>
                             <div class="col-md-4">
-                                <input asp-for="Customer.PremCountry" class="form-control form-control-sm" />
+                                <select asp-for="Customer.PremCountry" class="form-select form-select-sm">
+                                    <option value="">Select Country</option>
+                                    @foreach (var country in (ViewBag.CountryOptions as IEnumerable<string>) ?? Array.Empty<string>())
+                                    {
+                                        <option value="@country">@country</option>
+                                    }
+                                </select>
                                 <span asp-validation-for="Customer.PremCountry" class="text-danger small"></span>
                             </div>
                         </div>

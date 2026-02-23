@@ -92,7 +92,7 @@
 
 .pms-module-tile.pms-accent-green {
     border-left: 4px solid #dc3545;
-    background-color: #3a1c22;
+    background-color: #142b4d;
 }
 
 .pms-module-tile.pms-accent-green .pms-module-icon {
@@ -100,7 +100,7 @@
 }
 
 .pms-module-tile.pms-accent-green:hover {
-    background-color: #4b232c;
+    background-color: #1a3761;
 }
 
 .pms-module-tile.pms-accent-orange {
@@ -118,15 +118,15 @@
 
 .pms-module-tile.pms-accent-yellow {
     border-left: 4px solid #ffc107;
-    background-color: #3a3118;
+    background-color: #001f3f !important;
 }
 
 .pms-module-tile.pms-accent-yellow .pms-module-icon {
-    color: #b8860b;
+    color: #9cc7ff;
 }
 
 .pms-module-tile.pms-accent-yellow:hover {
-    background-color: #4a3f1f;
+    background-color: #003366 !important;
 }
 
 .pms-module-tile.pms-accent-red {
@@ -192,6 +192,32 @@
 
 .pms-module-tile.pms-accent-pink:hover {
     background-color: #4a2740;
+}
+
+.pms-module-tile.pms-accent-payments {
+    border-left: 4px solid #7c5db6;
+    background-color: #5c3e94 !important;
+}
+
+.pms-module-tile.pms-accent-payments .pms-module-icon {
+    color: #d8c9ff;
+}
+
+.pms-module-tile.pms-accent-payments:hover {
+    background-color: #4c3280 !important;
+}
+
+.pms-module-tile.pms-accent-property-waiver {
+    border-left: 4px solid #bd7e4a;
+    background-color: #bd7e4a !important;
+}
+
+.pms-module-tile.pms-accent-property-waiver .pms-module-icon {
+    color: #fff3e6;
+}
+
+.pms-module-tile.pms-accent-property-waiver:hover {
+    background-color: #aa6f3f !important;
 }
 
 /* Responsive: smaller icon on mobile */

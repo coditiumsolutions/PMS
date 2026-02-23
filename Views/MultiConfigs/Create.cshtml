@@ -1,0 +1,41 @@
+@model PMS.Web.Models.MultiConfig
+
+@{
+    ViewData["Title"] = "Create Multi Config";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Create Multi Config</h2>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="ConfigKey" class="form-label"></label>
+                    <input asp-for="ConfigKey" class="form-control" />
+                    <span asp-validation-for="ConfigKey" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ConfigValue" class="form-label"></label>
+                    <input asp-for="ConfigValue" class="form-control" />
+                    <span asp-validation-for="ConfigValue" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Create</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

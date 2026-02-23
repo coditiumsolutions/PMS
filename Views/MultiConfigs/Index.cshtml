@@ -1,0 +1,49 @@
+@model IEnumerable<PMS.Web.Models.MultiConfig>
+
+@{
+    ViewData["Title"] = "Multi Configs";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Multi Configs</h2>
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Multi Configs List</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" class="ps-3">@Html.DisplayNameFor(model => model.UId)</th>
+                            <th scope="col">@Html.DisplayNameFor(model => model.ConfigKey)</th>
+                            <th scope="col">@Html.DisplayNameFor(model => model.ConfigValue)</th>
+                            <th scope="col" class="pe-3 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-3">@Html.DisplayFor(modelItem => item.UId)</td>
+                                <td>@Html.DisplayFor(modelItem => item.ConfigKey)</td>
+                                <td>@Html.DisplayFor(modelItem => item.ConfigValue)</td>
+                                <td class="pe-3 text-center">
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.UId" class="btn btn-sm btn-info">Details</a>
+                                        <a asp-action="Edit" asp-route-id="@item.UId" class="btn btn-sm btn-warning">Edit</a>
+                                        <a asp-action="Delete" asp-route-id="@item.UId" class="btn btn-sm btn-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

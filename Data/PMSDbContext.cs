@@ -11,6 +11,7 @@ public class PMSDbContext : DbContext
     }
 
     public DbSet<Configuration> Configurations { get; set; }
+    public DbSet<MultiConfig> MultiConfigs { get; set; }
     public DbSet<Project> Projects { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<CustomerAuditLog> CustomerAuditLogs { get; set; }
@@ -23,6 +24,8 @@ public class PMSDbContext : DbContext
     public DbSet<RequestedProperty> RequestedProperties { get; set; }
     public DbSet<Registration> Registrations { get; set; }
     public DbSet<Dealer> Dealers { get; set; }
+    public DbSet<Refund> Refunds { get; set; }
+    public DbSet<Waiver> Waivers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -109,6 +112,25 @@ public class PMSDbContext : DbContext
                 .HasColumnName("Prefix")
                 .HasMaxLength(50)
                 .IsRequired(false);
+        });
+
+        // Configure MultiConfig entity (dbo.MultiValueConfigurations)
+        modelBuilder.Entity<MultiConfig>(entity =>
+        {
+            entity.HasKey(e => e.UId);
+            entity.ToTable("MultiValueConfigurations");
+
+            entity.Property(e => e.UId)
+                .HasColumnName("UId")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.ConfigKey)
+                .HasColumnName("ConfigKey")
+                .HasMaxLength(50);
+
+            entity.Property(e => e.ConfigValue)
+                .HasColumnName("ConfigValue")
+                .HasMaxLength(100);
         });
 
         // Configure InventoryDetail entity
@@ -239,6 +261,44 @@ public class PMSDbContext : DbContext
             entity.HasIndex(e => e.ProjectID);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
+        });
+
+        // Configure Refund entity
+        modelBuilder.Entity<Refund>(entity =>
+        {
+            entity.HasKey(e => e.Uid);
+            entity.ToTable("Refunds");
+
+            entity.Property(e => e.Uid)
+                .HasColumnName("uid")
+                .ValueGeneratedOnAdd();
+
+            // Keep DB typo as-is by mapping to a clean property name.
+            entity.Property(e => e.CustomerNo)
+                .HasColumnName("CusomerNo");
+
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true);
+        });
+
+        // Configure Waiver entity
+        modelBuilder.Entity<Waiver>(entity =>
+        {
+            entity.HasKey(e => e.Uid);
+            entity.ToTable("Waivers");
+
+            entity.Property(e => e.Uid)
+                .HasColumnName("uid")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("GETDATE()");
+
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true);
         });
     }
 }

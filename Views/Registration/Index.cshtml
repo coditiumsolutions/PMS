@@ -24,12 +24,19 @@
     }
     else
     {
+        <div class="d-flex justify-content-end mb-2">
+            <button type="button" id="createCustomerFromSelection" class="btn btn-success btn-sm" disabled>
+                <i class="bi bi-person-plus me-1"></i>Create Customer
+            </button>
+        </div>
+
         <div class="card shadow-sm">
             <div class="card-body p-0">
                 <div class="table-responsive" style="max-height: 600px; overflow-y: auto; overflow-x: auto; width: 100%;">
                     <table class="table table-bordered table-hover mb-0" id="registrationsTable" style="width: 100%; table-layout: auto; min-width: 800px;">
                         <thead class="sticky-top" style="background-color: #071a2e; color: white;">
                             <tr>
+                                <th scope="col" class="text-center" style="width: 48px; min-width: 48px;">Select</th>
                                 <th scope="col" class="sortable" data-sort="number">
                                     @Html.DisplayNameFor(model => model.RegID)
                                     <i class="bi bi-arrow-down-up ms-1"></i>
@@ -70,6 +77,12 @@
                                 var canCreateCustomer = isApproved && !hasCustomer;
                                 
                                 <tr>
+                                    <td class="text-center select-col">
+                                        <input type="checkbox"
+                                               class="form-check-input registration-select"
+                                               value="@item.RegID"
+                                               data-reg-id="@item.RegID" />
+                                    </td>
                                     <td class="fw-medium">@Html.DisplayFor(modelItem => item.RegID)</td>
                                     <td>@Html.DisplayFor(modelItem => item.FullName)</td>
                                     <td>@Html.DisplayFor(modelItem => item.Phone)</td>
@@ -204,6 +217,14 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
+    #registrationsTable tbody td.select-col {
+        width: 48px;
+        min-width: 48px;
+        max-width: 48px;
+        white-space: normal;
+        overflow: visible;
+    }
     
     #registrationsTable tbody td:last-child {
         white-space: normal;
@@ -262,12 +283,45 @@
         
         const tbody = table.querySelector('tbody');
         const headers = table.querySelectorAll('thead th.sortable');
+        const createCustomerBtn = document.getElementById('createCustomerFromSelection');
+        const selectionCheckboxes = table.querySelectorAll('.registration-select');
         let currentSort = { column: -1, direction: 'asc' };
+
+        selectionCheckboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', () => {
+                if (!checkbox.checked) return;
+                selectionCheckboxes.forEach((other) => {
+                    if (other !== checkbox) other.checked = false;
+                });
+                if (createCustomerBtn) createCustomerBtn.disabled = false;
+            });
+        });
+
+        selectionCheckboxes.forEach((checkbox) => {
+            checkbox.addEventListener('change', () => {
+                if (!createCustomerBtn) return;
+                const hasSelection = !!table.querySelector('.registration-select:checked');
+                createCustomerBtn.disabled = !hasSelection;
+            });
+        });
+
+        if (createCustomerBtn) {
+            createCustomerBtn.addEventListener('click', () => {
+                const selected = table.querySelector('.registration-select:checked');
+                if (!selected) return;
+                const regId = selected.getAttribute('data-reg-id');
+
+                if (!regId) return;
+
+                window.location.href = `/Customers/Create?registrationId=${encodeURIComponent(regId)}`;
+            });
+        }
         
         headers.forEach((header, index) => {
             header.addEventListener('click', () => {
                 const sortType = header.getAttribute('data-sort');
                 const isAsc = currentSort.column === index && currentSort.direction === 'asc';
+                const columnIndex = Array.from(header.parentElement.children).indexOf(header);
                 
                 // Update sort direction
                 currentSort.column = index;
@@ -284,8 +338,8 @@
                 // Sort rows
                 const rows = Array.from(tbody.querySelectorAll('tr'));
                 rows.sort((a, b) => {
-                    const aCell = a.cells[index];
-                    const bCell = b.cells[index];
+                    const aCell = a.cells[columnIndex];
+                    const bCell = b.cells[columnIndex];
                     
                     let aValue = aCell.getAttribute('data-sort-value') || aCell.textContent.trim();
                     let bValue = bCell.getAttribute('data-sort-value') || bCell.textContent.trim();

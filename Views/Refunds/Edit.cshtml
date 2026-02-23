@@ -1,0 +1,124 @@
+@model PMS.Web.Models.Refund
+
+@{
+    ViewData["Title"] = "Edit Refund";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Edit Refund</h2>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="Edit" asp-route-id="@Model.Uid">
+                <input type="hidden" asp-for="Uid" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="RefundType" class="form-label"></label>
+                        <input asp-for="RefundType" class="form-control" />
+                        <span asp-validation-for="RefundType" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="CustomerNo" class="form-label"></label>
+                        <input asp-for="CustomerNo" class="form-control" />
+                        <span asp-validation-for="CustomerNo" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="CustomerName" class="form-label"></label>
+                        <input asp-for="CustomerName" class="form-control" />
+                        <span asp-validation-for="CustomerName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="FatherName" class="form-label"></label>
+                        <input asp-for="FatherName" class="form-control" />
+                        <span asp-validation-for="FatherName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="CNICNo" class="form-label"></label>
+                        <input asp-for="CNICNo" class="form-control" />
+                        <span asp-validation-for="CNICNo" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="ApplicationNo" class="form-label"></label>
+                        <input asp-for="ApplicationNo" class="form-control" />
+                        <span asp-validation-for="ApplicationNo" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="TotalPaidAmount" class="form-label"></label>
+                        <input asp-for="TotalPaidAmount" class="form-control" type="number" />
+                        <span asp-validation-for="TotalPaidAmount" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="RefundableAmount" class="form-label"></label>
+                        <input asp-for="RefundableAmount" class="form-control" type="number" />
+                        <span asp-validation-for="RefundableAmount" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="Deduction" class="form-label"></label>
+                        <input asp-for="Deduction" class="form-control" type="number" />
+                        <span asp-validation-for="Deduction" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="AmountToRefund" class="form-label"></label>
+                        <input asp-for="AmountToRefund" class="form-control" type="number" />
+                        <span asp-validation-for="AmountToRefund" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="ProjectName" class="form-label"></label>
+                        <input asp-for="ProjectName" class="form-control" />
+                        <span asp-validation-for="ProjectName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="PlotSize" class="form-label"></label>
+                        <input asp-for="PlotSize" class="form-control" />
+                        <span asp-validation-for="PlotSize" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="PropertyDetail" class="form-label"></label>
+                        <input asp-for="PropertyDetail" class="form-control" />
+                        <span asp-validation-for="PropertyDetail" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Detail" class="form-label"></label>
+                        <textarea asp-for="Detail" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Detail" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="CreatedDate" class="form-label"></label>
+                        <input asp-for="CreatedDate" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="CreatedDate" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="CreatedBy" class="form-label"></label>
+                        <input asp-for="CreatedBy" class="form-control" />
+                        <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-check mt-4">
+                            <input asp-for="IsActive" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

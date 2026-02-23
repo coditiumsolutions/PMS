@@ -92,7 +92,8 @@
     {
         <h3 class="sidebar-heading">Setup</h3>
         <ul class="sidebar-nav">
-            <li><a href="/Setup/Configurations"><i class="bi bi-sliders me-2"></i>Configurations</a></li>
+            <li><a href="/Setup/Configurations"><i class="bi bi-sliders me-2"></i>Normal Configs</a></li>
+            <li><a href="/Setup/MultiConfigs"><i class="bi bi-grid-3x3-gap me-2"></i>Multi Configs</a></li>
             <li><a asp-controller="Setup" asp-action="Proj"><i class="bi bi-building me-2"></i>Project</a></li>
             <li><a asp-controller="Setup" asp-action="Roles"><i class="bi bi-diagram-3 me-2"></i>Roles</a></li>
             <li><a asp-controller="Setup" asp-action="Users"><i class="bi bi-people me-2"></i>Users</a></li>
@@ -124,6 +125,24 @@
             <li><a asp-controller="Dealers" asp-action="Create"><i class="bi bi-person-plus me-2"></i>New Dealer</a></li>
         </ul>
     }
+    else if (ViewBag.ActiveModule == "Refunds")
+    {
+        <h3 class="sidebar-heading">Refunds</h3>
+        <ul class="sidebar-nav">
+            <li><a asp-controller="Refunds" asp-action="Index"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+            <li><a asp-controller="Refunds" asp-action="Index"><i class="bi bi-list-ul me-2"></i>All Refund</a></li>
+            <li><a asp-controller="Refunds" asp-action="Create"><i class="bi bi-currency-exchange me-2"></i>New Refund</a></li>
+        </ul>
+    }
+    else if (ViewBag.ActiveModule == "Waivers")
+    {
+        <h3 class="sidebar-heading">Waivers</h3>
+        <ul class="sidebar-nav">
+            <li><a asp-controller="Waivers" asp-action="Index"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+            <li><a asp-controller="Waivers" asp-action="Index"><i class="bi bi-list-ul me-2"></i>All Waiver</a></li>
+            <li><a asp-controller="Waivers" asp-action="Create"><i class="bi bi-hand-thumbs-up me-2"></i>New Waiver</a></li>
+        </ul>
+    }
     else
     {
         <ul class="sidebar-nav">
@@ -132,6 +151,8 @@
             <li><a asp-controller="Dealers" asp-action="Index"><i class="bi bi-shop me-2"></i>Dealers</a></li>
             <li><a asp-controller="Inventory" asp-action="Index"><i class="bi bi-box-seam me-2"></i>Inventory</a></li>
             <li><a asp-controller="Payments" asp-action="Index"><i class="bi bi-credit-card me-2"></i>Payments</a></li>
+            <li><a asp-controller="Refunds" asp-action="Index"><i class="bi bi-currency-exchange me-2"></i>Refunds</a></li>
+            <li><a asp-controller="Waivers" asp-action="Index"><i class="bi bi-hand-thumbs-up me-2"></i>Waivers</a></li>
             <li><a asp-controller="Schedules" asp-action="Index"><i class="bi bi-calendar-event me-2"></i>Schedules</a></li>
             <li><a asp-controller="Transfers" asp-action="Index"><i class="bi bi-arrow-left-right me-2"></i>Transfers</a></li>
             <li><a asp-controller="Sales" asp-action="Index"><i class="bi bi-bar-chart-line me-2"></i>Sales</a></li>

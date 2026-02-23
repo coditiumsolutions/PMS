@@ -172,6 +172,9 @@ public class CustomersController : Controller
                 .OrderBy(v => v)
                 .ToListAsync();
 
+            ViewBag.CityOptions = await GetCityOptionsAsync();
+            ViewBag.CountryOptions = await GetCountryOptionsAsync();
+
             ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
             ViewBag.DealerOptions = await _context.Dealers.Where(d => d.Status == "Active").OrderBy(d => d.DealershipName).ToListAsync();
 
@@ -198,6 +201,9 @@ public class CustomersController : Controller
             .Distinct()
             .OrderBy(v => v)
             .ToListAsync();
+
+        ViewBag.CityOptions = await GetCityOptionsAsync();
+        ViewBag.CountryOptions = await GetCountryOptionsAsync();
 
         ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
         ViewBag.DealerOptions = await _context.Dealers.Where(d => d.Status == "Active").OrderBy(d => d.DealershipName).ToListAsync();
@@ -247,6 +253,9 @@ public class CustomersController : Controller
             .Distinct()
             .OrderBy(v => v)
             .ToListAsync();
+
+        ViewBag.CityOptions = await GetCityOptionsAsync();
+        ViewBag.CountryOptions = await GetCountryOptionsAsync();
 
         ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
         ViewBag.DealerOptions = await _context.Dealers.Where(d => d.Status == "Active").OrderBy(d => d.DealershipName).ToListAsync();
@@ -466,6 +475,9 @@ public class CustomersController : Controller
             .Distinct()
             .OrderBy(v => v)
             .ToListAsync();
+
+        ViewBag.CityOptions = await GetCityOptionsAsync();
+        ViewBag.CountryOptions = await GetCountryOptionsAsync();
 
         ViewBag.PlanOptions = await _context.PaymentPlans.OrderBy(p => p.planno).Select(p => p.planno).Distinct().ToListAsync();
         ViewBag.DealerOptions = await _context.Dealers.Where(d => d.Status == "Active").OrderBy(d => d.DealershipName).ToListAsync();
@@ -1018,6 +1030,46 @@ public class CustomersController : Controller
     {
         var options = await _analyticsService.GetFilterOptionsAsync();
         return Json(options);
+    }
+
+    private async Task<List<string>> GetCityOptionsAsync()
+    {
+        // MultiValueConfigurations may store multiple cities in a single row as comma-separated text.
+        // Split them into individual dropdown values.
+        var rawCityValues = await _context.MultiConfigs
+            .Where(c => !string.IsNullOrWhiteSpace(c.ConfigValue)
+                        && !string.IsNullOrWhiteSpace(c.ConfigKey)
+                        && c.ConfigKey!.ToLower().Contains("city"))
+            .Select(c => c.ConfigValue)
+            .ToListAsync();
+
+        return rawCityValues
+            .SelectMany(v => (v ?? string.Empty)
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            .Where(v => !string.IsNullOrWhiteSpace(v))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(v => v)
+            .ToList();
+    }
+
+    private async Task<List<string>> GetCountryOptionsAsync()
+    {
+        // MultiValueConfigurations may store multiple countries in one row as comma-separated text.
+        // Split into distinct values for dropdown options.
+        var rawCountryValues = await _context.MultiConfigs
+            .Where(c => !string.IsNullOrWhiteSpace(c.ConfigValue)
+                        && !string.IsNullOrWhiteSpace(c.ConfigKey)
+                        && c.ConfigKey!.ToLower() == "country")
+            .Select(c => c.ConfigValue)
+            .ToListAsync();
+
+        return rawCountryValues
+            .SelectMany(v => (v ?? string.Empty)
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            .Where(v => !string.IsNullOrWhiteSpace(v))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(v => v)
+            .ToList();
     }
 
     private bool CustomerExists(string id)

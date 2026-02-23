@@ -1,0 +1,83 @@
+@model PMS.Web.Models.Refund
+
+@{
+    ViewData["Title"] = "Refund Details";
+}
+
+<div class="container-fluid">
+    <div class="mb-3">
+        <h2 class="mb-0">Refund Details</h2>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="row g-2 mb-2 align-items-center">
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.Uid)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.Uid)</div>
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.RefundType)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.RefundType)</div>
+            </div>
+
+            <div class="row g-2 mb-2 align-items-center">
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.CustomerNo)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.CustomerNo)</div>
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.CustomerName)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.CustomerName)</div>
+            </div>
+
+            <div class="row g-2 mb-2 align-items-center">
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.FatherName)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.FatherName)</div>
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.CNICNo)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.CNICNo)</div>
+            </div>
+
+            <div class="row g-2 mb-2 align-items-center">
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.TotalPaidAmount)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.TotalPaidAmount)</div>
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.RefundableAmount)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.RefundableAmount)</div>
+            </div>
+
+            <div class="row g-2 mb-2 align-items-center">
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.Deduction)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.Deduction)</div>
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.AmountToRefund)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.AmountToRefund)</div>
+            </div>
+
+            <div class="row g-2 mb-2 align-items-center">
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.Detail)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.Detail)</div>
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.ProjectName)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.ProjectName)</div>
+            </div>
+
+            <div class="row g-2 mb-2 align-items-center">
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.ApplicationNo)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.ApplicationNo)</div>
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.PlotSize)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.PlotSize)</div>
+            </div>
+
+            <div class="row g-2 mb-2 align-items-center">
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.PropertyDetail)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.PropertyDetail)</div>
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.CreatedDate)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.CreatedDate)</div>
+            </div>
+
+            <div class="row g-2 align-items-center">
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.CreatedBy)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.CreatedBy)</div>
+                <div class="col-12 col-md-2 fw-semibold">@Html.DisplayNameFor(model => model.IsActive)</div>
+                <div class="col-12 col-md-4">@Html.DisplayFor(model => model.IsActive)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3 d-flex justify-content-end gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Uid" class="btn btn-warning">Edit</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>

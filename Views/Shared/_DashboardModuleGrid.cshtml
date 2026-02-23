@@ -7,17 +7,18 @@
 @{
     var modules = new[]
     {
+        new { Name = "PMS", Icon = "bi-grid-1x2-fill", Description = "Open the Property Management dashboard", Link = "http://172.20.228.2:84/", Accent = "pms-accent-blue" },
         new { Name = "Registration", Icon = "bi-clipboard-check-fill", Description = "Manage property registrations and requests", Link = Url.Action("Index", "Registration"), Accent = "pms-accent-blue" },
         new { Name = "Customers", Icon = "bi-people-fill", Description = "Manage customer records, profiles, and history", Link = Url.Action("Index", "Customers"), Accent = "pms-accent-yellow" },
-        new { Name = "Payments", Icon = "bi-credit-card-fill", Description = "Process payments, view history, and manage collections", Link = Url.Action("Index", "Payments"), Accent = "pms-accent-blue" },
+        new { Name = "Payments", Icon = "bi-credit-card-fill", Description = "Process payments, view history, and manage collections", Link = Url.Action("Index", "Payments"), Accent = "pms-accent-payments" },
         new { Name = "Challans", Icon = "bi-file-earmark-text-fill", Description = "Create and manage deposit challans and verification", Link = Url.Action("AllChallans", "Payments"), Accent = "pms-accent-purple" },
-        new { Name = "Property", Icon = "bi-building", Description = "Property inventory, plots, allotment, and availability", Link = Url.Action("Index", "Inventory"), Accent = "pms-accent-teal" },
+        new { Name = "Property", Icon = "bi-building", Description = "Property inventory, plots, allotment, and availability", Link = Url.Action("Index", "Inventory"), Accent = "pms-accent-property-waiver" },
         new { Name = "Dealers", Icon = "bi-shop", Description = "Affiliated dealers and agents", Link = Url.Action("Index", "Dealers"), Accent = "pms-accent-yellow" },
         new { Name = "Transfer", Icon = "bi-arrow-left-right", Description = "Property transfers, buyer-seller workflows, and NOCs", Link = Url.Action("Index", "Transfers"), Accent = "pms-accent-orange" },
         new { Name = "Merger", Icon = "bi-diagram-3-fill", Description = "Plot merger and split operations", Link = Url.Action("Index", "Transfers"), Accent = "pms-accent-cyan" },
-        new { Name = "Refund", Icon = "bi-currency-exchange", Description = "Refund requests and processing", Link = Url.Action("Index", "Payments"), Accent = "pms-accent-yellow" },
-        new { Name = "Waiver", Icon = "bi-hand-thumbs-up-fill", Description = "Waiver approvals and fee exemptions", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-red" },
-        new { Name = "Billing Management", Icon = "bi-receipt", Description = "Invoices, dues, and payment schedules", Link = Url.Action("Index", "Schedules"), Accent = "pms-accent-indigo" },
+        new { Name = "Refund", Icon = "bi-currency-exchange", Description = "Refund requests and processing", Link = Url.Action("Index", "Refunds"), Accent = "pms-accent-yellow" },
+        new { Name = "Waiver", Icon = "bi-hand-thumbs-up-fill", Description = "Waiver approvals and fee exemptions", Link = Url.Action("Index", "Waivers"), Accent = "pms-accent-property-waiver" },
+        new { Name = "Billing Management", Icon = "bi-receipt", Description = "Invoices, dues, and payment schedules", Link = "http://172.20.228.2:83/Home", Accent = "pms-accent-indigo" },
         new { Name = "AI Reports", Icon = "bi-cpu-fill", Description = "Analytics, forecasts, and smart insights", Link = Url.Action("Index", "AIRAG"), Accent = "pms-accent-pink" },
         new { Name = "Warehouse", Icon = "bi-box-seam-fill", Description = "Inventory and warehouse management", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-green" },
         new { Name = "Setup", Icon = "bi-gear-fill", Description = "Configurations, projects, roles, and users", Link = Url.Action("Index", "Setup"), Accent = "pms-accent-blue" }

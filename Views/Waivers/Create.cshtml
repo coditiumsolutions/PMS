@@ -1,0 +1,218 @@
+@model PMS.Web.Models.Waiver
+
+@{
+    ViewData["Title"] = "Create Waiver";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Create Waiver</h2>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <label for="customerSearchNo" class="form-label fw-semibold mb-2">Search Customer By Customer No</label>
+            <div class="input-group">
+                <input type="text" id="customerSearchNo" class="form-control" placeholder="Enter Customer No (e.g. CUST001)" />
+                <button type="button" id="btnSearchCustomer" class="btn btn-outline-primary">Search</button>
+            </div>
+            <small id="customerSearchMessage" class="form-text text-muted d-block mt-2"></small>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-12 col-md-2">
+                        <label asp-for="WaiveOffType" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <select asp-for="WaiveOffType" class="form-select">
+                            <option value="">-- Select Waiver Type --</option>
+                            <option value="Full waiver">Full waiver</option>
+                            <option value="Partial Waiver">Partial Waiver</option>
+                        </select>
+                        <span asp-validation-for="WaiveOffType" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label asp-for="CustomerNo" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="CustomerNo" class="form-control" readonly />
+                        <span asp-validation-for="CustomerNo" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-12 col-md-2">
+                        <label asp-for="CustomerName" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="CustomerName" class="form-control" readonly />
+                        <span asp-validation-for="CustomerName" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label asp-for="ProjectName" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="ProjectName" class="form-control" readonly />
+                        <span asp-validation-for="ProjectName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-12 col-md-2">
+                        <label asp-for="PropertyDetail" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="PropertyDetail" class="form-control" readonly />
+                        <span asp-validation-for="PropertyDetail" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label asp-for="RequestedPlotType" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="RequestedPlotType" class="form-control" readonly />
+                        <span asp-validation-for="RequestedPlotType" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-12 col-md-2">
+                        <label asp-for="PaymentDesc" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <select asp-for="PaymentDesc" class="form-select">
+                            <option value="">-- Select Payment Description --</option>
+                            <option value="Token">Token</option>
+                            <option value="Land Charges">Land Charges</option>
+                            <option value="Dev Charges">Dev Charges</option>
+                            <option value="Surcharge">Surcharge</option>
+                            <option value="Restoration">Restoration</option>
+                            <option value="Corner Charges">Corner Charges</option>
+                        </select>
+                        <span asp-validation-for="PaymentDesc" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label asp-for="InstallmentNo" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="InstallmentNo" class="form-control" type="number" />
+                        <span asp-validation-for="InstallmentNo" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-12 col-md-2">
+                        <label asp-for="DueAmount" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="DueAmount" class="form-control" type="number" />
+                        <span asp-validation-for="DueAmount" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label asp-for="WaiveOffAmount" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="WaiveOffAmount" class="form-control" type="number" />
+                        <span asp-validation-for="WaiveOffAmount" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-12 col-md-2">
+                        <label asp-for="CreatedDate" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="CreatedDate" class="form-control" type="datetime-local" readonly />
+                        <span asp-validation-for="CreatedDate" class="text-danger"></span>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <label asp-for="CreatedBy" class="col-form-label"></label>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <input asp-for="CreatedBy" class="form-control" />
+                        <span asp-validation-for="CreatedBy" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary px-4">Create</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4 ms-2">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        (() => {
+            const searchInput = document.getElementById("customerSearchNo");
+            const searchButton = document.getElementById("btnSearchCustomer");
+            const messageEl = document.getElementById("customerSearchMessage");
+
+            const setMessage = (text, isError = false) => {
+                messageEl.textContent = text;
+                messageEl.classList.toggle("text-danger", isError);
+                messageEl.classList.toggle("text-success", !isError);
+                messageEl.classList.toggle("text-muted", false);
+            };
+
+            const fillField = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.value = value ?? "";
+                }
+            };
+
+            const lookupCustomer = async () => {
+                const customerNo = (searchInput?.value || "").trim();
+                if (!customerNo) {
+                    setMessage("Please enter Customer No first.", true);
+                    return;
+                }
+
+                setMessage("Searching customer...");
+
+                try {
+                    const response = await fetch(`@Url.Action("LookupCustomer", "Waivers")?customerNo=${encodeURIComponent(customerNo)}`, {
+                        method: "GET",
+                        headers: { "X-Requested-With": "XMLHttpRequest" }
+                    });
+
+                    const payload = await response.json();
+
+                    if (!response.ok || !payload.success) {
+                        setMessage(payload.message || "Customer not found.", true);
+                        return;
+                    }
+
+                    const data = payload.data || {};
+                    fillField("CustomerNo", data.customerNo);
+                    fillField("CustomerName", data.customerName);
+                    fillField("ProjectName", data.projectName);
+                    fillField("PropertyDetail", data.propertyDetail);
+                    fillField("RequestedPlotType", data.requestedPlotType);
+
+                    setMessage("Customer data loaded successfully.");
+                } catch {
+                    setMessage("Unable to fetch customer right now. Please try again.", true);
+                }
+            };
+
+            searchButton?.addEventListener("click", lookupCustomer);
+            searchInput?.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    lookupCustomer();
+                }
+            });
+        })();
+    </script>
+}

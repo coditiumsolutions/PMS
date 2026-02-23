@@ -1,7 +1,7 @@
 DATABASE SCHEMA REPORT
 ======================
 
-Generated: 2026-02-21 12:39:56
+Generated: 2026-02-23 11:26:02
 
 TABLE: dbo.BlockStatus
 ----------------------------
@@ -28,13 +28,6 @@ TABLE: dbo.Challan
 - verifiedby (varchar(50), nullable)
 - creationdate (date, nullable)
 - AmountPaid (int, default: ((0)))
-
-TABLE: dbo.Configuration
-----------------------------
-- UId (int, PK)
-- ConfigId (int, nullable)
-- ConfigKey (varchar(50), nullable)
-- ConfigValue (varchar(100), nullable)
 
 TABLE: dbo.Configurations
 ----------------------------
@@ -128,6 +121,12 @@ TABLE: dbo.JointOwners
 - jointcontactno (varchar(100), nullable)
 - jointaddress (varchar(100), nullable)
 
+TABLE: dbo.MultiValueConfigurations
+----------------------------
+- UId (int, PK)
+- ConfigKey (varchar(50))
+- ConfigValue (varchar(max))
+
 TABLE: dbo.Nominee
 ----------------------------
 - uid (int, PK)
@@ -194,6 +193,27 @@ TABLE: dbo.Projects
 - CreatedAt (datetime, nullable, default: (getdate()))
 - SubProject (nvarchar(100), default: ('MAIN'))
 - Prefix (nvarchar(50), nullable)
+
+TABLE: dbo.Refunds
+----------------------------
+- uid (int, PK)
+- RefundType (nvarchar(50))
+- CusomerNo (nvarchar(50))
+- CustomerName (nvarchar(150))
+- FatherName (nvarchar(150), nullable)
+- CNICNo (nvarchar(20))
+- TotalPaidAmount (bigint, nullable)
+- RefundableAmount (bigint, nullable)
+- Deduction (bigint, nullable)
+- AmountToRefund (bigint, nullable)
+- Detail (nvarchar(500), nullable)
+- ProjectName (nvarchar(150), nullable)
+- ApplicationNo (nvarchar(50), nullable)
+- PlotSize (nvarchar(50), nullable)
+- PropertyDetail (nvarchar(100), nullable)
+- CreatedDate (datetime, nullable, default: (getdate()))
+- CreatedBy (nvarchar(100), nullable)
+- IsActive (bit, nullable, default: ((1)))
 
 TABLE: dbo.Registration
 ----------------------------
@@ -290,6 +310,23 @@ TABLE: dbo.Users
 - CreatedBy (varchar(max), nullable)
 - CreatedOn (varchar(max), nullable)
 - History (varchar(max), nullable)
+
+TABLE: dbo.Waivers
+----------------------------
+- uid (int, PK)
+- CustomerNo (nvarchar(50))
+- ProjectName (nvarchar(150), nullable)
+- CustomerName (nvarchar(150))
+- WaiveOffType (nvarchar(100))
+- PaymentDesc (nvarchar(200), nullable)
+- InstallmentNo (int, nullable)
+- DueAmount (bigint, nullable)
+- PropertyDetail (nvarchar(150), nullable)
+- RequestedPlotType (nvarchar(100), nullable)
+- WaiveOffAmount (bigint, nullable)
+- CreatedDate (datetime, nullable, default: (getdate()))
+- CreatedBy (nvarchar(100), nullable)
+- IsActive (bit, nullable, default: ((1)))
 
 TABLE: dbo.__EFMigrationsHistory
 ----------------------------

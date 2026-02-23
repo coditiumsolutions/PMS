@@ -1,0 +1,34 @@
+@model PMS.Web.Models.MultiConfig
+
+@{
+    ViewData["Title"] = "Delete Multi Config";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Delete Multi Config</h2>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+
+    <div class="card shadow-sm border-danger">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Confirm Delete</h5>
+        </div>
+        <div class="card-body">
+            <p class="mb-3">Are you sure you want to delete this record?</p>
+            <dl class="row mb-0">
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ConfigKey)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.ConfigKey)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ConfigValue)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.ConfigValue)</dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-white">
+            <form asp-action="Delete" asp-route-id="@Model.UId" method="post" class="d-inline">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+</div>
